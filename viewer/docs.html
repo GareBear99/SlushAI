@@ -1,0 +1,1153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Documentation - SlushAI 3D Modeller</title>
+    <link rel="stylesheet" href="themes.css" />
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #1e1b4b 0%, #312e81 100%);
+            color: #fff;
+            min-height: 100vh;
+            padding: 40px 20px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 60px;
+        }
+
+        .header h1 {
+            font-size: 36px;
+            font-weight: 700;
+            margin-bottom: 10px;
+            background: linear-gradient(135deg, #f43f5e, #f97316);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .header p {
+            font-size: 14px;
+            color: rgba(255, 255, 255, 0.6);
+            letter-spacing: 0.05em;
+        }
+
+        .docs-grid {
+            display: grid;
+            gap: 30px;
+            margin-bottom: 60px;
+        }
+
+        .doc-card {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            padding: 40px;
+            transition: all 0.3s;
+            backdrop-filter: blur(10px);
+        }
+
+        .doc-card:hover {
+            border-color: rgba(249, 115, 22, 0.5);
+            transform: translateY(-4px);
+            box-shadow: 0 20px 40px rgba(249, 115, 22, 0.2);
+        }
+
+        .doc-icon {
+            font-size: 48px;
+            margin-bottom: 20px;
+        }
+
+        .doc-card h2 {
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: 12px;
+            color: #fff;
+        }
+
+        .doc-card p {
+            font-size: 14px;
+            line-height: 1.6;
+            color: rgba(255, 255, 255, 0.7);
+            margin-bottom: 24px;
+        }
+
+        .doc-links {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .doc-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 12px 20px;
+            background: rgba(249, 115, 22, 0.1);
+            border: 1px solid rgba(249, 115, 22, 0.3);
+            border-radius: 8px;
+            color: #f97316;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+
+        .doc-link:hover {
+            background: rgba(249, 115, 22, 0.2);
+            border-color: #f97316;
+            transform: translateX(4px);
+        }
+
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 12px 24px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            color: #fff;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.2s;
+            margin: 0 auto;
+            display: table;
+        }
+
+        .back-link:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: rgba(255, 255, 255, 0.2);
+        }
+
+        .highlight-box {
+            background: rgba(34, 197, 94, 0.1);
+            border: 2px solid rgba(34, 197, 94, 0.3);
+            border-radius: 12px;
+            padding: 20px;
+            margin-top: 40px;
+            transition: all 0.3s ease;
+        }
+        
+        .highlight-box:hover {
+            border-color: rgba(34, 197, 94, 0.6);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(34, 197, 94, 0.25);
+        }
+
+        .highlight-box h3 {
+            font-size: 16px;
+            font-weight: 600;
+            color: #22c55e;
+            margin-bottom: 12px;
+        }
+
+        .highlight-box ul {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        .highlight-box li {
+            font-size: 13px;
+            line-height: 1.8;
+            color: rgba(255, 255, 255, 0.8);
+            padding-left: 24px;
+            position: relative;
+        }
+
+        .highlight-box li:before {
+            content: "✓";
+            position: absolute;
+            left: 0;
+            color: #22c55e;
+            font-weight: bold;
+        }
+
+        .highlight-box li.no-check:before {
+            content: none;
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 28px;
+            }
+
+            .doc-card {
+                padding: 24px;
+            }
+
+            .doc-card h2 {
+                font-size: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📚 SlushAI Documentation</h1>
+            <p>Spatial Latent Understanding & Synthetic Hyper-Accuracy Intelligence</p>
+        </div>
+
+        <!-- Donations (First Card) -->
+        <div style="background: linear-gradient(135deg, rgba(236, 72, 153, 0.1), rgba(239, 68, 68, 0.1)); border: 2px solid rgba(236, 72, 153, 0.4); border-radius: 16px; padding: 30px; margin-bottom: 30px; text-align: center; transition: all 0.3s ease;" onmouseover="this.style.borderColor='rgba(236, 72, 153, 0.7)'; this.style.transform='translateY(-2px)'; this.style.boxShadow='0 8px 24px rgba(236, 72, 153, 0.3)'" onmouseout="this.style.borderColor='rgba(236, 72, 153, 0.4)'; this.style.transform='translateY(0)'; this.style.boxShadow='none'">
+            <div style="font-size: 48px; margin-bottom: 12px;">💝</div>
+            <h2 style="font-size: 22px; font-weight: 700; margin-bottom: 12px; color: #ec4899;">Support SlushAI</h2>
+            <p style="font-size: 15px; line-height: 1.6; color: rgba(255, 255, 255, 0.8); margin-bottom: 20px; max-width: 600px; margin-left: auto; margin-right: auto;">
+                Love SlushAI? Support the platform's development and infrastructure costs with a donation. 
+                Every contribution helps me (Founder) keep the service running and improve features for everyone.
+            </p>
+            <a href="/donate" style="display: inline-flex; align-items: center; gap: 8px; padding: 14px 32px; background: linear-gradient(135deg, #ec4899, #ef4444); color: white; text-decoration: none; border-radius: 12px; font-weight: 600; font-size: 16px; transition: all 0.3s ease; box-shadow: 0 4px 12px rgba(236, 72, 153, 0.3);" onmouseover="this.style.transform='scale(1.05)'; this.style.boxShadow='0 6px 20px rgba(236, 72, 153, 0.5)'" onmouseout="this.style.transform='scale(1)'; this.style.boxShadow='0 4px 12px rgba(236, 72, 153, 0.3)'">
+                <span style="font-size: 20px;">💖</span>
+                <span>Make a Donation</span>
+            </a>
+        </div>
+
+        <!-- Terms of Service (Moved here from bottom) -->
+        <div style="background: rgba(255, 255, 255, 0.05); border: 2px solid rgba(139, 92, 246, 0.3); border-radius: 16px; padding: 30px; margin-bottom: 30px; transition: all 0.3s ease;" onmouseover="this.style.borderColor='rgba(139, 92, 246, 0.6)'; this.style.transform='translateY(-2px)'; this.style.boxShadow='0 8px 24px rgba(139, 92, 246, 0.2)'" onmouseout="this.style.borderColor='rgba(139, 92, 246, 0.3)'; this.style.transform='translateY(0)'; this.style.boxShadow='none'">
+            <div style="font-size: 32px; margin-bottom: 12px;">📜</div>
+            <h2 style="font-size: 20px; font-weight: 600; margin-bottom: 12px; color: #fff;">Terms of Service</h2>
+            <p style="font-size: 14px; line-height: 1.6; color: rgba(255, 255, 255, 0.8); margin-bottom: 16px;">
+                Our Terms of Service outline the rules and regulations for using SlushAI 3D Modeller. 
+                By accessing this service, you agree to be bound by these terms.
+            </p>
+            <a href="/docs/terms" style="display: inline-flex; align-items: center; gap: 8px; padding: 12px 24px; background: rgba(139, 92, 246, 0.2); color: white; text-decoration: none; border-radius: 8px; font-weight: 600; font-size: 14px; transition: all 0.3s ease; border: 1px solid rgba(139, 92, 246, 0.4);" onmouseover="this.style.background='rgba(139, 92, 246, 0.3)'; this.style.borderColor='rgba(139, 92, 246, 0.6)'" onmouseout="this.style.background='rgba(139, 92, 246, 0.2)'; this.style.borderColor='rgba(139, 92, 246, 0.4)'">
+                <span style="font-size: 18px;">📖</span>
+                <span>Read Terms of Service</span>
+            </a>
+        </div>
+
+        <!-- Overview Section -->
+        <div style="background: rgba(255, 255, 255, 0.05); border: 2px solid rgba(59, 130, 246, 0.3); border-radius: 16px; padding: 30px; margin-bottom: 40px; transition: all 0.3s ease;" onmouseover="this.style.borderColor='rgba(59, 130, 246, 0.6)'; this.style.transform='translateY(-2px)'; this.style.boxShadow='0 8px 24px rgba(59, 130, 246, 0.2)'" onmouseout="this.style.borderColor='rgba(59, 130, 246, 0.3)'; this.style.transform='translateY(0)'; this.style.boxShadow='none'">
+            <h2 style="font-size: 20px; font-weight: 600; margin-bottom: 8px; color: #fff;">📋 Documentation Overview</h2>
+            <p style="font-size: 13px; color: rgba(255, 255, 255, 0.6); margin-bottom: 4px; font-style: italic;">
+                Spatial Latent Understanding & Synthetic Hyper-Accuracy Intelligence
+            </p>
+            <p style="font-size: 12px; color: rgba(255, 215, 0, 0.8); margin-bottom: 4px; font-weight: 600;">
+                👑 Founded by Gary Richard Doman
+            </p>
+            <p style="font-size: 11px; margin-bottom: 16px;">
+                <a href="https://www.youtube.com/@gfgfvmhj" target="_blank" style="color: #ff0000; text-decoration: none; font-weight: 500;">
+                    🎥 GareBearProductionz/TizWildinEntertainment
+                </a>
+            </p>
+            <p style="font-size: 14px; line-height: 1.8; color: rgba(255, 255, 255, 0.8); margin-bottom: 12px;">
+                Welcome to SlushAI 3D Modeller - an AI-powered platform that transforms 2D images into high-quality 3D models. 
+                Our intelligent system handles everything from generation to storage management, with comprehensive security and fair-use policies.
+            </p>
+            <div style="background: rgba(59, 130, 246, 0.1); border-left: 4px solid #3b82f6; padding: 16px; border-radius: 8px; margin-bottom: 16px;">
+                <div style="font-size: 13px; font-weight: 600; color: #3b82f6; margin-bottom: 8px;">🚀 How to Use SlushAI</div>
+                <ol style="margin: 0; padding-left: 20px; font-size: 13px; line-height: 1.8; color: rgba(255, 255, 255, 0.8);">
+                    <li><strong>Sign Up:</strong> Create a free account with Google, Facebook, or email verification</li>
+                    <li><strong>Upload:</strong> Select a 2D image to convert into a 3D model</li>
+                    <li><strong>Generate:</strong> Our AI processes your image using TripoSR technology</li>
+                    <li><strong>View & Download:</strong> Interact with your 3D model in real-time and download GLB files</li>
+                    <li><strong>Manage:</strong> Save, favorite, or let temporary models auto-delete based on your plan</li>
+                </ol>
+            </div>
+            <div style="background: rgba(34, 197, 94, 0.1); border-left: 4px solid #22c55e; padding: 20px; border-radius: 8px; margin-bottom: 16px;">
+                <div style="font-size: 15px; font-weight: 700; color: #22c55e; margin-bottom: 12px; display: flex; align-items: center; gap: 8px;">
+                    <span style="font-size: 20px;">✨</span>
+                    <span>Key Features</span>
+                </div>
+                <ul style="margin: 0; padding-left: 0; font-size: 13px; line-height: 2; color: rgba(255, 255, 255, 0.8); list-style: none; display: grid; gap: 8px;">
+                    <li style="padding: 8px 12px; background: rgba(34, 197, 94, 0.08); border-radius: 6px; display: flex; align-items: flex-start; gap: 10px;">
+                        <span style="font-size: 18px; flex-shrink: 0;">⚡</span>
+                        <span><strong style="color: #22c55e;">AI-Powered Generation:</strong> High-quality 3D models from single images</span>
+                    </li>
+                    <li style="padding: 8px 12px; background: rgba(34, 197, 94, 0.08); border-radius: 6px; display: flex; align-items: flex-start; gap: 10px;">
+                        <span style="font-size: 18px; flex-shrink: 0;">💾</span>
+                        <span><strong style="color: #22c55e;">Smart Storage:</strong> Auto-cleanup with save/favorite system (permanent favorites)</span>
+                    </li>
+                    <li style="padding: 8px 12px; background: rgba(34, 197, 94, 0.08); border-radius: 6px; display: flex; align-items: flex-start; gap: 10px;">
+                        <span style="font-size: 18px; flex-shrink: 0;">📊</span>
+                        <span><strong style="color: #22c55e;">Activity Tracking:</strong> Complete logs of generations, saves, and deletions (30-day retention)</span>
+                    </li>
+                    <li style="padding: 8px 12px; background: rgba(34, 197, 94, 0.08); border-radius: 6px; display: flex; align-items: flex-start; gap: 10px;">
+                        <span style="font-size: 18px; flex-shrink: 0;">🔒</span>
+                        <span><strong style="color: #22c55e;">Multi-Tier Security:</strong> Progressive blocking, attack detection, and rate limiting</span>
+                    </li>
+                    <li style="padding: 8px 12px; background: rgba(34, 197, 94, 0.08); border-radius: 6px; display: flex; align-items: flex-start; gap: 10px;">
+                        <span style="font-size: 18px; flex-shrink: 0;">🏆</span>
+                        <span><strong style="color: #22c55e;">Badge System:</strong> Earn badges from Newcomer to Legend based on completed models</span>
+                    </li>
+                    <li style="padding: 8px 12px; background: rgba(34, 197, 94, 0.08); border-radius: 6px; display: flex; align-items: flex-start; gap: 10px;">
+                        <span style="font-size: 18px; flex-shrink: 0;">💳</span>
+                        <span><strong style="color: #22c55e;">Flexible Payments:</strong> Credit cards, crypto (BTC/ETH), or quick $1 refills</span>
+                    </li>
+                    <li style="padding: 8px 12px; background: rgba(34, 197, 94, 0.08); border-radius: 6px; display: flex; align-items: flex-start; gap: 10px;">
+                        <span style="font-size: 18px; flex-shrink: 0;">📈</span>
+                        <span><strong style="color: #22c55e;">Three Tiers:</strong> Free (10/week), Standard (40/week), Pro (120/week)</span>
+                    </li>
+                </ul>
+            </div>
+            <div style="background: rgba(249, 115, 22, 0.1); border-left: 4px solid #f97316; padding: 16px; border-radius: 8px; margin-bottom: 16px;">
+                <div style="font-size: 13px; font-weight: 600; color: #f97316; margin-bottom: 8px;">🏛️ Interface Tabs & Features</div>
+                <div style="display: grid; gap: 12px;">
+                    <div>
+                        <div style="font-size: 12px; color: #f97316; font-weight: 600; margin-bottom: 4px;">🎲 Generate Tab</div>
+                        <div style="font-size: 12px; color: rgba(255, 255, 255, 0.7);">Upload images, start AI generation, monitor real-time progress with 3-worker queue system</div>
+                    </div>
+                    <div>
+                        <div style="font-size: 12px; color: #f97316; font-weight: 600; margin-bottom: 4px;">👁️ Viewer Tab</div>
+                        <div style="font-size: 12px; color: rgba(255, 255, 255, 0.7);">Interactive 3D viewer with orbit controls, download GLB files, take screenshots, view model details</div>
+                    </div>
+                    <div>
+                        <div style="font-size: 12px; color: #f97316; font-weight: 600; margin-bottom: 4px;">⭐ Favorites Tab</div>
+                        <div style="font-size: 12px; color: rgba(255, 255, 255, 0.7);">View all models with Save/Unsave and Favorite buttons, favorited models auto-save permanently (cannot unsave),<br>
+                        unsaved models delete after retention period</div>
+                    </div>
+                    <div>
+                        <div style="font-size: 12px; color: #f97316; font-weight: 600; margin-bottom: 4px;">🖼️ Screenshots Tab</div>
+                        <div style="font-size: 12px; color: rgba(255, 255, 255, 0.7);">Gallery of captured screenshots with timestamps, download or delete images, 1-minute cooldown</div>
+                    </div>
+                    <div>
+                        <div style="font-size: 12px; color: #f97316; font-weight: 600; margin-bottom: 4px;">👤 Account Tab</div>
+                        <div style="font-size: 12px; color: rgba(255, 255, 255, 0.7);">View profile, check quota usage, see badge progress, manage subscription, view activity history</div>
+                    </div>
+                    <div>
+                        <div style="font-size: 12px; color: #f97316; font-weight: 600; margin-bottom: 4px;">🐛 Issues Tab</div>
+                        <div style="font-size: 12px; color: rgba(255, 255, 255, 0.7);">Report bugs, submit feature requests, track issue status, admin/moderator moderation tools (access separate from capacity limits)</div>
+                    </div>
+                    <div>
+                        <div style="font-size: 12px; color: #f97316; font-weight: 600; margin-bottom: 4px;">📊 Queue Status</div>
+                        <div style="font-size: 12px; color: rgba(255, 255, 255, 0.7);">Real-time queue monitoring, see active workers (1-3 concurrent), position in queue, ETA display</div>
+                    </div>
+                </div>
+            </div>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 16px; margin-top: 20px;">
+                <div style="background: rgba(249, 115, 22, 0.1); border: 2px solid rgba(249, 115, 22, 0.3); border-radius: 8px; padding: 16px; transition: all 0.3s ease; cursor: pointer;" onmouseover="this.style.borderColor='rgba(249, 115, 22, 0.6)'; this.style.transform='translateY(-4px)'; this.style.boxShadow='0 8px 24px rgba(249, 115, 22, 0.25)'" onmouseout="this.style.borderColor='rgba(249, 115, 22, 0.3)'; this.style.transform='translateY(0)'; this.style.boxShadow='none'">
+                    <div style="font-weight: 600; color: #f97316; margin-bottom: 8px;">🎯 Getting Started</div>
+                    <div style="font-size: 13px; color: rgba(255, 255, 255, 0.7);">Sign in with Google or Facebook to generate your first 3D model</div>
+                </div>
+                <div style="background: rgba(34, 197, 94, 0.1); border: 2px solid rgba(34, 197, 94, 0.3); border-radius: 8px; padding: 16px; transition: all 0.3s ease; cursor: pointer;" onmouseover="this.style.borderColor='rgba(34, 197, 94, 0.6)'; this.style.transform='translateY(-4px)'; this.style.boxShadow='0 8px 24px rgba(34, 197, 94, 0.25)'" onmouseout="this.style.borderColor='rgba(34, 197, 94, 0.3)'; this.style.transform='translateY(0)'; this.style.boxShadow='none'">
+                    <div style="font-weight: 600; color: #22c55e; margin-bottom: 8px;">⚡ Free Tier</div>
+                    <div style="font-size: 13px; color: rgba(255, 255, 255, 0.7);">10 free model generations per week, 10 favorites, 32 total models</div>
+                </div>
+                <div style="background: rgba(59, 130, 246, 0.1); border: 2px solid rgba(59, 130, 246, 0.3); border-radius: 8px; padding: 16px; transition: all 0.3s ease; cursor: pointer;" onmouseover="this.style.borderColor='rgba(59, 130, 246, 0.6)'; this.style.transform='translateY(-4px)'; this.style.boxShadow='0 8px 24px rgba(59, 130, 246, 0.25)'" onmouseout="this.style.borderColor='rgba(59, 130, 246, 0.3)'; this.style.transform='translateY(0)'; this.style.boxShadow='none'">
+                    <div style="font-weight: 600; color: #3b82f6; margin-bottom: 8px;">🔒 Secure by Design</div>
+                    <div style="font-size: 13px; color: rgba(255, 255, 255, 0.7);">Multi-tier protection, rate limiting, and attack detection</div>
+                </div>
+            </div>
+            
+            <!-- User Capacity Section -->
+            <div id="capacity" style="margin-top: 24px; padding: 20px; background: rgba(139, 92, 246, 0.1); border: 1px solid rgba(139, 92, 246, 0.3); border-radius: 12px;">
+                <h3 style="font-size: 16px; font-weight: 600; color: #8b5cf6; margin-bottom: 12px;">📈 Platform Capacity (1000GB Infrastructure)</h3>
+                <p style="font-size: 13px; color: rgba(255, 255, 255, 0.7); margin-bottom: 16px;">
+                    SlushAI is currently in controlled growth phase with carefully managed user capacity to ensure optimal performance and reliability for all users.
+                </p>
+                <!-- Staff/Founder Section -->
+                <div style="margin-bottom: 16px; padding: 14px; background: rgba(255, 215, 0, 0.15); border: 2px solid rgba(255, 215, 0, 0.4); border-radius: 8px;">
+                    <div style="font-size: 13px; font-weight: 600; color: #ffd700; margin-bottom: 8px;">♟️ Platform Staff</div>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 8px; font-size: 11px;">
+                        <div style="padding: 8px; background: rgba(255, 215, 0, 0.1); border-radius: 6px;">
+                            <div style="color: #ffd700; font-weight: 600;">👑 Founder</div>
+                            <div style="color: rgba(255, 215, 0, 0.8); font-size: 11px; font-weight: 600; margin-bottom: 2px;">@GareBearProductionz</div>
+                            <div style="color: rgba(255, 255, 255, 0.9); font-size: 10px; margin-bottom: 2px;">Gary Richard Doman</div>
+                            <div style="color: rgba(255, 255, 255, 0.7); font-size: 10px;" id="founder-info">Not logged in</div>
+                        </div>
+                        <div style="padding: 8px; background: rgba(139, 92, 246, 0.1); border-radius: 6px;">
+                            <div style="color: #8b5cf6; font-weight: 600;">🛡️ Moderators</div>
+                            <div style="color: rgba(255, 255, 255, 0.7); font-size: 10px;" id="moderator-info">0/0 logged in (5 max)</div>
+                        </div>
+                        <div style="padding: 8px; background: rgba(239, 68, 68, 0.1); border-radius: 6px;">
+                            <div style="color: #ef4444; font-weight: 600;">⚙️ Admins</div>
+                            <div style="color: rgba(255, 255, 255, 0.7); font-size: 10px;" id="admin-info">0/0 logged in (3 max)</div>
+                        </div>
+                    </div>
+                    <div style="margin-top: 8px; font-size: 10px; color: rgba(255, 255, 255, 0.5); text-align: center;">
+                        Staff members have 50GB storage each • Founder has unlimited<br>
+                        Staff can access Shared Generated Assets tab for platform-wide model management
+                    </div>
+                </div>
+                
+                <!-- User Tier Capacity -->
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px;">
+                    <div style="background: rgba(34, 197, 94, 0.15); border: 1px solid rgba(34, 197, 94, 0.3); border-radius: 8px; padding: 14px;">
+                        <div style="font-size: 12px; color: rgba(255, 255, 255, 0.6); margin-bottom: 4px;">🎁 Free Tier</div>
+                        <div style="font-size: 20px; font-weight: 700; color: #22c55e; margin-bottom: 2px;" id="free-count">0/200 Users</div>
+                        <div style="font-size: 12px; color: #22c55e; font-weight: 600; margin-bottom: 4px;" id="free-available">✓ 200 slots available</div>
+                        <div style="font-size: 11px; color: rgba(255, 255, 255, 0.5);" id="free-utilization">~0GB / 64GB (0% utilization)</div>
+                    </div>
+                    <div style="background: rgba(249, 115, 22, 0.15); border: 1px solid rgba(249, 115, 22, 0.3); border-radius: 8px; padding: 14px;">
+                        <div style="font-size: 12px; color: rgba(255, 255, 255, 0.6); margin-bottom: 4px;">⭐ Standard Tier</div>
+                        <div style="font-size: 20px; font-weight: 700; color: #f97316; margin-bottom: 2px;" id="standard-count">0/50 Users</div>
+                        <div style="font-size: 12px; color: #f97316; font-weight: 600; margin-bottom: 4px;" id="standard-available">✓ 50 slots available</div>
+                        <div style="font-size: 11px; color: rgba(255, 255, 255, 0.5);" id="standard-utilization">~0GB / 75GB (0% utilization)</div>
+                    </div>
+                    <div style="background: rgba(139, 92, 246, 0.15); border: 1px solid rgba(139, 92, 246, 0.3); border-radius: 8px; padding: 14px;">
+                        <div style="font-size: 12px; color: rgba(255, 255, 255, 0.6); margin-bottom: 4px;">👑 Pro Tier</div>
+                        <div style="font-size: 20px; font-weight: 700; color: #8b5cf6; margin-bottom: 2px;" id="pro-count">0/20 Users</div>
+                        <div style="font-size: 12px; color: #8b5cf6; font-weight: 600; margin-bottom: 4px;" id="pro-available">✓ 20 slots available</div>
+                        <div style="font-size: 11px; color: rgba(255, 255, 255, 0.5);" id="pro-utilization">~0GB / 100GB (0% utilization)</div>
+                    </div>
+                    <div style="background: rgba(59, 130, 246, 0.15); border: 1px solid rgba(59, 130, 246, 0.3); border-radius: 8px; padding: 14px;">
+                        <div style="font-size: 12px; color: rgba(255, 255, 255, 0.6); margin-bottom: 4px;">📊 Total Capacity</div>
+                        <div style="font-size: 20px; font-weight: 700; color: #3b82f6; margin-bottom: 2px;" id="total-count">0/279 Users</div>
+                        <div style="font-size: 12px; color: #3b82f6; font-weight: 600; margin-bottom: 4px;" id="total-available">✓ 270 user slots available</div>
+                        <div style="font-size: 11px; color: rgba(255, 255, 255, 0.5);" id="total-utilization">~0GB / 239GB (0% utilization)</div>
+                        <div style="font-size: 10px; color: rgba(255, 255, 255, 0.4); margin-top: 2px;">+9 staff (not counted in slots)</div>
+                    </div>
+                    <div style="background: rgba(168, 85, 247, 0.15); border: 1px solid rgba(168, 85, 247, 0.3); border-radius: 8px; padding: 14px;">
+                        <div style="font-size: 12px; color: rgba(255, 255, 255, 0.6); margin-bottom: 4px;">👷 Active Workers</div>
+                        <div style="font-size: 20px; font-weight: 700; color: #a855f7; margin-bottom: 2px;" id="workers-count">0/3 Processing</div>
+                        <div style="font-size: 12px; color: #a855f7; font-weight: 600; margin-bottom: 4px;" id="workers-status">✓ Ready</div>
+                        <div style="font-size: 11px; color: rgba(255, 255, 255, 0.5);" id="workers-queue">0 tasks in queue</div>
+                        <div style="font-size: 10px; color: rgba(255, 255, 255, 0.4); margin-top: 4px;" id="workers-total">0 total processed</div>
+                    </div>
+                </div>
+                <div style="margin-top: 16px; padding: 12px; background: rgba(0, 0, 0, 0.3); border-radius: 6px;">
+                    <div style="font-size: 12px; color: rgba(255, 255, 255, 0.8); line-height: 1.6;">
+                        <strong>⚠️ Registration Notice:</strong> When a tier reaches capacity, new signups for that tier will be temporarily paused. 
+                        Users can upgrade to a higher tier with available capacity. We regularly expand capacity based on demand.
+                    </div>
+                </div>
+                <div style="margin-top: 12px; font-size: 11px; color: rgba(255, 255, 255, 0.5); text-align: center;">
+                    🚧 Infrastructure scales as needed • Priority given to paid tiers • Fair usage for all
+                </div>
+                
+                <!-- User List Button (Public) -->
+                <div style="margin-top: 16px; text-align: center;">
+                    <button onclick="window.open('/users', '_blank')" style="padding: 10px 20px; background: linear-gradient(135deg, #8b5cf6, #6366f1); color: white; border: none; border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer; box-shadow: 0 4px 12px rgba(139, 92, 246, 0.3); transition: all 0.2s;" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 16px rgba(139, 92, 246, 0.4)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 12px rgba(139, 92, 246, 0.3)'">
+                        👥 View User List
+                    </button>
+                    <div style="margin-top: 6px; font-size: 10px; color: rgba(255, 255, 255, 0.4);">
+                        Public directory: Usernames and membership status only<br>
+                        <span style="font-size: 9px;">(Staff can look up full details in Issues moderation page)</span>
+                    </div>
+                </div>
+                
+                <!-- Subscription Plans (Under Platform Capacity) -->
+                <div style="margin-top: 20px; padding: 20px; background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(139, 92, 246, 0.2); border-radius: 12px;">
+                    <h3 style="font-size: 16px; font-weight: 600; color: #a78bfa; margin-bottom: 12px;">💎 Subscription Plans</h3>
+                    <p style="font-size: 13px; color: rgba(255, 255, 255, 0.7); margin-bottom: 16px;">
+                        Choose the plan that fits your needs. All plans include badge progression, screenshot gallery, 
+                        and generous storage with automatic cleanup for unfavorited models.
+                    </p>
+                    <div style="display: grid; gap: 16px; font-size: 13px;">
+                        <div>
+                            <div style="font-weight: 600; color: #22c55e; margin-bottom: 6px;">🎁 Free Plan - $0 USD/week</div>
+                            <ul style="margin: 0; padding-left: 20px; color: rgba(255, 255, 255, 0.7); line-height: 1.8;">
+                                <li>10 models per week</li>
+                                <li>Standard queue priority</li>
+                                <li><strong>10 favorites max</strong>, 32 total models stored</li>
+                                <li><strong>36-hour auto-deletion</strong> for unsaved models</li>
+                                <li style="color: #22c55e; font-weight: 600;">💾 Up to 32 models can be saved total</li>
+                                <li style="color: #fbbf24; font-weight: 600;">👥 Limited to 200 users (capacity enforcement)</li>
+                            </ul>
+                        </div>
+                        <div>
+                            <div style="font-weight: 600; color: #f97316; margin-bottom: 6px;">⭐ Standard Plan - $3.47 USD/week (or $72 USD/year, save 60%)</div>
+                            <ul style="margin: 0; padding-left: 20px; color: rgba(255, 255, 255, 0.7); line-height: 1.8;">
+                                <li>40 models per week</li>
+                                <li>Priority queue</li>
+                                <li>Higher resolution (512px)</li>
+                                <li>Email support</li>
+                                <li><strong>50 favorites max</strong>, 150 total models stored</li>
+                                <li><strong>14-day auto-deletion</strong> for unsaved models</li>
+                                <li style="color: #f97316; font-weight: 600;">💾 Up to 150 models can be saved total</li>
+                                <li style="color: #fbbf24; font-weight: 600;">👥 Limited to 50 users (capacity enforcement)</li>
+                            </ul>
+                        </div>
+                        <div>
+                            <div style="font-weight: 600; color: #8b5cf6; margin-bottom: 6px;">👑 Pro Plan - $7.89 USD/week (or $164 USD/year, save 60%)</div>
+                            <ul style="margin: 0; padding-left: 20px; color: rgba(255, 255, 255, 0.7); line-height: 1.8;">
+                                <li>120 models per week</li>
+                                <li>Highest priority queue</li>
+                                <li>Max resolution (1024px)</li>
+                                <li>API access</li>
+                                <li>Premium support</li>
+                                <li><strong>150 favorites max</strong>, 500 total models stored</li>
+                                <li><strong>30-day auto-deletion</strong> for unsaved models</li>
+                                <li style="color: #8b5cf6; font-weight: 600;">💾 Up to 500 models can be saved total</li>
+                                <li style="color: #fbbf24; font-weight: 600;">👥 Limited to 20 users (capacity enforcement)</li>
+                            </ul>
+                        </div>
+                        <div style="border-top: 1px solid rgba(255, 255, 255, 0.1); padding-top: 12px;">
+                            <div style="font-weight: 600; color: #3b82f6; margin-bottom: 6px;">⚡ Quick Refill - $1.00 USD</div>
+                            <ul style="margin: 0; padding-left: 20px; color: rgba(255, 255, 255, 0.7); line-height: 1.8;">
+                                <li>+10 models instantly added to your current quota</li>
+                                <li>No subscription required</li>
+                                <li>Max 100 refills per week</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div style="margin-top: 16px; padding: 14px; background: rgba(255, 215, 0, 0.1); border: 1px solid rgba(255, 215, 0, 0.3); border-radius: 8px;">
+                        <div style="font-size: 12px; font-weight: 600; color: #ffd700; margin-bottom: 6px;">⚠️ Capacity Limits (1000GB Infrastructure)</div>
+                        <div style="font-size: 12px; color: rgba(255, 255, 255, 0.8); line-height: 1.6;">
+                            <strong>User Registration Limits:</strong>
+                            <ul style="margin: 4px 0 0 20px; padding: 0;">
+                                <li>🎁 <strong>Free:</strong> 200 users maximum (32 models each = ~64GB total)</li>
+                                <li>⭐ <strong>Standard:</strong> 50 users maximum (150 models each = ~75GB total)</li>
+                                <li>👑 <strong>Pro:</strong> 20 users maximum (500 models each = ~100GB total)</li>
+                            </ul>
+                            When a tier reaches capacity, new signups for that tier are paused. You can upgrade to a higher tier with available capacity.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="docs-grid">
+            <!-- Privacy Policy -->
+            <div class="doc-card">
+                <div class="doc-icon">🔒</div>
+                <h2>Privacy Policy</h2>
+                <p>
+                    Our Privacy Policy explains how we collect, use, and protect your personal information. 
+                    We are committed to protecting your privacy and handling your data transparently.
+                </p>
+                <div class="doc-links">
+                    <a href="/docs/privacy" class="doc-link">
+                        <span>📖</span>
+                        <span>Read Privacy Policy</span>
+                    </a>
+                </div>
+            </div>
+
+            <!-- API Documentation -->
+            <div class="doc-card">
+                <div class="doc-icon">🔌</div>
+                <h2>API Documentation</h2>
+                <p>
+                    Complete API reference for developers. Learn how to integrate SlushAI 3D generation 
+                    into your applications with OAuth authentication and RESTful endpoints.
+                </p>
+                <div class="doc-links">
+                    <a href="/docs/api" class="doc-link">
+                        <span>💻</span>
+                        <span>View API Reference</span>
+                    </a>
+                </div>
+                
+                <!-- API Navigation Legend -->
+                <div style="margin-top: 20px; padding: 18px; background: rgba(59, 130, 246, 0.05); border: 1px solid rgba(59, 130, 246, 0.25); border-radius: 10px;">
+                    <div style="font-size: 14px; font-weight: 600; color: #60a5fa; margin-bottom: 14px; display: flex; align-items: center; gap: 8px;">
+                        <span>📑</span>
+                        <span>Quick Navigation - Jump to Section</span>
+                    </div>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 8px;">
+                        <a href="#api-endpoints" style="display: flex; align-items: center; gap: 6px; padding: 8px 10px; background: rgba(59, 130, 246, 0.15); border: 1px solid rgba(59, 130, 246, 0.3); border-radius: 6px; color: #fff; text-decoration: none; font-size: 12px; font-weight: 500; transition: all 0.2s;" onmouseover="this.style.background='rgba(59, 130, 246, 0.25)'; this.style.transform='translateX(4px)';" onmouseout="this.style.background='rgba(59, 130, 246, 0.15)'; this.style.transform='translateX(0)';">
+                            <span>🌐</span>
+                            <span>Public Endpoints</span>
+                        </a>
+                        <a href="#api-health" style="display: flex; align-items: center; gap: 6px; padding: 8px 10px; background: rgba(59, 130, 246, 0.15); border: 1px solid rgba(59, 130, 246, 0.3); border-radius: 6px; color: #fff; text-decoration: none; font-size: 12px; font-weight: 500; transition: all 0.2s;" onmouseover="this.style.background='rgba(59, 130, 246, 0.25)'; this.style.transform='translateX(4px)';" onmouseout="this.style.background='rgba(59, 130, 246, 0.15)'; this.style.transform='translateX(0)';">
+                            <span>🟢</span>
+                            <span>GET /api/health</span>
+                        </a>
+                        <a href="#api-capacity" style="display: flex; align-items: center; gap: 6px; padding: 8px 10px; background: rgba(59, 130, 246, 0.15); border: 1px solid rgba(59, 130, 246, 0.3); border-radius: 6px; color: #fff; text-decoration: none; font-size: 12px; font-weight: 500; transition: all 0.2s;" onmouseover="this.style.background='rgba(59, 130, 246, 0.25)'; this.style.transform='translateX(4px)';" onmouseout="this.style.background='rgba(59, 130, 246, 0.15)'; this.style.transform='translateX(0)';">
+                            <span>🟢</span>
+                            <span>GET /api/capacity</span>
+                        </a>
+                        <a href="#api-check-username" style="display: flex; align-items: center; gap: 6px; padding: 8px 10px; background: rgba(59, 130, 246, 0.15); border: 1px solid rgba(59, 130, 246, 0.3); border-radius: 6px; color: #fff; text-decoration: none; font-size: 12px; font-weight: 500; transition: all 0.2s;" onmouseover="this.style.background='rgba(59, 130, 246, 0.25)'; this.style.transform='translateX(4px)';" onmouseout="this.style.background='rgba(59, 130, 246, 0.15)'; this.style.transform='translateX(0)';">
+                            <span>🟣</span>
+                            <span>POST /check-username</span>
+                        </a>
+                        <a href="#api-example" style="display: flex; align-items: center; gap: 6px; padding: 8px 10px; background: rgba(59, 130, 246, 0.15); border: 1px solid rgba(59, 130, 246, 0.3); border-radius: 6px; color: #fff; text-decoration: none; font-size: 12px; font-weight: 500; transition: all 0.2s;" onmouseover="this.style.background='rgba(59, 130, 246, 0.25)'; this.style.transform='translateX(4px)';" onmouseout="this.style.background='rgba(59, 130, 246, 0.15)'; this.style.transform='translateX(0)';">
+                            <span>📝</span>
+                            <span>Example Usage</span>
+                        </a>
+                        <a href="/docs/api" style="display: flex; align-items: center; gap: 6px; padding: 8px 10px; background: rgba(249, 115, 22, 0.15); border: 1px solid rgba(249, 115, 22, 0.3); border-radius: 6px; color: #fff; text-decoration: none; font-size: 12px; font-weight: 500; transition: all 0.2s;" onmouseover="this.style.background='rgba(249, 115, 22, 0.25)'; this.style.transform='translateX(4px)';" onmouseout="this.style.background='rgba(249, 115, 22, 0.15)'; this.style.transform='translateX(0)';">
+                            <span>🔗</span>
+                            <span>Full API Docs</span>
+                        </a>
+                    </div>
+                </div>
+                
+                <!-- Public API Endpoints -->
+                <div id="api-endpoints" style="margin-top: 24px; padding: 20px; background: rgba(59, 130, 246, 0.1); border: 1px solid rgba(59, 130, 246, 0.3); border-radius: 12px; scroll-margin-top: 20px;">
+                    <h3 style="font-size: 16px; font-weight: 600; color: #3b82f6; margin-bottom: 12px;">🌐 Public API Endpoints</h3>
+                    <p style="font-size: 13px; color: rgba(255, 255, 255, 0.8); margin-bottom: 16px;">
+                        These endpoints are publicly accessible without authentication. All responses include a <code>_meta</code> field with endpoint descriptions and field documentation.
+                    </p>
+                    
+                    <!-- /api/health -->
+                    <div id="api-health" style="margin-bottom: 16px; padding: 14px; background: rgba(0, 0, 0, 0.2); border-radius: 8px; border-left: 3px solid #22c55e; scroll-margin-top: 20px;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                            <code style="font-size: 14px; color: #22c55e; font-weight: 600;">🟢 GET /api/health</code>
+                            <span style="font-size: 11px; color: rgba(255, 255, 255, 0.5);">No rate limit</span>
+                        </div>
+                        <p style="font-size: 12px; color: rgba(255, 255, 255, 0.8); margin-bottom: 8px;">
+                            <strong>Purpose:</strong> Server health check and status verification. Returns server timestamp and operational status.
+                        </p>
+                        <div style="font-size: 11px; color: rgba(255, 255, 255, 0.6);">
+                            <strong>Response Fields:</strong><br>
+                            • <code>ok</code>: Boolean indicating server is operational<br>
+                            • <code>time</code>: Current Unix timestamp (seconds since epoch)<br>
+                            • <code>outputs_dir</code>: Absolute path to model outputs directory<br>
+                            • <code>_meta</code>: Endpoint metadata with field descriptions
+                        </div>
+                    </div>
+                    
+                    <!-- /api/capacity -->
+                    <div id="api-capacity" style="margin-bottom: 16px; padding: 14px; background: rgba(0, 0, 0, 0.2); border-radius: 8px; border-left: 3px solid #3b82f6; scroll-margin-top: 20px;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                            <code style="font-size: 14px; color: #3b82f6; font-weight: 600;">🟢 GET /api/capacity</code>
+                            <span style="font-size: 11px; color: rgba(255, 255, 255, 0.5);">No rate limit</span>
+                        </div>
+                        <p style="font-size: 12px; color: rgba(255, 255, 255, 0.8); margin-bottom: 8px;">
+                            <strong>Purpose:</strong> Real-time platform capacity and usage statistics across all subscription tiers. Shows user counts, available slots, worker status, and processing queue.
+                        </p>
+                        <div style="font-size: 11px; color: rgba(255, 255, 255, 0.6);">
+                            <strong>Response Structure:</strong><br>
+                            • <code>capacity.{tier}.current</code>: Number of registered users<br>
+                            • <code>capacity.{tier}.max</code>: Maximum allowed users<br>
+                            • <code>capacity.{tier}.available</code>: Remaining slots<br>
+                            • <code>capacity.{tier}.percent_full</code>: Usage percentage<br>
+                            • <code>capacity.workers.active</code>: Active worker processes (1-20)<br>
+                            • <code>capacity.workers.processing</code>: Models currently generating<br>
+                            • <code>capacity.workers.queue_length</code>: Pending tasks<br>
+                            • <code>capacity.workers.total_processed</code>: Total models since server start
+                        </div>
+                    </div>
+                    
+                    <!-- /api/check-username -->
+                    <div id="api-check-username" style="margin-bottom: 16px; padding: 14px; background: rgba(0, 0, 0, 0.2); border-radius: 8px; border-left: 3px solid #8b5cf6; scroll-margin-top: 20px;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                            <code style="font-size: 14px; color: #8b5cf6; font-weight: 600;">🟣 POST /api/check-username</code>
+                            <span style="font-size: 11px; color: rgba(255, 255, 255, 0.5);">30/min</span>
+                        </div>
+                        <p style="font-size: 12px; color: rgba(255, 255, 255, 0.8); margin-bottom: 8px;">
+                            <strong>Purpose:</strong> Check if a username is available for registration. Used for real-time validation during signup.
+                        </p>
+                        <div style="font-size: 11px; color: rgba(255, 255, 255, 0.6);">
+                            <strong>Request Body:</strong> <code>{"username": "string"}</code><br>
+                            <strong>Response:</strong> <code>{"available": boolean, "message": "string"}</code><br>
+                            <strong>Validation Rules:</strong> 3-20 chars, alphanumeric + underscore, must start with letter, case-insensitive
+                        </div>
+                    </div>
+                    
+                    <!-- Example Usage -->
+                    <div id="api-example" style="margin-top: 16px; padding: 14px; background: rgba(249, 115, 22, 0.1); border: 1px solid rgba(249, 115, 22, 0.3); border-radius: 8px; scroll-margin-top: 20px;">
+                        <div style="font-size: 12px; font-weight: 600; color: #f97316; margin-bottom: 8px;">📝 Example Usage</div>
+                        <pre style="background: rgba(0, 0, 0, 0.4); padding: 12px; border-radius: 6px; overflow-x: auto; font-size: 11px; color: #22c55e; line-height: 1.6;">// Fetch platform capacity
+fetch('http://localhost:5000/api/capacity')
+  .then(res => res.json())
+  .then(data => {
+    console.log('Metadata:', data._meta);
+    console.log('Free tier:', data.capacity.free);
+    console.log('Workers:', data.capacity.workers);
+  });</pre>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Rate Limits & Security -->
+            <div class="doc-card">
+                <div class="doc-icon">⚡</div>
+                <h2>Rate Limits & Security</h2>
+                <p>
+                    Understand our rate limiting policies, quotas, and multi-tier progressive blocking system. 
+                    Learn best practices to avoid blocks and keep your integration running smoothly.
+                </p>
+                <div class="doc-links">
+                    <a href="/docs/rate-limits" class="doc-link">
+                        <span>🛡️</span>
+                        <span>View Rate Limits</span>
+                    </a>
+                </div>
+                
+                <!-- Rate Limit Details -->
+                <div style="margin-top: 24px; padding: 20px; background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.3); border-radius: 12px;">
+                    <h3 style="font-size: 16px; font-weight: 600; color: #ef4444; margin-bottom: 12px;">🔥 Rate Limit Overview</h3>
+                    <p style="font-size: 13px; color: rgba(255, 255, 255, 0.8); margin-bottom: 16px;">
+                        SlushAI implements a fair-use rate limiting system to prevent abuse while ensuring reliable service for all users. Limits are applied per IP address and per user account.
+                    </p>
+                    
+                    <!-- Endpoint Rate Limits -->
+                    <div style="margin-bottom: 16px;">
+                        <div style="font-size: 14px; font-weight: 600; color: #fbbf24; margin-bottom: 10px;">📊 Per-Endpoint Limits</div>
+                        <div style="display: grid; gap: 10px; font-size: 12px;">
+                            <div style="padding: 10px; background: rgba(0, 0, 0, 0.2); border-radius: 6px; border-left: 3px solid #22c55e;">
+                                <code style="color: #22c55e;">/api/health, /api/capacity</code><br>
+                                <span style="color: rgba(255, 255, 255, 0.7);">No rate limit (public monitoring endpoints)</span>
+                            </div>
+                            <div style="padding: 10px; background: rgba(0, 0, 0, 0.2); border-radius: 6px; border-left: 3px solid #3b82f6;">
+                                <code style="color: #3b82f6;">/docs, /users, Public Pages</code><br>
+                                <span style="color: rgba(255, 255, 255, 0.7);">100 requests/min, 256,000 requests/day per IP</span>
+                            </div>
+                            <div style="padding: 10px; background: rgba(0, 0, 0, 0.2); border-radius: 6px; border-left: 3px solid #8b5cf6;">
+                                <code style="color: #8b5cf6;">/api/check-username</code><br>
+                                <span style="color: rgba(255, 255, 255, 0.7);">30 requests/min per IP (signup validation)</span>
+                            </div>
+                            <div style="padding: 10px; background: rgba(0, 0, 0, 0.2); border-radius: 6px; border-left: 3px solid #f59e0b;">
+                                <code style="color: #f59e0b;">/auth/email/signup</code><br>
+                                <span style="color: rgba(255, 255, 255, 0.7);">5 signups/hour, 3 accounts maximum per IP (prevents spam/abuse)</span>
+                            </div>
+                            <div style="padding: 10px; background: rgba(0, 0, 0, 0.2); border-radius: 6px; border-left: 3px solid #22c55e;">
+                                <code style="color: #22c55e;">/api/user/*, Protected Endpoints</code><br>
+                                <span style="color: rgba(255, 255, 255, 0.7);">30-60 requests/min per user (varies by endpoint)</span>
+                            </div>
+                            <div style="padding: 10px; background: rgba(0, 0, 0, 0.2); border-radius: 6px; border-left: 3px solid #ef4444;">
+                                <code style="color: #ef4444;">/api/support/submit</code><br>
+                                <span style="color: rgba(255, 255, 255, 0.7);">5 requests/hour per user/IP (prevents support spam)</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Weekly Quotas -->
+                    <div style="margin-bottom: 16px; padding: 14px; background: rgba(59, 130, 246, 0.1); border: 1px solid rgba(59, 130, 246, 0.3); border-radius: 8px;">
+                        <div style="font-size: 14px; font-weight: 600; color: #3b82f6; margin-bottom: 10px;">📅 Weekly Generation Quotas</div>
+                        <div style="font-size: 12px; color: rgba(255, 255, 255, 0.8); line-height: 1.8;">
+                            • <strong style="color: #22c55e;">Free Tier:</strong> 10 models/week (resets Monday 00:00 UTC)<br>
+                            • <strong style="color: #f97316;">Standard Tier:</strong> 40 models/week<br>
+                            • <strong style="color: #8b5cf6;">Pro Tier:</strong> 120 models/week<br>
+                            • <strong style="color: #fbbf24;">Staff (Founder/Admin/Moderator):</strong> 500 models/week<br>
+                            <span style="font-size: 11px; color: rgba(255, 255, 255, 0.6); margin-top: 8px; display: block;">
+                                ⚠️ Only successful model completions count towards quota. Failed or cancelled generations do not consume your limit.
+                            </span>
+                        </div>
+                    </div>
+                    
+                    <!-- Multi-Tier Security System -->
+                    <div style="margin-bottom: 16px;">
+                        <div style="font-size: 14px; font-weight: 600; color: #ef4444; margin-bottom: 10px;">🛡️ Progressive Security Blocking</div>
+                        <div style="font-size: 12px; color: rgba(255, 255, 255, 0.8);">
+                            <p style="margin-bottom: 10px; line-height: 1.6;">
+                                Our multi-tier blocking system automatically detects and prevents abuse with increasing severity:
+                            </p>
+                            <div style="display: grid; gap: 10px;">
+                                <div style="padding: 10px; background: rgba(234, 179, 8, 0.1); border-left: 3px solid #eab308; border-radius: 6px;">
+                                    <strong style="color: #eab308;">Level 1: Rate Limit Warning</strong><br>
+                                    <span style="color: rgba(255, 255, 255, 0.7);">429 error returned, retry after cooldown period (1-60 seconds)</span>
+                                </div>
+                                <div style="padding: 10px; background: rgba(249, 115, 22, 0.1); border-left: 3px solid #f97316; border-radius: 6px;">
+                                    <strong style="color: #f97316;">Level 2: Temporary Block</strong><br>
+                                    <span style="color: rgba(255, 255, 255, 0.7);">1-hour block for excessive requests (>100 req/min sustained)</span>
+                                </div>
+                                <div style="padding: 10px; background: rgba(239, 68, 68, 0.1); border-left: 3px solid #ef4444; border-radius: 6px;">
+                                    <strong style="color: #ef4444;">Level 3: Extended Block</strong><br>
+                                    <span style="color: rgba(255, 255, 255, 0.7);">24-hour block for attack patterns (SQL injection, XSS, path traversal)</span>
+                                </div>
+                                <div style="padding: 10px; background: rgba(127, 29, 29, 0.2); border-left: 3px solid #7f1d1d; border-radius: 6px;">
+                                    <strong style="color: #fca5a5;">Level 4: Permanent Ban</strong><br>
+                                    <span style="color: rgba(255, 255, 255, 0.7);">DDoS attacks (>1,000 req/10s), repeated malicious activity</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Attack Detection -->
+                    <div style="margin-bottom: 16px; padding: 14px; background: rgba(139, 92, 246, 0.1); border: 1px solid rgba(139, 92, 246, 0.3); border-radius: 8px;">
+                        <div style="font-size: 14px; font-weight: 600; color: #8b5cf6; margin-bottom: 10px;">🔍 Real-Time Attack Detection</div>
+                        <div style="font-size: 12px; color: rgba(255, 255, 255, 0.8); line-height: 1.8;">
+                            Our security system automatically detects and blocks:<br>
+                            • <strong>SQL Injection:</strong> Pattern matching for UNION, SELECT, DROP, etc.<br>
+                            • <strong>XSS Attempts:</strong> Script tags, javascript: URIs, event handlers<br>
+                            • <strong>Path Traversal:</strong> ../ sequences, /etc/ access attempts<br>
+                            • <strong>Command Injection:</strong> Shell metacharacters, eval patterns<br>
+                            • <strong>DDoS Attacks:</strong> Sustained >1000 req/10s threshold<br>
+                            • <strong>Brute Force:</strong> Repeated failed login attempts<br>
+                            <span style="font-size: 11px; color: rgba(255, 255, 255, 0.6); margin-top: 8px; display: block;">
+                                📊 All attacks are logged for 3 months in separate error logs for troubleshooting and security audits.
+                            </span>
+                        </div>
+                    </div>
+                    
+                    <!-- Best Practices -->
+                    <div style="padding: 14px; background: rgba(34, 197, 94, 0.1); border: 1px solid rgba(34, 197, 94, 0.3); border-radius: 8px;">
+                        <div style="font-size: 14px; font-weight: 600; color: #22c55e; margin-bottom: 10px;">✅ Best Practices to Avoid Blocks</div>
+                        <div style="font-size: 12px; color: rgba(255, 255, 255, 0.8); line-height: 1.8;">
+                            1. <strong>Implement exponential backoff</strong> when receiving 429 errors<br>
+                            2. <strong>Cache API responses</strong> where appropriate (capacity data, etc.)<br>
+                            3. <strong>Use proper authentication</strong> instead of relying on IP limits<br>
+                            4. <strong>Respect rate limit headers</strong> in API responses<br>
+                            5. <strong>Batch requests</strong> when possible instead of rapid-fire calls<br>
+                            6. <strong>Handle errors gracefully</strong> and don't retry indefinitely<br>
+                            7. <strong>Monitor your quota usage</strong> via the Account tab<br>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Badge System -->
+            <div class="doc-card">
+                <div class="doc-icon">🏆</div>
+                <h2>Badge System</h2>
+                <p>
+                    Earn badges by generating 3D models! Each badge level unlocks a one-time quota reset reward. 
+                    Progress from Newcomer to Legend as you create more models.
+                </p>
+                <div style="margin: 20px 0; padding: 16px; background: rgba(255, 255, 255, 0.03); border-radius: 8px;">
+                    <div style="display: grid; gap: 12px; font-size: 13px;">
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <div><span style="color: #94a3b8; font-size: 18px;">🔰</span> <strong style="color: #94a3b8;">Newcomer</strong></div>
+                            <div style="color: rgba(255, 255, 255, 0.6);">0-9 models</div>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <div><span style="color: #3b82f6; font-size: 18px;">⭐</span> <strong style="color: #3b82f6;">Creator</strong></div>
+                            <div style="color: rgba(255, 255, 255, 0.6);">10-49 models + Quota Reset</div>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <div><span style="color: #8b5cf6; font-size: 18px;">✨</span> <strong style="color: #8b5cf6;">Artist</strong></div>
+                            <div style="color: rgba(255, 255, 255, 0.6);">50-199 models + Quota Reset</div>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <div><span style="color: #f59e0b; font-size: 18px;">👑</span> <strong style="color: #f59e0b;">Master</strong></div>
+                            <div style="color: rgba(255, 255, 255, 0.6);">200-499 models + Quota Reset</div>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <div><span style="color: #ef4444; font-size: 18px;">🔥</span> <strong style="color: #ef4444;">Legend</strong></div>
+                            <div style="color: rgba(255, 255, 255, 0.6);">500+ models + Quota Reset</div>
+                        </div>
+                        <div style="border-top: 2px solid rgba(168, 85, 247, 0.3); padding-top: 12px; margin-top: 8px;">
+                            <div style="display: flex; justify-content: space-between; align-items: center; background: rgba(168, 85, 247, 0.15); padding: 12px; border-radius: 6px; border: 1px solid rgba(168, 85, 247, 0.3);">
+                                <div><span style="color: #a855f7; font-size: 18px;">💝</span> <strong style="color: #a855f7;">Benefactor</strong> <span style="font-size: 11px; color: #fbbf24;">(Mystery Badge)</span></div>
+                                <div style="color: rgba(255, 255, 255, 0.8); font-weight: 600;">🎁 Donate Any Amount</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <p style="font-size: 13px; color: rgba(255, 255, 255, 0.7); margin-top: 12px;">
+                    ✨ Badge levels are based on lifetime completed models. Each time you level up, you receive a one-time weekly quota reset reward!
+                </p>
+                <div style="margin-top: 16px; padding: 16px; background: linear-gradient(135deg, rgba(168, 85, 247, 0.2), rgba(139, 92, 246, 0.2)); border: 2px solid rgba(168, 85, 247, 0.4); border-radius: 12px;">
+                    <div style="font-size: 14px; font-weight: 600; color: #a855f7; margin-bottom: 8px;">💝 Mystery Badge: Benefactor Badge (Monthly Renewal)</div>
+                    <p style="font-size: 13px; color: rgba(255, 255, 255, 0.9); margin: 0 0 12px 0; line-height: 1.6;">
+                        <strong>How to unlock:</strong> Donate $1 or more to SlushAI - unlocks the Benefactor badge and referral system access.<br>
+                        <strong style="color: #fbbf24;">⏰ Monthly Renewal Required:</strong> Badge expires on the 1st of each month. Donate again to maintain your referral earnings!
+                    </p>
+                    <div style="font-size: 14px; font-weight: 600; color: #22c55e; margin-bottom: 8px;">💰 Referral System (Benefactor Members Only)</div>
+                    <p style="font-size: 13px; color: rgba(255, 255, 255, 0.9); margin: 0 0 8px 0; line-height: 1.6;">
+                        When you donate and unlock the Benefactor badge, you gain access to the <strong>referral system</strong>:
+                    </p>
+                    <ul style="margin: 8px 0; padding-left: 24px; font-size: 13px; color: rgba(255, 255, 255, 0.85); line-height: 1.8;">
+                        <li>Get a <strong>unique referral code and link</strong></li>
+                        <li>Share with friends and earn <strong>$1 USD per week</strong> for each paying member you refer</li>
+                        <li>Unlimited referrals - the more paying members you refer, the more you earn!</li>
+                        <li>Only paying members (Standard/Pro subscribers) count toward your weekly earnings</li>
+                    </ul>
+                    
+                    <!-- Earnings Distribution System -->
+                    <div style="margin-top: 12px; padding: 14px; background: rgba(59, 130, 246, 0.15); border: 2px solid rgba(59, 130, 246, 0.4); border-radius: 8px;">
+                        <div style="font-size: 13px; font-weight: 600; color: #3b82f6; margin-bottom: 8px;">💳 How Referral Earnings Work</div>
+                        <div style="font-size: 12px; color: rgba(255, 255, 255, 0.9); line-height: 1.7;">
+                            <strong>Earnings are applied in this order:</strong><br>
+                            <div style="margin: 8px 0; padding-left: 16px;">
+                                1️⃣ <strong style="color: #f97316;">Pay Your Bill First</strong> - Referral earnings automatically pay off your subscription cost<br>
+                                2️⃣ <strong style="color: #22c55e;">Accumulate Profit</strong> - Any earnings beyond your bill accumulate as redeemable balance<br>
+                                3️⃣ <strong style="color: #fbbf24;">Cash Out</strong> - Redeem profits once you reach minimum $5 threshold
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div style="margin-top: 12px; padding: 12px; background: rgba(0, 0, 0, 0.3); border-radius: 6px; border-left: 3px solid #fbbf24;">
+                        <p style="font-size: 12px; color: rgba(255, 255, 255, 0.9); margin: 0 0 10px 0; line-height: 1.6;">
+                            <strong style="color: #fbbf24;">💡 Example Scenario:</strong>
+                        </p>
+                        <div style="font-size: 11px; color: rgba(255, 255, 255, 0.85); line-height: 1.7;">
+                            You have <strong>Standard plan ($3.50/week)</strong> and refer <strong>10 paying members</strong>:<br>
+                            • Weekly earnings: <strong style="color: #22c55e;">$10.00</strong><br>
+                            • Minus subscription cost: <strong style="color: #f97316;">-$3.50</strong><br>
+                            • Redeemable profit per week: <strong style="color: #fbbf24;">$6.50</strong><br>
+                            • After 1 week, you have <strong>$6.50</strong> to cash out (above $5 minimum) ✅<br>
+                            • Your subscription is essentially <strong>FREE</strong> + you earn passive income!
+                        </div>
+                    </div>
+                    
+                    <div style="margin-top: 10px; padding: 10px; background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.3); border-radius: 6px;">
+                        <div style="font-size: 11px; color: rgba(255, 255, 255, 0.8); line-height: 1.6;">
+                            <strong style="color: #ef4444;">⚠️ Redemption & Renewal Rules:</strong><br>
+                            • Minimum cashout: <strong>$5.00 USD</strong><br>
+                            • Earnings first cover your subscription bill, then become redeemable profit<br>
+                            • Payouts sent weekly via PayPal or Crypto (BTC/ETH/TRX)<br>
+                            • <strong style="color: #fbbf24;">Benefactor badge expires monthly (1st of each month)</strong><br>
+                            • Donate $1+ each month to renew badge and maintain referral access<br>
+                            • <strong style="color: #ef4444;">Losing badge locks your referral system</strong> - redeemable balance preserved but frozen<br>
+                            • Renew badge to unlock and continue earning
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Crypto Payment -->
+            <div class="doc-card">
+                <div class="doc-icon">🪙</div>
+                <h2>Cryptocurrency Payments</h2>
+                <p>
+                    We accept Bitcoin (BTC), Ethereum (ETH), and Tron (TRX) for all subscription plans and refills. 
+                    Crypto payments feature incremental payment support, automatic price monitoring, and blockchain verification.
+                </p>
+                <div style="margin: 20px 0; padding: 16px; background: rgba(255, 255, 255, 0.03); border-radius: 8px;">
+                    <div style="display: grid; gap: 16px; font-size: 13px;">
+                        <div>
+                            <div style="font-weight: 600; color: #22c55e; margin-bottom: 10px;">💰 Crypto Pricing (USD Equivalent)</div>
+                            <div style="background: rgba(0, 0, 0, 0.2); padding: 12px; border-radius: 6px; margin-bottom: 12px;">
+                                <div style="color: rgba(255, 255, 255, 0.9); margin-bottom: 8px;">📊 <strong>Standard Plan:</strong></div>
+                                <div style="color: rgba(255, 255, 255, 0.7); padding-left: 20px; line-height: 1.8;">
+                                    • Weekly: $3.47 USD in BTC/ETH/TRX<br>
+                                    • Yearly: $68.40 USD in BTC/ETH/TRX (save 60% + 5% crypto discount)
+                                </div>
+                            </div>
+                            <div style="background: rgba(0, 0, 0, 0.2); padding: 12px; border-radius: 6px; margin-bottom: 12px;">
+                                <div style="color: rgba(255, 255, 255, 0.9); margin-bottom: 8px;">📊 <strong>Pro Plan:</strong></div>
+                                <div style="color: rgba(255, 255, 255, 0.7); padding-left: 20px; line-height: 1.8;">
+                                    • Weekly: $7.89 USD in BTC/ETH/TRX<br>
+                                    • Yearly: $155.80 USD in BTC/ETH/TRX (save 60% + 5% crypto discount)
+                                </div>
+                            </div>
+                            <div style="background: rgba(0, 0, 0, 0.2); padding: 12px; border-radius: 6px;">
+                                <div style="color: rgba(255, 255, 255, 0.9); margin-bottom: 8px;">📊 <strong>Quick Refill:</strong></div>
+                                <div style="color: rgba(255, 255, 255, 0.7); padding-left: 20px; line-height: 1.8;">
+                                    • Standard: $1.00 USD (credit card)<br>
+                                    • Crypto: $5.00 USD in BTC/ETH/TRX (crypto-exclusive pricing)
+                                </div>
+                            </div>
+                        </div>
+                        <div style="border-top: 1px solid rgba(255, 255, 255, 0.1); padding-top: 12px;">
+                            <div style="font-weight: 600; color: #f97316; margin-bottom: 6px;">₿ Bitcoin (BTC)</div>
+                            <ul style="margin: 0; padding-left: 20px; color: rgba(255, 255, 255, 0.7); line-height: 1.8;">
+                                <li>Lightning-fast confirmations</li>
+                                <li>Lower transaction fees</li>
+                                <li>Secure on-chain verification</li>
+                                <li>Real-time price conversion</li>
+                            </ul>
+                        </div>
+                        <div>
+                            <div style="font-weight: 600; color: #627eea; margin-bottom: 6px;">⟠ Ethereum (ETH)</div>
+                            <ul style="margin: 0; padding-left: 20px; color: rgba(255, 255, 255, 0.7); line-height: 1.8;">
+                                <li>Smart contract compatibility</li>
+                                <li>Fast network confirmations</li>
+                                <li>ERC-20 token support</li>
+                                <li>Automated subscription renewal</li>
+                            </ul>
+                        </div>
+                        <div>
+                            <div style="font-weight: 600; color: #eb0029; margin-bottom: 6px;">◈ Tron (TRX)</div>
+                            <ul style="margin: 0; padding-left: 20px; color: rgba(255, 255, 255, 0.7); line-height: 1.8;">
+                                <li>Ultra-low transaction fees (&lt;$0.01)</li>
+                                <li>Near-instant confirmations (3 seconds)</li>
+                                <li>High throughput network</li>
+                                <li>TRC-20 token compatibility</li>
+                            </ul>
+                        </div>
+                        <div style="border-top: 1px solid rgba(255, 255, 255, 0.1); padding-top: 12px;">
+                            <div style="font-weight: 600; color: #22c55e; margin-bottom: 6px;">✓ How It Works</div>
+                            <ol style="margin: 0; padding-left: 20px; color: rgba(255, 255, 255, 0.7); line-height: 1.8;">
+                                <li>Select your plan and choose BTC, ETH, or TRX</li>
+                                <li>Receive a payment address valid for 24 hours</li>
+                                <li>Send crypto to the address (incremental payments supported)</li>
+                                <li>Real-time blockchain verification confirms your transaction</li>
+                                <li>Subscription activates after confirmation</li>
+                            </ol>
+                        </div>
+                        <div style="margin-top: 12px; padding: 12px; background: rgba(59, 130, 246, 0.1); border: 1px solid rgba(59, 130, 246, 0.3); border-radius: 6px;">
+                            <div style="font-weight: 600; color: #3b82f6; margin-bottom: 6px;">⚡ Advanced Features</div>
+                            <ul style="margin: 0; padding-left: 20px; color: rgba(255, 255, 255, 0.7); line-height: 1.8;">
+                                <li><strong>Incremental Payments:</strong> Send partial amounts over multiple transactions</li>
+                                <li><strong>Price Monitoring:</strong> Prices update every 10 minutes via CoinGecko</li>
+                                <li><strong>Auto-Authorization:</strong> Payments auto-complete if crypto price drops within 5% tolerance</li>
+                                <li><strong>24-Hour Window:</strong> Payment sessions remain active for 24 hours</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <p style="font-size: 13px; color: rgba(255, 255, 255, 0.7); margin-top: 12px;">
+                    💡 <strong>Note:</strong> Crypto prices are calculated in real-time using CoinGecko API and update every 10 minutes. 
+                    Yearly crypto payments receive an additional 5% discount on top of the 60% yearly savings. 
+                    All transactions are verified on-chain via Blockstream (BTC), Etherscan (ETH), and Tronscan (TRX) APIs.
+                </p>
+            </div>
+        </div>
+
+        <div class="highlight-box">
+            <h3>📌 Key Points</h3>
+            <ul>
+                <li><strong>Privacy:</strong> We do NOT sell your data to third parties - all data stays secure</li>
+                <li><strong>Security:</strong> 4-level progressive blocking system (warning → 1hr → 24hr → permanent ban)</li>
+                <li><strong>Attack Protection:</strong> Real-time detection of SQL injection, XSS, path traversal, command injection, DDoS, and brute force</li>
+                <li><strong>Storage Limits:</strong> Free (10 favorites/32 models, 36-hour deletion), Standard (50/150, 14-day), Pro (150/500, 30-day)</li>
+                <li><strong>Permanent Favorites:</strong> Favorited models are locked and protected from automatic deletion (cannot be unsaved)</li>
+                <li><strong>Weekly Quotas:</strong> Free (10/week), Standard (40/week), Pro (120/week) - only successful generations count</li>
+                <li><strong>Badge System:</strong> 5 levels from Newcomer to Legend, plus Benefactor badge for donors</li>
+                <li><strong>Account Limits:</strong> Maximum 3 accounts per IP address to prevent abuse</li>
+                <li><strong>Signup Rate Limits:</strong> 5 signups/hour, username validation (3-20 chars, alphanumeric + underscore)</li>
+                <li><strong>Email Verification:</strong> Required for email/password accounts, 6-digit codes expire in 10 minutes</li>
+                <li><strong>Log Retention:</strong> Error logs kept for 3 months, regular logs truncate at 2,560 entries</li>
+                <li><strong>Capacity Management:</strong> 200 Free users, 50 Standard, 20 Pro (total 270 user slots + 9 staff)</li>
+                <li><strong>Referral System:</strong> Benefactor badge required, earn $1/week per paying referral, minimum $5 cashout</li>
+                <li><strong>Monthly Badge Renewal:</strong> Benefactor badge expires 1st of each month, requires $1+ donation to renew</li>
+                <li><strong>Ownership:</strong> You retain full ownership of images you upload and generated 3D models</li>
+                <li><strong>Compliance:</strong> GDPR and CCPA compliant with IP anonymization and data retention policies</li>
+                <li><strong>API Access:</strong> Public endpoints (health, capacity), authenticated endpoints with rate limits</li>
+                <li><strong>Payment Options:</strong> Credit cards (Stripe), Bitcoin, Ethereum, with crypto discount (5% yearly)</li>
+            </ul>
+        </div>
+
+        <div style="display: flex; gap: 12px; justify-content: center; margin-top: 30px;">
+            <a href="/" class="back-link">
+                <span>←</span>
+                <span>Back to Home</span>
+            </a>
+            <a href="/users" class="back-link">
+                <span>👥</span>
+                <span>User Directory</span>
+            </a>
+        </div>
+    </div>
+    
+    <script>
+        // Fetch and display real-time user capacity counts
+        async function updateCapacityCounts() {
+            try {
+                const response = await fetch('/api/capacity');
+                const data = await response.json();
+                
+                if (data.success) {
+                    const { capacity } = data;
+                    
+                    // Update Staff section
+                    if (capacity.founder) {
+                        const isActive = capacity.founder.active > 0;
+                        document.getElementById('founder-info').innerHTML = 
+                            isActive ? 
+                            `✓ Active (logged in)<br><small style="font-size: 9px;">${capacity.founder.email}</small>` : 
+                            capacity.founder.count > 0 ?
+                            `<small style="font-size: 9px;">Registered, not logged in</small>` :
+                            '<small style="font-size: 9px;">No founder account</small>';
+                    }
+                    
+                    if (capacity.moderator) {
+                        document.getElementById('moderator-info').textContent = 
+                            `${capacity.moderator.active}/${capacity.moderator.current} active (${capacity.moderator.max} max)`;
+                    }
+                    
+                    if (capacity.admin) {
+                        document.getElementById('admin-info').textContent = 
+                            `${capacity.admin.active}/${capacity.admin.current} active (${capacity.admin.max} max)`;
+                    }
+                    
+                    // Update Free tier
+                    document.getElementById('free-count').textContent = 
+                        `${capacity.free.current}/${capacity.free.max} Users`;
+                    document.getElementById('free-available').textContent = 
+                        capacity.free.available > 0 ? 
+                        `✓ ${capacity.free.available} slots available` : 
+                        '⚠️ At capacity';
+                    
+                    // Calculate Free tier storage (32 models × 10MB per user)
+                    const freeGB = (capacity.free.current * 32 * 0.01).toFixed(1);
+                    const freeMaxGB = 64; // 200 users × 32 models × 10MB = 64GB
+                    const freePercent = capacity.free.percent_full;
+                    document.getElementById('free-utilization').textContent = 
+                        `~${freeGB}GB / ${freeMaxGB}GB (${freePercent}% utilization)`;
+                    
+                    // Update Standard tier
+                    document.getElementById('standard-count').textContent = 
+                        `${capacity.standard.current}/${capacity.standard.max} Users`;
+                    document.getElementById('standard-available').textContent = 
+                        capacity.standard.available > 0 ? 
+                        `✓ ${capacity.standard.available} slots available` : 
+                        '⚠️ At capacity';
+                    
+                    // Calculate Standard tier storage (150 models × 10MB per user)
+                    const standardGB = (capacity.standard.current * 150 * 0.01).toFixed(1);
+                    const standardMaxGB = 75; // 50 users × 150 models × 10MB = 75GB
+                    const standardPercent = capacity.standard.percent_full;
+                    document.getElementById('standard-utilization').textContent = 
+                        `~${standardGB}GB / ${standardMaxGB}GB (${standardPercent}% utilization)`;
+                    
+                    // Update Pro tier
+                    document.getElementById('pro-count').textContent = 
+                        `${capacity.pro.current}/${capacity.pro.max} Users`;
+                    document.getElementById('pro-available').textContent = 
+                        capacity.pro.available > 0 ? 
+                        `✓ ${capacity.pro.available} slots available` : 
+                        '⚠️ At capacity';
+                    
+                    // Calculate Pro tier storage (500 models × 10MB per user)
+                    const proGB = (capacity.pro.current * 500 * 0.01).toFixed(1);
+                    const proMaxGB = 100; // 20 users × 500 models × 10MB = 100GB
+                    const proPercent = capacity.pro.percent_full;
+                    document.getElementById('pro-utilization').textContent = 
+                        `~${proGB}GB / ${proMaxGB}GB (${proPercent}% utilization)`;
+                    
+                    // Update Total
+                    const totalAvailable = capacity.free.available + capacity.standard.available + capacity.pro.available;
+                    // Total max should be 279 (270 regular users + 9 staff: 5 moderators + 3 admins + 1 founder)
+                    const totalMaxWithStaff = 279;
+                    document.getElementById('total-count').textContent = 
+                        `${capacity.total.current}/${totalMaxWithStaff} Users`;
+                    document.getElementById('total-available').textContent = 
+                        `✓ ${totalAvailable} total slots available`;
+                    
+                    // Calculate total storage usage based on actual save limits (avg 10MB per model)
+                    const totalFreeGB = (capacity.free.current * 32 * 0.01).toFixed(1);  // 32 models × 10MB
+                    const totalStandardGB = (capacity.standard.current * 150 * 0.01).toFixed(1);  // 150 models × 10MB
+                    const totalProGB = (capacity.pro.current * 500 * 0.01).toFixed(1);  // 500 models × 10MB
+                    const moderatorGB = (capacity.moderator ? capacity.moderator.current * 50 : 0).toFixed(1);  // 5000 models × 10MB = 50GB
+                    const adminGB = (capacity.admin ? capacity.admin.current * 50 : 0).toFixed(1);  // 5000 models × 10MB = 50GB
+                    // Founder: ~10,000 models × 10MB = 100GB
+                    const founderGB = (capacity.founder && capacity.founder.count > 0 ? 100 : 0);
+                    const totalGB = (parseFloat(totalFreeGB) + parseFloat(totalStandardGB) + parseFloat(totalProGB) + 
+                                    parseFloat(moderatorGB) + parseFloat(adminGB) + founderGB).toFixed(1);
+                    
+                    // Total max is 239GB (64 + 75 + 100 = 239GB for users only, staff not counted in displayed max)
+                    const totalMaxGB = 239;
+                    document.getElementById('total-utilization').textContent = 
+                        `~${totalGB}GB / ${totalMaxGB}GB (${capacity.total.percent_full}% utilization)`;
+                    
+                    // Update worker tracking bubble
+                    if (capacity.workers) {
+                        const activeWorkers = capacity.workers.active;
+                        const maxWorkers = capacity.workers.max;
+                        const queueLength = capacity.workers.queue_length;
+                        const processing = capacity.workers.processing;
+                        
+                        document.getElementById('workers-count').textContent = 
+                            `${activeWorkers}/${maxWorkers} Processing`;
+                        
+                        // Status based on activity
+                        if (activeWorkers === 0) {
+                            document.getElementById('workers-status').textContent = '✓ Idle - Ready for tasks';
+                            document.getElementById('workers-status').style.color = '#22c55e';
+                        } else if (activeWorkers >= maxWorkers) {
+                            document.getElementById('workers-status').textContent = '🔥 All workers busy';
+                            document.getElementById('workers-status').style.color = '#f97316';
+                        } else {
+                            document.getElementById('workers-status').textContent = '⚡ Processing tasks...';
+                            document.getElementById('workers-status').style.color = '#3b82f6';
+                        }
+                        
+                        document.getElementById('workers-queue').textContent = 
+                            queueLength > 0 ? `${queueLength} task${queueLength !== 1 ? 's' : ''} in queue` : 'No tasks queued';
+                        
+                        // Update total processed
+                        const totalProcessed = capacity.workers.total_processed || 0;
+                        document.getElementById('workers-total').textContent = 
+                            `${totalProcessed.toLocaleString()} total processed`;
+                    }
+                }
+            } catch (error) {
+                console.error('Failed to fetch capacity:', error);
+                // Keep the default 0 values on error
+            }
+        }
+        
+        // Update on page load
+        updateCapacityCounts();
+        
+        // Optionally refresh every 30 seconds
+        setInterval(updateCapacityCounts, 30000);
+    </script>
+</body>
+</html>

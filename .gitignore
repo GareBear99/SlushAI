@@ -1,0 +1,46 @@
+# SlushAI .gitignore — source only, no secrets, no binaries, no generated output
+
+# Python virtualenvs (large, machine-local)
+.venv/
+.venv_old/
+venv/
+
+# Bundled macOS apps (huge binaries, not source)
+Blender.app/
+MeshLab2021.10.app/
+
+# Installer binaries
+*.dmg
+*.pkg
+
+# Secrets — NEVER commit these (contain live passwords/keys)
+.env
+.env.*
+SETUP_COMPLETE.md
+docs/ADMIN_API.md
+
+# Live data and logs (user data, runtime state)
+data/
+logs/
+*.log
+*.db
+*.sqlite
+*.sqlite3
+
+# Generated output (meshes, renders, temp files)
+outputs/
+
+# Python bytecode and caches
+__pycache__/
+*.pyc
+*.pyo
+.pytest_cache/
+
+# Nested git repos (vendored code keeps its own history out)
+**/.git/
+
+# macOS / editor noise
+.DS_Store
+node_modules/
+.idea/
+.vscode/

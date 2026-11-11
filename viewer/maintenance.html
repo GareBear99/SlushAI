@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SlushAI 3D Modeller - Maintenance Mode</title>
+    <link rel="stylesheet" href="themes.css" />
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--bg);
+            color: var(--text-main);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .maintenance-container {
+            max-width: 600px;
+            text-align: center;
+            background: var(--card);
+            border-radius: 24px;
+            padding: 60px 40px;
+            border: 1px solid var(--border-soft);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+
+        .icon {
+            font-size: 80px;
+            margin-bottom: 30px;
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% {
+                transform: scale(1);
+                opacity: 1;
+            }
+            50% {
+                transform: scale(1.05);
+                opacity: 0.8;
+            }
+        }
+
+        h1 {
+            font-size: 32px;
+            font-weight: 700;
+            margin-bottom: 16px;
+            background: linear-gradient(135deg, var(--accent-1), var(--accent-2));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .subtitle {
+            font-size: 18px;
+            color: var(--text-sub);
+            margin-bottom: 30px;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+            margin: 30px 0;
+        }
+
+        .stat-card {
+            background: var(--bg-soft);
+            border-radius: 12px;
+            padding: 20px;
+            border: 1px solid var(--border-soft);
+        }
+
+        .stat-label {
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--text-sub);
+            margin-bottom: 8px;
+        }
+
+        .stat-value {
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--accent-1);
+        }
+
+        .message {
+            font-size: 14px;
+            color: var(--text-sub);
+            line-height: 1.6;
+            margin: 20px 0;
+        }
+
+        .retry-button {
+            margin-top: 30px;
+            padding: 12px 32px;
+            background: linear-gradient(135deg, var(--accent-1), var(--accent-2));
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .retry-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px var(--accent-soft);
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 4px;
+            background: var(--bg-soft);
+            border-radius: 2px;
+            overflow: hidden;
+            margin-top: 20px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--accent-1), var(--accent-2));
+            animation: progress 3s ease-in-out infinite;
+        }
+
+        @keyframes progress {
+            0% {
+                width: 0%;
+            }
+            50% {
+                width: 70%;
+            }
+            100% {
+                width: 0%;
+            }
+        }
+
+        .status-indicator {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            background: var(--accent-1);
+            border-radius: 50%;
+            margin-right: 8px;
+            animation: blink 1.5s ease-in-out infinite;
+        }
+
+        @keyframes blink {
+            0%, 100% {
+                opacity: 1;
+            }
+            50% {
+                opacity: 0.3;
+            }
+        }
+
+        .eta {
+            font-size: 13px;
+            color: var(--text-main);
+            margin-top: 20px;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body class="app-bg theme-6">
+    <div class="maintenance-container">
+        <div class="icon">⚙️</div>
+        <h1>Server Under Heavy Load</h1>
+        <p class="subtitle">We're processing a high volume of requests</p>
+
+        <div class="stats">
+            <div class="stat-card">
+                <div class="stat-label">Queue Position</div>
+                <div class="stat-value" id="queuePosition">--</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Active Workers</div>
+                <div class="stat-value" id="activeWorkers">--</div>
+            </div>
+        </div>
+
+        <p class="message">
+            <span class="status-indicator"></span>
+            <strong>Server Status:</strong> <span id="serverStatus">Checking...</span>
+        </p>
+
+        <p class="message">
+            Our servers are currently experiencing high traffic. Please wait a moment while we clear the queue.
+            We automatically scale up to 3 workers to handle increased load.
+        </p>
+
+        <p class="eta" id="eta">Estimated wait time: Calculating...</p>
+
+        <div class="progress-bar">
+            <div class="progress-fill"></div>
+        </div>
+
+        <button class="retry-button" onclick="checkServerStatus()">Retry Now</button>
+
+        <p class="message" style="margin-top: 30px; font-size: 12px; opacity: 0.6;">
+            Page will automatically retry every 5 seconds
+        </p>
+    </div>
+
+    <script>
+        // Check server status periodically
+        async function checkServerStatus() {
+            try {
+                const response = await fetch('/api/queue/status');
+                const data = await response.json();
+
+                document.getElementById('queuePosition').textContent = data.queued_count || 0;
+                document.getElementById('activeWorkers').textContent = data.active_workers || 0;
+
+                // Calculate ETA (assumes 2 min per model)
+                const queuedCount = data.queued_count || 0;
+                const activeWorkers = data.active_workers || 1;
+                const avgTimePerModel = 120; // seconds
+                const etaSeconds = Math.ceil((queuedCount / activeWorkers) * avgTimePerModel);
+                const etaMinutes = Math.ceil(etaSeconds / 60);
+
+                document.getElementById('eta').textContent = 
+                    `Estimated wait time: ${etaMinutes} minute${etaMinutes !== 1 ? 's' : ''}`;
+
+                // Update status
+                if (queuedCount < 5) {
+                    document.getElementById('serverStatus').textContent = 'Available - Redirecting...';
+                    // Server is available, redirect to viewer
+                    setTimeout(() => {
+                        window.location.href = '/viewer';
+                    }, 1000);
+                } else if (queuedCount < 10) {
+                    document.getElementById('serverStatus').textContent = 'Moderate Load';
+                } else {
+                    document.getElementById('serverStatus').textContent = 'High Load';
+                }
+            } catch (error) {
+                console.error('Failed to check server status:', error);
+                document.getElementById('serverStatus').textContent = 'Unable to connect';
+            }
+        }
+
+        // Check status on load
+        checkServerStatus();
+
+        // Auto-retry every 5 seconds
+        setInterval(checkServerStatus, 5000);
+    </script>
+</body>
+</html>

@@ -1,0 +1,25 @@
+# SlushAI TripoSR deps: installed after the core set (slow: torch + a git build).
+# CPU-only on the Intel Mac. Weights (~2 GB) download from Hugging Face on first run.
+# TORCH PIN — 2.2.2 is the NEWEST torch with a macOS x86_64 (Intel) wheel.
+# torch 2.3+ ships macOS wheels for arm64 ONLY (verified 2026-11-10 from the
+# PyPI JSON API: 2.5.1 has manylinux/win/arm64 files, zero macosx_x86_64),
+# and 2.2.2 needs Python <=3.12, so the venv is Python 3.12 (see
+# .slushai-py312.sh). Do NOT bump to 2.5.x on this machine — pip finds
+# no matching distribution at all ("from versions: none").
+torch==2.2.2
+omegaconf==2.3.0
+einops==0.7.0
+git+https://github.com/tatsy/torchmcubes.git
+transformers==4.35.0
+rembg
+# numba/llvmlite are rembg's transitive deps (rembg -> pymatting -> numba
+# -> llvmlite). PINNED: the newest numba (0.63.x) needs llvmlite>=0.46,
+# and llvmlite 0.46.0 ships NO macOS x86_64 wheel — pip then tries a
+# source build that needs cmake + LLVM and fails. numba 0.62.1 +
+# llvmlite 0.45.0 both have cp312 macosx_x86_64 wheels (verified 2026-11-10).
+numba==0.62.1
+llvmlite==0.45.0
+huggingface-hub
+imageio[ffmpeg]
+gradio>=4.0,<6
+moderngl==5.10.0

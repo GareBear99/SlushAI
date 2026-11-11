@@ -1,0 +1,18 @@
+# SlushAI pipeline libs: numpy/Pillow/mesh libs used by the generation path
+# (src/ai3d/pipeline.py, runners, vendors/TripoSR/run.py). Installed in the
+# background after the server is up, so auth verification is not blocked.
+# numpy is PINNED to 1.26.4 (last 1.x with cp312 wheels): PyMCubes 0.1.4
+# builds its C extension against oldest-supported-numpy (1.26.4 for cp312),
+# so with numpy 2.x at runtime its import fails with "numpy.dtype size
+# changed, may indicate binary incompatibility" (verified 2026-11-10).
+# Pillow 10.1.0 has no cp312/cp313 wheels and fails to build from source.
+numpy==1.26.4
+Pillow==11.3.0
+trimesh==4.0.5
+# xatlas 0.0.9 does NOT install cleanly on this Mac: its bundled pybind11
+# declares cmake_minimum_required < 3.5 and the installed CMake refuses it.
+# Use the patched build instead — see .slushai-stage1d.sh (downloads the
+# sdist, bumps the minimum to 3.5, builds + installs a wheel). Do not just
+# `pip install xatlas==0.0.9` here; it fails and aborts the whole install.
+xatlas==0.0.9
+PyMCubes==0.1.4

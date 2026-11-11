@@ -1,0 +1,64 @@
+# SlushAI 3D Modeller — real requirements, built from the imports actually used.
+# Generated 2026-11-10 (Stage 1 fix). Install with: pip install -r requirements.txt
+# Python 3.12 on macOS (Intel) — the venv is built with Python 3.12.16 from uv
+# (see .slushai-py312.sh). Torch needs <=3.12 AND an Intel-mac wheel, which
+# only exists up to torch 2.2.2. Torch is CPU-only here (no MPS/CUDA).
+
+# --- Flask backend (viewer/app.py) ---
+Flask==3.1.0
+Flask-CORS==5.0.0
+Flask-SocketIO==5.3.6
+Flask-Login==0.6.3
+Flask-Limiter==3.12.0
+Authlib==1.3.2
+# cryptography is Authlib's dep. Unpinned pip picks 50.0.2, which has NO cp313
+# x86_64 wheel — it then tries a Rust/maturin source build that fails (no
+# OpenSSL dev headers / pkg-config on the Mac). 44.0.3 ships a cp313 wheel.
+cryptography==44.0.3
+python-dotenv==1.0.1
+requests==2.32.3
+stripe==16.1.0
+
+# --- Auth (src/ai3d/utils/user_manager.py) ---
+bcrypt==4.1.2
+PyJWT==2.8.0
+
+# --- Pipeline (src/ai3d/) ---
+# NOTE 2026-11-10: numpy is PINNED to 1.26.4 (last 1.x with cp312 wheels) —
+# PyMCubes 0.1.4 builds its C extension against oldest-supported-numpy
+# (1.26.4 for cp312), so numpy 2.x at runtime breaks its import with
+# "numpy.dtype size changed". Pillow 10.1.0 has no cp312/cp313 wheels and
+# fails to build from source, so it stays at 11.3.0.
+numpy==1.26.4
+Pillow==11.3.0
+trimesh==4.0.5
+# xatlas: do NOT plain `pip install` it — its bundled pybind11 declares a
+# cmake minimum the installed CMake refuses. Use the patched build in
+# .slushai-stage1d.sh (builds a wheel, vendored under vendor/wheels/).
+xatlas==0.0.9
+PyMCubes==0.1.4
+tqdm==4.66.4
+
+# --- TripoSR (vendors/TripoSR/run.py, tsr/) — CPU on the Intel Mac ---
+# torch 2.2.2 is the NEWEST torch with a macOS x86_64 (Intel) wheel — 2.3+
+# ships macOS wheels for arm64 only (verified 2026-11-10 via the PyPI JSON
+# API). Do NOT bump: pip finds no matching distribution at all on this Mac.
+torch==2.2.2
+omegaconf==2.3.0
+einops==0.7.0
+# torchmcubes: install AFTER torch, with --no-build-isolation (it builds
+# against the installed torch; a one-shot pip install fails on it).
+git+https://github.com/tatsy/torchmcubes.git
+transformers==4.35.0
+rembg
+# numba/llvmlite are rembg's transitive deps (rembg -> pymatting -> numba
+# -> llvmlite). PINNED: the newest numba (0.63.x) needs llvmlite>=0.46,
+# and llvmlite 0.46.0 ships NO macOS x86_64 wheel — pip then tries a
+# source build that needs cmake + LLVM and fails. numba 0.62.1 +
+# llvmlite 0.45.0 both have cp312 macosx_x86_64 wheels (verified 2026-11-10).
+numba==0.62.1
+llvmlite==0.45.0
+huggingface-hub
+imageio[ffmpeg]
+gradio>=4.0,<6
+moderngl==5.10.0

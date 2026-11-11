@@ -1,0 +1,2918 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SlushAI 3D Modeller - 3D Generation Studio</title>
+    <link rel="stylesheet" href="themes.css" />
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--bg);
+            color: var(--text-main);
+            overflow: hidden;
+        }
+
+        .app {
+            display: flex;
+            height: 100vh;
+        }
+
+        /* LEFT SIDEBAR - Generation Controls */
+        .sidebar-left {
+            width: 300px;
+            background: var(--card);
+            border-right: 1px solid var(--border-soft);
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+        }
+
+        .sidebar-header {
+            padding: 20px;
+            border-bottom: 1px solid var(--bg-soft);
+        }
+
+        .sidebar-header h2 {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .tab {
+            padding: 8px 16px;
+            background: var(--bg-soft);
+            border: none;
+            border-radius: 6px;
+            color: #888;
+            cursor: pointer;
+            font-size: 13px;
+            transition: all 0.2s;
+        }
+
+        .tab.active {
+            background: var(--accent-1);
+            color: white;
+        }
+
+        .controls {
+            padding: 20px;
+            flex: 1;
+        }
+
+        .control-group {
+            margin-bottom: 20px;
+        }
+
+        .control-group label {
+            display: block;
+            font-size: 13px;
+            color: var(--text-sub);
+            margin-bottom: 8px;
+        }
+
+        .upload-area {
+            position: relative;
+            width: 100%;
+            aspect-ratio: 1;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .upload-glow {
+            position: absolute;
+            inset: 0;
+            border-radius: 24px;
+            opacity: 0.6;
+            background-image: radial-gradient(circle at top, var(--accent-1), transparent 55%), radial-gradient(circle at bottom, var(--accent-2), transparent 55%);
+            filter: blur(40px);
+        }
+
+        .upload-card {
+            position: relative;
+            height: 100%;
+            width: 100%;
+            border-radius: 24px;
+            border: 1px solid var(--border-soft);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            background: var(--card-alt);
+            box-shadow: 0 0 40px var(--accent-soft);
+        }
+
+        .upload-content {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-image: radial-gradient(circle at top, rgba(244, 63, 94, 0.7) 0, transparent 55%), radial-gradient(circle at bottom, rgba(249, 115, 22, 0.8) 0, transparent 55%);
+        }
+
+        body.theme-2 .upload-content {
+            background-image: radial-gradient(circle at top, rgba(56, 189, 248, 0.8) 0, transparent 55%), radial-gradient(circle at bottom, rgba(96, 165, 250, 0.8) 0, transparent 55%);
+        }
+
+        body.theme-3 .upload-content {
+            background-image: radial-gradient(circle at top, rgba(148, 163, 184, 0.7) 0, transparent 55%), radial-gradient(circle at bottom, rgba(75, 85, 99, 0.9) 0, transparent 55%);
+        }
+
+        body.theme-4 .upload-content {
+            background-image: radial-gradient(circle at top, rgba(248, 113, 113, 0.9) 0, transparent 55%), radial-gradient(circle at bottom, rgba(220, 38, 38, 0.9) 0, transparent 55%);
+        }
+
+        body.theme-5 .upload-content {
+            background-image: radial-gradient(circle at top, rgba(56, 189, 248, 0.9) 0, transparent 55%), radial-gradient(circle at bottom, rgba(45, 212, 191, 0.9) 0, transparent 55%);
+        }
+
+        body.theme-6 .upload-content {
+            background-image: radial-gradient(circle at top, rgba(34, 197, 94, 0.9) 0, transparent 55%), radial-gradient(circle at bottom, rgba(236, 72, 153, 0.9) 0, transparent 55%);
+        }
+
+        .upload-footer {
+            padding: 16px;
+            border-top: 1px solid var(--border-soft);
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(10px);
+        }
+
+        .upload-area:hover .upload-glow {
+            opacity: 0.8;
+        }
+
+        .upload-preview {
+            width: 100%;
+            border-radius: 6px;
+        }
+
+        textarea {
+            width: 100%;
+            padding: 12px;
+            background: var(--bg-soft);
+            border: 1px solid var(--border-soft);
+            border-radius: 6px;
+            color: var(--text-main);
+            font-size: 13px;
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        select {
+            width: 100%;
+            padding: 10px;
+            background: var(--bg-soft);
+            border: 1px solid var(--border-soft);
+            border-radius: 6px;
+            color: var(--text-main);
+            font-size: 13px;
+        }
+
+        .aspect-ratio-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 8px;
+        }
+
+        .aspect-btn {
+            padding: 8px;
+            background: var(--bg-soft);
+            border: 1px solid var(--border-soft);
+            border-radius: 6px;
+            color: var(--text-sub);
+            cursor: pointer;
+            font-size: 11px;
+            text-align: center;
+            transition: all 0.2s;
+        }
+
+        .aspect-btn.active {
+            background: var(--accent-1);
+            color: white;
+            border-color: var(--accent-1);
+        }
+
+        .generate-btn {
+            width: 100%;
+            padding: 14px;
+            border: none;
+            border-radius: 8px;
+            color: white;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .generate-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(168, 224, 99, 0.3);
+        }
+
+        .generate-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        /* CENTER - 3D Viewer */
+        .viewer-area {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            background: var(--bg);
+        }
+
+        .viewer-header {
+            padding: 15px 20px;
+            background: var(--card);
+            border-bottom: 1px solid var(--bg-soft);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .viewer-title {
+            font-size: 14px;
+            color: var(--text-sub);
+        }
+
+        .view-controls {
+            display: flex;
+            gap: 10px;
+        }
+
+        .view-btn {
+            padding: 6px 12px;
+            background: var(--bg-soft);
+            border: 1px solid var(--border-soft);
+            border-radius: 6px;
+            color: var(--text-sub);
+            cursor: pointer;
+            font-size: 12px;
+            transition: all 0.2s;
+        }
+
+        .view-btn:hover {
+            background: var(--border-soft);
+        }
+
+        .canvas-container {
+            flex: 1;
+            position: relative;
+        }
+
+        #canvas {
+            width: 100%;
+            height: 100%;
+        }
+
+        .empty-state {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            color: var(--text-sub);
+        }
+
+        .empty-state-icon {
+            font-size: 64px;
+            margin-bottom: 20px;
+        }
+
+        /* RIGHT SIDEBAR - Assets Gallery */
+        .sidebar-right {
+            width: 320px;
+            background: var(--card);
+            border-left: 1px solid var(--bg-soft);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .assets-header {
+            padding: 20px;
+            border-bottom: 1px solid var(--bg-soft);
+        }
+
+        .assets-header input {
+            width: 100%;
+            padding: 10px;
+            background: var(--bg-soft);
+            border: 1px solid var(--border-soft);
+            border-radius: 6px;
+            color: var(--text-main);
+            font-size: 13px;
+        }
+
+        .view-mode-btns {
+            display: flex;
+            gap: 8px;
+            margin-top: 15px;
+        }
+
+        .view-mode-btn {
+            padding: 8px;
+            background: var(--bg-soft);
+            border: 1px solid var(--border-soft);
+            border-radius: 6px;
+            cursor: pointer;
+            color: var(--text-sub);
+            transition: all 0.2s;
+        }
+
+        .view-mode-btn.active {
+            background: var(--border-soft);
+            color: var(--accent-1);
+        }
+
+        .assets-list {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+        }
+
+        .collection {
+            margin-bottom: 30px;
+        }
+
+        .collection-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .collection-title {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-sub);
+        }
+
+        .collection-count {
+            font-size: 12px;
+            color: var(--text-sub);
+        }
+
+        .assets-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+        }
+
+        .asset-card {
+            background: var(--bg-soft);
+            border-radius: 8px;
+            overflow: hidden;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: 2px solid transparent;
+        }
+
+        .asset-card:hover {
+            transform: translateY(-2px);
+            border-color: var(--accent-1);
+        }
+
+        .asset-card.active {
+            border-color: var(--accent-1);
+        }
+
+        .asset-thumbnail {
+            width: 100%;
+            aspect-ratio: 1;
+            background: var(--card);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .asset-thumbnail img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .asset-info {
+            padding: 8px;
+        }
+
+        .asset-name {
+            font-size: 11px;
+            color: var(--text-main);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .asset-stats {
+            font-size: 10px;
+            color: var(--text-sub);
+            margin-top: 2px;
+        }
+
+        .pagination {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 15px;
+            border-top: 1px solid var(--bg-soft);
+        }
+
+        .page-btn {
+            padding: 6px 10px;
+            background: var(--bg-soft);
+            border: none;
+            border-radius: 4px;
+            color: var(--text-sub);
+            cursor: pointer;
+            font-size: 12px;
+        }
+
+        .page-btn:hover {
+            background: var(--border-soft);
+        }
+
+        .page-info {
+            font-size: 12px;
+            color: var(--text-sub);
+        }
+
+        /* Loading Overlay */
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.8);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+
+        .loading-overlay.active {
+            display: flex;
+        }
+
+        .loading-card {
+            background: var(--card);
+            padding: 30px;
+            border-radius: 12px;
+            text-align: center;
+            min-width: 300px;
+        }
+
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid var(--bg-soft);
+            border-top-color: var(--accent-1);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 4px;
+            background: var(--bg-soft);
+            border-radius: 2px;
+            overflow: hidden;
+            margin: 15px 0;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: var(--accent-1);
+            width: 0%;
+            transition: width 0.3s;
+        }
+
+        input[type="file"] {
+            display: none;
+        }
+
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--card);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--border-soft);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #4a4a4a;
+        }
+
+        .prompt-container {
+            display: none;
+        }
+
+        .prompt-container.active {
+            display: block;
+        }
+        
+
+        .char-counter {
+            position: absolute;
+            bottom: 12px;
+            right: 12px;
+            font-size: 11px;
+            color: var(--text-sub);
+            opacity: 0.7;
+        }
+
+        .image-strength-container {
+            position: relative;
+        }
+
+        .strength-value {
+            position: absolute;
+            right: 0;
+            top: 0;
+            font-size: 11px;
+            color: var(--text-sub);
+        }
+
+        input[type="range"] {
+            width: 100%;
+            height: 6px;
+            background: var(--bg-soft);
+            border-radius: 3px;
+            outline: none;
+            -webkit-appearance: none;
+        }
+
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background: var(--accent-1);
+            cursor: pointer;
+        }
+
+        input[type="range"]::-moz-range-thumb {
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background: var(--accent-1);
+            cursor: pointer;
+            border: none;
+        }
+
+        .cost-display {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 8px 12px;
+            background: var(--bg-soft);
+            border-radius: 6px;
+            font-size: 12px;
+            margin-top: 10px;
+        }
+
+        .cost-time {
+            color: var(--text-sub);
+        }
+
+        .cost-amount {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            color: var(--accent-2);
+            font-weight: 600;
+        }
+
+        .pro-badge {
+            background: linear-gradient(90deg, var(--accent-1), var(--accent-2));
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 9px;
+            font-weight: 700;
+            color: white;
+            text-transform: uppercase;
+        }
+
+        /* Vertical Navigation Sidebar */
+        .nav-sidebar {
+            position: fixed;
+            left: 0;
+            top: 52px;
+            bottom: 0;
+            width: 60px;
+            background: var(--card-alt);
+            border-right: 1px solid var(--border-soft);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px 0;
+            z-index: 50;
+        }
+
+        .nav-item {
+            width: 44px;
+            height: 44px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+            cursor: pointer;
+            border-radius: 8px;
+            margin-bottom: 8px;
+            transition: all 0.2s;
+            color: var(--text-sub);
+            border: 1px solid transparent;
+        }
+
+        .nav-item:hover {
+            background: var(--bg-soft);
+            color: var(--text-main);
+        }
+
+        .nav-item.active {
+            background: var(--bg-soft);
+            color: var(--accent-1);
+            border-color: var(--accent-1);
+        }
+
+        .nav-icon {
+            font-size: 20px;
+        }
+
+        .nav-label {
+            font-size: 9px;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        /* Adjust main content for nav sidebar */
+        .sidebar-left {
+            margin-left: 60px;
+        }
+
+        /* Mode panels */
+        .mode-panel {
+            display: none;
+        }
+
+        .mode-panel.active {
+            display: block;
+        }
+
+        /* Hover effects */
+        .asset-card {
+            transition: all 0.2s ease;
+        }
+
+        .asset-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4), 0 0 16px var(--accent-soft);
+            border-color: var(--accent-1);
+        }
+
+        .generate-btn:hover {
+            transform: scale(1.02);
+            box-shadow: 0 8px 20px var(--accent-soft);
+        }
+
+        .view-btn:hover,
+        .tab:hover,
+        .aspect-btn:hover {
+            border-color: var(--accent-1);
+            color: var(--accent-1);
+        }
+
+        /* Tooltips */
+        [title] {
+            position: relative;
+            cursor: help;
+        }
+
+        /* Favorite star overlay */
+        .favorite-star {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            font-size: 24px;
+            cursor: pointer;
+            z-index: 10;
+            background: rgba(0, 0, 0, 0.6);
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(4px);
+            transition: all 0.2s;
+            color: #fbbf24;
+        }
+
+        .favorite-star:hover {
+            background: rgba(0, 0, 0, 0.8);
+            transform: scale(1.1);
+        }
+
+        .favorite-star.favorited {
+            background: rgba(251, 191, 36, 0.3);
+            animation: pulse 0.3s ease;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.2); }
+        }
+
+        /* Image lightbox overlay */
+        .image-lightbox {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.95);
+            backdrop-filter: blur(10px);
+            z-index: 1000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            animation: fadeIn 0.2s ease;
+        }
+
+        .image-lightbox.active {
+            display: flex;
+        }
+
+        .lightbox-content {
+            position: relative;
+            max-width: 90vw;
+            max-height: 90vh;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5), 0 0 40px var(--accent-soft);
+        }
+
+        .lightbox-image {
+            max-width: 100%;
+            max-height: 90vh;
+            display: block;
+        }
+
+        .lightbox-close {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: rgba(0, 0, 0, 0.8);
+            border: 1px solid var(--border-soft);
+            color: var(--text-main);
+            font-size: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .lightbox-close:hover {
+            background: var(--accent-1);
+            transform: scale(1.1);
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        /* Support Button - Same style as landing page */
+        .support-floating-btn {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--accent-1), var(--accent-2));
+            color: white;
+            font-size: 28px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            border: none;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+            transition: all 0.2s;
+            z-index: 1000;
+        }
+
+        .support-floating-btn:hover {
+            transform: scale(1.1);
+            box-shadow: 0 12px 32px rgba(0, 0, 0, 0.4);
+        }
+
+        .support-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 2000;
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(8px);
+        }
+
+        .support-modal-content {
+            position: relative;
+            background: var(--card);
+            border-radius: 20px;
+            padding: 40px;
+            max-width: 500px;
+            width: 90%;
+            border: 1px solid var(--border-soft);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .support-modal h2 {
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 8px;
+            background: linear-gradient(135deg, var(--accent-1), var(--accent-2));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .support-modal-content > p {
+            color: var(--text-sub);
+            margin-bottom: 24px;
+            font-size: 14px;
+        }
+
+        .support-close-btn {
+            position: absolute;
+            top: 16px;
+            right: 16px;
+            background: none;
+            border: none;
+            font-size: 32px;
+            color: var(--text-sub);
+            cursor: pointer;
+            line-height: 1;
+            padding: 8px;
+            transition: all 0.2s;
+        }
+
+        .support-close-btn:hover {
+            color: var(--text-main);
+        }
+    </style>
+</head>
+<body class="app-bg theme-6" id="app-root">
+    <div class="app">
+        <!-- HEADER WITH THEME SWITCHER & USER PROFILE -->
+        <header style="position: fixed; top: 0; left: 0; right: 0; z-index: 100; background: var(--card); border-bottom: 1px solid var(--border-soft); padding: 12px 20px; display: flex; flex-direction: column; gap: 4px;">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <div style="display: flex; flex-direction: column; gap: 2px;">
+                    <div style="display: flex; align-items: center; gap: 12px;">
+                        <div style="font-size: 20px;">🎨</div>
+                        <span style="font-weight: 600; font-size: 15px; color: var(--text-main);">SlushAI 3D Modeller</span>
+                    </div>
+                    <div style="font-size: 9px; color: var(--text-sub); padding-left: 32px; letter-spacing: 0.05em; font-weight: 500;">Spatial Latent Understanding & Synthetic Hyper-Accuracy Intelligence</div>
+                </div>
+                <div style="display: flex; align-items: center; gap: 16px;">
+            <div style="display: flex; align-items: center; gap: 16px;">
+                <!-- User Profile Section -->
+                <div id="userProfile" style="display: flex; align-items: center; gap: 12px; padding: 6px 12px; background: var(--bg-soft); border: 1px solid var(--border-soft); border-radius: 8px;">
+                    <div style="display: flex; flex-direction: column; align-items: flex-end; gap: 2px;">
+                        <div style="display: flex; align-items: center; gap: 6px;">
+                            <span id="userName" style="font-size: 13px; font-weight: 600; color: var(--text-main);">Loading...</span>
+                            <span id="userBadge" style="font-size: 10px; padding: 2px 6px; border-radius: 4px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em;">...</span>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            <span id="userQuota" style="font-size: 11px; color: var(--text-sub);">... / 10 this week</span>
+                            <button onclick="window.location.href='/pricing'" style="font-size: 10px; padding: 2px 8px; background: linear-gradient(135deg, var(--accent-1), var(--accent-2)); border: none; border-radius: 4px; color: white; cursor: pointer; transition: all 0.2s; font-weight: 600;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'" title="Upgrade plan">Upgrade</button>
+                            <button onclick="window.location.href='/auth/logout'" style="font-size: 10px; padding: 2px 6px; background: transparent; border: 1px solid var(--border-soft); border-radius: 4px; color: var(--text-sub); cursor: pointer; transition: all 0.2s;" onmouseover="this.style.borderColor='var(--accent-1)'; this.style.color='var(--accent-1)'" onmouseout="this.style.borderColor='var(--border-soft)'; this.style.color='var(--text-sub)'" title="Sign out">Logout</button>
+                        </div>
+                    </div>
+                    <img id="userAvatar" src="" style="width: 36px; height: 36px; border-radius: 50%; border: 2px solid var(--border-soft); object-fit: cover;" alt="User Avatar">
+                </div>
+                <div style="width: 1px; height: 40px; background: var(--border-soft);"></div>
+                <div style="display: flex; flex-direction: column; align-items: center;">
+                    <button id="screenshotBtn" onclick="exportScreenshot()" style="padding: 6px 12px; background: var(--bg-soft); border: 1px solid var(--border-soft); border-radius: 6px; color: var(--text-main); cursor: pointer; font-size: 12px; display: flex; align-items: center; gap: 6px; transition: all 0.2s;" title="Save Screenshot" onmouseover="this.style.borderColor='var(--accent-1)'" onmouseout="this.style.borderColor='var(--border-soft)'">
+                        <span>📸</span>
+                        <span>Screenshot</span>
+                    </button>
+                    <span id="screenshotCooldown" style="font-size: 10px; color: #ef4444; margin-top: 4px; font-weight: 600; display: none;"></span>
+                </div>
+                <div style="width: 1px; height: 40px; background: var(--border-soft);"></div>
+                <div style="display: flex; flex-direction: column; align-items: center;">
+                    <button onclick="window.open('/docs', '_blank')" style="padding: 6px 12px; background: var(--bg-soft); border: 1px solid var(--border-soft); border-radius: 6px; color: var(--text-main); cursor: pointer; font-size: 12px; display: flex; align-items: center; gap: 6px; transition: all 0.2s;" title="View Documentation" onmouseover="this.style.borderColor='var(--accent-1)'" onmouseout="this.style.borderColor='var(--border-soft)'">
+                        <span>📚</span>
+                        <span>Docs</span>
+                    </button>
+                </div>
+                <div style="width: 1px; height: 24px; background: var(--border-soft);"></div>
+                <span style="font-size: 10px; text-transform: uppercase; letter-spacing: 0.15em; color: var(--text-sub);">Theme</span>
+                <div style="display: flex; gap: 6px;">
+                    <div class="theme-dot theme-1" data-theme="1" title="Purple/Orange Theme"></div>
+                    <div class="theme-dot theme-2" data-theme="2" title="Blue/Cyan Theme"></div>
+                    <div class="theme-dot theme-3" data-theme="3" title="Grey Studio Theme"></div>
+                    <div class="theme-dot theme-4" data-theme="4" title="Red/Black Theme"></div>
+                    <div class="theme-dot theme-5" data-theme="5" title="Turquoise/Teal Theme"></div>
+                    <div class="theme-dot theme-6" data-theme="6" data-active="true" title="Green/Pink Theme (Meshy Style)"></div>
+                </div>
+                </div>
+            </div>
+            <!-- Last Event Notification -->
+            <div id="lastEventNotification" style="display: none; font-size: 11px; padding: 4px 12px; text-align: center; font-weight: 600; transition: all 0.3s;"></div>
+        </header>
+
+        <!-- VERTICAL NAVIGATION SIDEBAR -->
+        <nav class="nav-sidebar">
+            <div class="nav-item active" data-mode="image" title="Image to 3D">
+                <div class="nav-icon">🖼️</div>
+                <div class="nav-label">Image</div>
+            </div>
+            <div class="nav-item" data-mode="model" title="3D Model Viewer">
+                <div class="nav-icon">🎲</div>
+                <div class="nav-label">Model</div>
+            </div>
+            <div class="nav-item" data-mode="refine" title="Refine & Texture">
+                <div class="nav-icon">✨</div>
+                <div class="nav-label">Refine</div>
+            </div>
+            <div class="nav-item" data-mode="texture" title="Texture Paint">
+                <div class="nav-icon">🎨</div>
+                <div class="nav-label">Texture</div>
+            </div>
+            <div class="nav-item" data-mode="animate" title="Animation (Coming Soon)">
+                <div class="nav-icon">🏃</div>
+                <div class="nav-label">Animate</div>
+            </div>
+            <div class="nav-item" data-mode="structures" title="Structures (Coming Soon)">
+                <div class="nav-icon">🏛️</div>
+                <div class="nav-label">Structures</div>
+            </div>
+            <div class="nav-item" data-mode="favorites" title="Favorite Models">
+                <div class="nav-icon">⭐</div>
+                <div class="nav-label">Favorites</div>
+            </div>
+            <div class="nav-item" data-mode="issues" title="Community Issues Board" onclick="window.location.href='/issues'">
+                <div class="nav-icon">🐛</div>
+                <div class="nav-label">Issues?</div>
+            </div>
+        </nav>
+
+        <!-- LEFT SIDEBAR -->
+        <div class="sidebar-left" style="margin-top: 52px;">
+            <!-- IMAGE MODE PANEL -->
+            <div class="mode-panel active" id="imageMode">
+                <div class="sidebar-header">
+                    <h2>New Image</h2>
+                    <div class="tabs">
+                        <button class="tab active" data-tab="image">Image</button>
+                        <button class="tab" data-tab="prompt">Prompt</button>
+                    </div>
+                </div>
+
+                <div class="controls">
+                <!-- IMAGE TAB CONTENT -->
+                <div class="image-container" id="imageTab">
+                <div class="control-group">
+                    <label>Upload Reference Image</label>
+                    <div class="upload-area" id="uploadArea">
+                        <div class="upload-glow"></div>
+                        <div class="upload-card">
+                            <div class="upload-content" id="uploadContent">
+                                <div id="uploadPrompt" style="text-align: center; padding: 20px;">
+                                    <div style="font-size: 48px; margin-bottom: 10px; opacity: 0.9;">🎨</div>
+                                    <div style="font-size: 13px; color: var(--text-main); font-weight: 500;">Click or Drop Image</div>
+                                    <div style="font-size: 11px; color: var(--text-sub); margin-top: 5px;">png, jpg, jpeg, webp</div>
+                                </div>
+                                <img id="uploadPreview" style="display: none; width: 100%; height: 100%; object-fit: cover;">
+                            </div>
+                            <div class="upload-footer" id="uploadFooter" style="display: none;">
+                                <p style="font-size: 10px; text-transform: uppercase; letter-spacing: 0.15em; color: rgba(249, 115, 22, 0.8);">Ready to Generate</p>
+                                <p style="font-size: 12px; font-weight: 600; color: var(--text-main); margin-top: 4px;" id="uploadFileName">Image uploaded</p>
+                            </div>
+                        </div>
+                    </div>
+                    <input type="file" id="fileInput" accept="image/*">
+                </div>
+
+                <div class="control-group">
+                    <label>AI Model</label>
+                    <select id="modelSelect">
+                        <option value="triposr" selected>TripoSR (High Quality) - Recommended</option>
+                        <option value="native">Native (Fast - 2.5D only)</option>
+                    </select>
+                    <div style="font-size: 11px; color: var(--text-sub); margin-top: 5px;">⚠️ Use TripoSR for full 3D models</div>
+                </div>
+
+                <!-- Stage 3 (#12): the Aspect Ratio buttons and Generation
+                     Time select were removed — they were UI-only and never
+                     sent to the backend, so they promised settings the
+                     generation never used. -->
+
+                <div class="control-group">
+                    <label>Texture/Refinement</label>
+                    <select id="textureSelect">
+                        <option value="none">Geometry Only (Fastest)</option>
+                        <option value="native" selected>Add Texture (Recommended)</option>
+                    </select>
+                    <div style="font-size: 11px; color: var(--text-sub); margin-top: 5px;">💡 Adds UV mapping and texture to model</div>
+                </div>
+
+                <button class="generate-btn accent-pill" id="generateBtn" disabled>
+                    <span>⚡</span>
+                    <span>Generate 3D Model</span>
+                </button>
+                </div>
+
+                <!-- PROMPT TAB CONTENT -->
+                <div class="prompt-container" id="promptTab">
+                    <div class="control-group">
+                        <label>Prompt</label>
+                        <div style="position: relative;">
+                            <textarea id="promptInput" placeholder="Describe the image you want to generate. You can use your native language. Example: 一只可爱的哈士奇🐶" style="min-height: 80px; padding-right: 60px;"></textarea>
+                            <span class="char-counter" id="charCounter">0/ 800</span>
+                        </div>
+                    </div>
+
+                    <div class="control-group">
+                        <label style="display: flex; align-items: center; gap: 8px;">
+                            AI Model
+                            <select id="aiModelSelect" style="width: auto; flex: 1;">
+                                <option value="nano-banana-pro">Nano Banana Pro</option>
+                                <option value="nano-banana">Nano Banana</option>
+                                <option value="flux-kontext">Flux Kontext</option>
+                                <option value="flux-dev">Flux Dev</option>
+                            </select>
+                        </label>
+                        <div style="display: flex; align-items: center; gap: 6px; margin-top: 8px;">
+                            <span style="font-size: 13px; color: var(--accent-1); font-weight: 600;">🔥 Nano Banana Pro</span>
+                            <span class="pro-badge">PRO</span>
+                            <span style="font-size: 11px; color: var(--text-sub);">— your next gener</span>
+                        </div>
+                    </div>
+
+                    <div class="control-group">
+                        <label>Reference Image (Optional)</label>
+                        <div style="background: var(--bg-soft); border: 1px dashed var(--border-soft); border-radius: 8px; padding: 16px; text-align: center; cursor: pointer;" id="refImageArea">
+                            <div style="font-size: 11px; color: var(--text-sub);">Click / Drag & Drop / Paste Image</div>
+                            <div style="font-size: 10px; color: var(--text-sub); opacity: 0.7; margin-top: 4px;">supported formats: png, jpg, jpeg, webp</div>
+                            <div style="font-size: 10px; color: var(--text-sub); opacity: 0.7;">Max size: 20MB</div>
+                        </div>
+                        <input type="file" id="refImageInput" accept="image/*" style="display: none;">
+                    </div>
+
+                    <div class="control-group">
+                        <div class="image-strength-container">
+                            <label>Image Strength</label>
+                            <span class="strength-value" id="strengthValue">0.5</span>
+                        </div>
+                        <input type="range" id="strengthSlider" min="0" max="1" step="0.05" value="0.5">
+                    </div>
+
+                    <div class="control-group">
+                        <label>Aspect Ratio</label>
+                        <div class="aspect-ratio-grid">
+                            <button class="aspect-btn active" data-ratio="1:1">1:1</button>
+                            <button class="aspect-btn" data-ratio="16:9">16:9</button>
+                            <button class="aspect-btn" data-ratio="9:16">9:16</button>
+                            <button class="aspect-btn" data-ratio="4:3">4:3</button>
+                            <button class="aspect-btn" data-ratio="3:4">3:4</button>
+                        </div>
+                    </div>
+
+                    <div class="cost-display">
+                        <span style="font-size: 12px; color: var(--text-sub);">Text-to-image is not available in this build — upload an image on the Image tab instead. No Nano Banana / Flux models are connected.</span>
+                    </div>
+
+                    <button class="generate-btn accent-pill" id="generatePromptBtn" disabled>
+                        <span>✨</span>
+                        <span>Generate</span>
+                    </button>
+                </div>
+                </div>
+            </div>
+
+            <!-- MODEL MODE PANEL -->
+            <div class="mode-panel" id="modelMode">
+                <div class="sidebar-header">
+                    <h2>3D Model Viewer</h2>
+                </div>
+                <div class="controls">
+                    <div class="control-group">
+                        <label>Load Model</label>
+                        <select id="loadModelSelect">
+                            <option value="">Select a model...</option>
+                        </select>
+                    </div>
+                    <div class="control-group">
+                        <label>Download current model</label>
+                        <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+                            <a class="view-btn" id="downloadObjBtn" href="#" download style="text-decoration: none;">⬇ .OBJ</a>
+                            <a class="view-btn" id="downloadMtlBtn" href="#" download style="text-decoration: none;">⬇ .MTL</a>
+                            <a class="view-btn" id="downloadPngBtn" href="#" download style="text-decoration: none;">⬇ .PNG texture</a>
+                        </div>
+                        <div style="font-size: 11px; color: var(--text-sub); margin-top: 5px;">GLB export is not produced by this build — OBJ + MTL + PNG only.</div>
+                    </div>
+                    <div class="control-group">
+                        <label>Base Color</label>
+                        <div style="font-size: 11px; color: var(--text-sub); margin-bottom: 6px;">Theme Colors</div>
+                        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px;">
+                            <button class="aspect-btn" data-color="theme-1" title="Purple/Orange" style="background: linear-gradient(135deg, #a855f7, #f97316); color: white; border: 2px solid transparent;"></button>
+                            <button class="aspect-btn" data-color="theme-2" title="Blue/Cyan" style="background: linear-gradient(135deg, #22d3ee, #6366f1); color: white; border: 2px solid transparent;"></button>
+                            <button class="aspect-btn" data-color="theme-3" title="Grey Studio" style="background: linear-gradient(135deg, #9ca3af, #e5e7eb); color: white; border: 2px solid transparent;"></button>
+                        </div>
+                        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 8px;">
+                            <button class="aspect-btn" data-color="theme-4" title="Red/Black" style="background: linear-gradient(135deg, #f97373, #b91c1c); color: white; border: 2px solid transparent;"></button>
+                            <button class="aspect-btn" data-color="theme-5" title="Turquoise/Teal" style="background: linear-gradient(135deg, #14b8a6, #22d3ee); color: white; border: 2px solid transparent;"></button>
+                            <button class="aspect-btn" data-color="theme-6" title="Green/Pink (Meshy)" style="background: linear-gradient(135deg, #22c55e, #ec4899); color: white; border: 2px solid transparent;"></button>
+                        </div>
+                        <div style="font-size: 11px; color: var(--text-sub); margin: 12px 0 6px;">Quick Colors</div>
+                        <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px;">
+                            <button class="aspect-btn" data-color="extracted" title="From Image" style="background: var(--accent-1); color: white;">🖼️</button>
+                            <button class="aspect-btn" data-color="clay" title="Clay" style="background: #d4a574; color: white;"></button>
+                            <button class="aspect-btn" data-color="white" title="White" style="background: #ffffff; color: #333;"></button>
+                            <button class="aspect-btn" data-color="gray" title="Gray" style="background: #808080; color: white;"></button>
+                        </div>
+                        <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-top: 8px;">
+                            <button class="aspect-btn" data-color="red" title="Red" style="background: #ff4444; color: white;"></button>
+                            <button class="aspect-btn" data-color="blue" title="Blue" style="background: #4488ff; color: white;"></button>
+                            <button class="aspect-btn" data-color="green" title="Green" style="background: #44ff88; color: white;"></button>
+                            <button class="aspect-btn" data-color="black" title="Black" style="background: #000000; color: white;"></button>
+                        </div>
+                        <input type="color" id="customColor" value="#a855f7" style="width: 100%; height: 36px; margin-top: 8px; cursor: pointer; border-radius: 6px; border: 1px solid var(--border-soft);" title="Custom Color">
+                    </div>
+                    <div class="control-group">
+                        <label>Material</label>
+                        <select id="materialSelect">
+                            <option value="standard">Standard (Matte)</option>
+                            <option value="glossy">Glossy</option>
+                            <option value="metal">Metallic</option>
+                            <option value="plastic">Plastic</option>
+                            <option value="clay" selected>Clay</option>
+                        </select>
+                    </div>
+                    <div class="control-group">
+                        <label>Display Mode</label>
+                        <div class="aspect-ratio-grid">
+                            <button class="aspect-btn active" id="solidBtn">Solid</button>
+                            <button class="aspect-btn" id="wireBtn">Wire</button>
+                            <button class="aspect-btn" id="pointsBtn">Points</button>
+                        </div>
+                    </div>
+                    <div class="control-group">
+                        <label>Shading</label>
+                        <select id="shadingSelect">
+                            <option value="smooth" selected>Smooth</option>
+                            <option value="flat">Flat</option>
+                        </select>
+                    </div>
+                    <button class="generate-btn accent-pill" id="importBtn">
+                        <span>📂</span>
+                        <span>Import Model</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- REFINE MODE PANEL -->
+            <div class="mode-panel" id="refineMode">
+                <div class="sidebar-header">
+                    <h2>Refine & Texture</h2>
+                </div>
+                <div class="controls">
+                    <div class="control-group">
+                        <label>Select Model to Refine</label>
+                        <select id="refineModelSelect">
+                            <option value="">Choose from recent generations...</option>
+                        </select>
+                    </div>
+                    <div class="control-group">
+                        <label>Refinement Level</label>
+                        <select>
+                            <option>Basic</option>
+                            <option>Standard</option>
+                            <option>High Quality</option>
+                        </select>
+                    </div>
+                    <div class="control-group">
+                        <label>Texture Resolution</label>
+                        <select>
+                            <option>1024x1024</option>
+                            <option>2048x2048</option>
+                            <option>4096x4096</option>
+                        </select>
+                    </div>
+                    <button class="generate-btn accent-pill">
+                        <span>✨</span>
+                        <span>Refine Model</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- TEXTURE MODE PANEL -->
+            <div class="mode-panel" id="textureMode">
+                <div class="sidebar-header">
+                    <h2>Texture Paint</h2>
+                </div>
+                <div class="controls">
+                    <div class="control-group">
+                        <label>Brush Size</label>
+                        <input type="range" min="1" max="100" value="20">
+                    </div>
+                    <div class="control-group">
+                        <label>Color</label>
+                        <input type="color" value="#a855f7" style="width: 100%; height: 40px; cursor: pointer;">
+                    </div>
+                    <div class="control-group">
+                        <label>Opacity</label>
+                        <input type="range" min="0" max="1" step="0.1" value="1.0">
+                    </div>
+                    <button class="generate-btn accent-pill">
+                        <span>💾</span>
+                        <span>Save Texture</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- ANIMATE MODE PANEL -->
+            <div class="mode-panel" id="animateMode">
+                <div class="sidebar-header">
+                    <h2>Animation</h2>
+                </div>
+                <div class="controls">
+                    <div style="text-align: center; padding: 40px 20px; color: var(--text-sub);">
+                        <div style="font-size: 48px; margin-bottom: 16px;">🏃</div>
+                        <h3 style="margin-bottom: 8px; color: var(--text-main);">Coming Soon</h3>
+                        <p style="font-size: 13px;">Animation features are in development</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- STRUCTURES MODE PANEL -->
+            <div class="mode-panel" id="structuresMode">
+                <div class="sidebar-header">
+                    <h2>Structures</h2>
+                </div>
+                <div class="controls">
+                    <div style="text-align: center; padding: 40px 20px; color: var(--text-sub);">
+                        <div style="font-size: 48px; margin-bottom: 16px;">🏛️</div>
+                        <h3 style="margin-bottom: 8px; color: var(--text-main);">Coming Soon</h3>
+                        <p style="font-size: 13px;">Generate architectural structures and buildings</p>
+                        <p style="font-size: 12px; margin-top: 12px; opacity: 0.7;">Create houses, temples, towers and more with AI</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- FAVORITES MODE PANEL -->
+            <div class="mode-panel" id="favoritesMode">
+                <div class="sidebar-header">
+                    <h2>Favorites</h2>
+                </div>
+                <div class="controls">
+                    <div id="favoritesList" style="max-height: calc(100vh - 200px); overflow-y: auto;">
+                        <div style="text-align: center; padding: 40px 20px; color: var(--text-sub);">
+                            <div style="font-size: 48px; margin-bottom: 16px;">⭐</div>
+                            <h3 style="margin-bottom: 8px; color: var(--text-main);">No Favorites Yet</h3>
+                            <p style="font-size: 13px;">Click the star icon on a model to add it here</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- CENTER VIEWER -->
+        <div class="viewer-area">
+            <div class="viewer-header">
+                <div class="viewer-title">3D Preview</div>
+                <div class="view-controls">
+                    <button class="view-btn" onclick="toggleWireframe()" title="Toggle wireframe mode">📐 Wireframe</button>
+                    <button class="view-btn" onclick="toggleTexture()" title="Toggle texture display">🎨 Texture</button>
+                    <button class="view-btn" onclick="resetCamera()" title="Reset camera position">🔄 Reset</button>
+                    <button class="view-btn" onclick="exportScreenshot()" title="Save screenshot as PNG">📸 Screenshot</button>
+                </div>
+            </div>
+            <div class="canvas-container">
+                <canvas id="canvas"></canvas>
+                <div class="empty-state" id="emptyState">
+                    <div class="empty-state-icon">🎨</div>
+                    <h3 style="margin-bottom: 10px;">What will you create today?</h3>
+                    <p>Generate a new model from image or text, or edit one from your asset library</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- RIGHT SIDEBAR -->
+        <div class="sidebar-right">
+            <div class="assets-header">
+                <input type="text" placeholder="🔍 Search my generation" id="searchInput" title="Search your models and images">
+                <div class="view-mode-btns">
+                    <button class="view-mode-btn active" title="Show All Assets">📁</button>
+                    <button class="view-mode-btn" title="Show Recent Images Only">📋</button>
+                    <button class="view-mode-btn" title="Show Recent Generations Only">🖼</button>
+                </div>
+            </div>
+
+            <div class="assets-list" id="assetsList">
+                <!-- Collections will be populated here -->
+            </div>
+
+            <div class="pagination">
+                <button class="page-btn">«</button>
+                <button class="page-btn">‹</button>
+                <span class="page-info">1/1</span>
+                <button class="page-btn">›</button>
+                <button class="page-btn">»</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Image Lightbox Overlay -->
+    <div class="image-lightbox" id="imageLightbox">
+        <div class="lightbox-content">
+            <button class="lightbox-close" onclick="closeLightbox()">&times;</button>
+            <img class="lightbox-image" id="lightboxImage" src="" alt="">
+        </div>
+    </div>
+
+    <!-- Loading Overlay -->
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="loading-card">
+            <div class="spinner"></div>
+            <h3 id="loadingTitle">Generating 3D Model...</h3>
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 10px;">
+                <p id="loadingStatus" style="font-size: 13px; color: var(--text-sub);">Initializing...</p>
+                <p id="loadingPercent" style="font-size: 14px; font-weight: 600; color: var(--accent-1);">0%</p>
+            </div>
+            <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; margin-top: 16px; padding-top: 16px; border-top: 1px solid var(--border-soft);">
+                <div style="text-align: center;">
+                    <div style="font-size: 10px; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-sub); opacity: 0.7; margin-bottom: 4px;">Elapsed</div>
+                    <div id="elapsedTime" style="font-size: 16px; font-weight: 600; color: var(--text-main); font-family: 'Monaco', monospace;">0:00</div>
+                </div>
+                <div style="text-align: center;">
+                    <div style="font-size: 10px; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-sub); opacity: 0.7; margin-bottom: 4px;">Est. Remaining</div>
+                    <div id="remainingTime" style="font-size: 16px; font-weight: 600; color: var(--accent-2); font-family: 'Monaco', monospace;">~2:30</div>
+                </div>
+                <div style="text-align: center;">
+                    <div style="font-size: 10px; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-sub); opacity: 0.7; margin-bottom: 4px;">Avg. Time</div>
+                    <div id="avgTime" style="font-size: 16px; font-weight: 600; color: var(--text-main); font-family: 'Monaco', monospace;">2:15</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script type="importmap">
+    {
+        "imports": {
+            "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+            "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+        }
+    }
+    </script>
+    <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
+    <script type="module">
+        import * as THREE from 'three';
+        import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+        import { OBJLoader } from 'three/addons/loaders/OBJLoader.js';
+
+        let scene, camera, renderer, controls, currentMesh;
+        let uploadedImage = null;
+        let lastLoadedModel = null;
+        let recentImages = JSON.parse(localStorage.getItem('recent-images') || '[]');
+        let favorites = JSON.parse(localStorage.getItem('favorite-images') || '[]');
+        let generationTimes = JSON.parse(localStorage.getItem('generation-times') || '[]');
+        let generationStartTime = 0;
+        let timerInterval = null;
+        
+        // Logging helper
+        async function logAction(type, details = {}) {
+            try {
+                await fetch('/api/log', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ type, details })
+                });
+            } catch (error) {
+                console.warn('Logging failed:', error);
+            }
+        }
+
+        // Initialize 3D scene
+        function initScene() {
+            const canvas = document.getElementById('canvas');
+            scene = new THREE.Scene();
+            scene.background = new THREE.Color(0x0f0f0f);
+            
+            camera = new THREE.PerspectiveCamera(45, canvas.clientWidth / canvas.clientHeight, 0.1, 1000);
+            camera.position.set(0, 1.5, 3.5);
+            
+            renderer = new THREE.WebGLRenderer({ 
+                canvas, 
+                antialias: true,
+                alpha: true,
+                powerPreference: 'high-performance'
+            });
+            renderer.setSize(canvas.clientWidth, canvas.clientHeight);
+            renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+            renderer.shadowMap.enabled = true;
+            renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+            renderer.toneMapping = THREE.ACESFilmicToneMapping;
+            renderer.toneMappingExposure = 1.0;
+            renderer.outputColorSpace = THREE.SRGBColorSpace;
+            
+            controls = new OrbitControls(camera, canvas);
+            controls.enableDamping = true;
+            controls.dampingFactor = 0.08;
+            
+            // Professional Meshy-style lighting
+            const ambient = new THREE.AmbientLight(0xffffff, 0.5);
+            scene.add(ambient);
+            
+            // Key light (main)
+            const keyLight = new THREE.DirectionalLight(0xffffff, 1.5);
+            keyLight.position.set(5, 8, 3);
+            keyLight.castShadow = true;
+            keyLight.shadow.mapSize.width = 2048;
+            keyLight.shadow.mapSize.height = 2048;
+            keyLight.shadow.camera.near = 0.5;
+            keyLight.shadow.camera.far = 50;
+            scene.add(keyLight);
+            
+            // Fill light (soft, cool)
+            const fillLight = new THREE.DirectionalLight(0xb3d9ff, 0.4);
+            fillLight.position.set(-5, 3, -3);
+            scene.add(fillLight);
+            
+            // Rim light (back highlight)
+            const rimLight = new THREE.DirectionalLight(0xffffff, 0.8);
+            rimLight.position.set(0, 3, -6);
+            scene.add(rimLight);
+            
+            // Top light (subtle)
+            const topLight = new THREE.DirectionalLight(0xffffff, 0.3);
+            topLight.position.set(0, 10, 0);
+            scene.add(topLight);
+            
+            const grid = new THREE.GridHelper(10, 20, 0x333333, 0x1a1a1a);
+            grid.position.y = -0.5;
+            scene.add(grid);
+            
+            animate();
+            window.addEventListener('resize', onResize);
+        }
+
+        function animate() {
+            requestAnimationFrame(animate);
+            controls.update();
+            renderer.render(scene, camera);
+        }
+
+        function onResize() {
+            const canvas = document.getElementById('canvas');
+            camera.aspect = canvas.clientWidth / canvas.clientHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(canvas.clientWidth, canvas.clientHeight);
+        }
+
+        // Apply initial mode from URL (e.g., ?mode=image)
+        (function() {
+            const params = new URLSearchParams(location.search);
+            const mode = params.get('mode');
+            if (mode) {
+                const item = document.querySelector(`.nav-item[data-mode="${mode}"]`);
+                if (item) item.click();
+            }
+        })();
+
+        // UI Event Handlers
+        document.getElementById('uploadArea').addEventListener('click', () => {
+            document.getElementById('fileInput').click();
+        });
+
+        document.getElementById('fileInput').addEventListener('change', (e) => {
+            handleFile(e.target.files[0]);
+        });
+
+// Paste clipboard images
+document.addEventListener('paste', (e) => {
+    const items = e.clipboardData?.items || [];
+    for (const it of items) {
+        if (it.type && it.type.startsWith('image/')) {
+            const file = it.getAsFile();
+            if (file) handleFile(file);
+        }
+    }
+});
+
+// Drag and drop
+        document.getElementById('uploadArea').addEventListener('dragover', (e) => {
+            e.preventDefault();
+            e.currentTarget.style.borderColor = 'var(--accent-1)';
+        });
+
+        document.getElementById('uploadArea').addEventListener('dragleave', (e) => {
+            e.currentTarget.style.borderColor = 'var(--border-soft)';
+        });
+
+        document.getElementById('uploadArea').addEventListener('drop', (e) => {
+            e.preventDefault();
+            e.currentTarget.style.borderColor = 'var(--border-soft)';
+            const file = e.dataTransfer.files[0];
+            if (file && file.type.startsWith('image/')) {
+                handleFile(file);
+            }
+        });
+
+        function handleFile(file) {
+            if (!file) return;
+            
+            // Log file upload
+            logAction('image_upload', { 
+                filename: file.name,
+                size: file.size,
+                type: file.type
+            });
+            
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                uploadedImage = e.target.result;
+                const preview = document.getElementById('uploadPreview');
+                const prompt = document.getElementById('uploadPrompt');
+                const footer = document.getElementById('uploadFooter');
+                const fileName = document.getElementById('uploadFileName');
+                const uploadArea = document.getElementById('uploadArea');
+                
+                // Load image to get dimensions
+                const img = new Image();
+                img.onload = () => {
+                    // Calculate aspect ratio
+                    const aspectRatio = img.width / img.height;
+                    
+                    // Set reasonable aspect ratio limits
+                    let finalAspectRatio = aspectRatio;
+                    if (aspectRatio > 2) finalAspectRatio = 2; // Max 2:1
+                    if (aspectRatio < 0.5) finalAspectRatio = 0.5; // Min 1:2
+                    
+                    // Update upload area aspect ratio
+                    uploadArea.style.aspectRatio = finalAspectRatio;
+                    
+preview.onerror = () => {
+    const promptBox = document.getElementById('uploadPrompt');
+    promptBox.style.display = 'block';
+    promptBox.innerHTML = '<div style="font-size:12px;color:var(--text-sub);">Preview not supported in this browser, but the server will convert automatically.</div>';
+    preview.style.display = 'none';
+};
+preview.src = uploadedImage;
+                    preview.style.display = 'block';
+                    prompt.style.display = 'none';
+                    footer.style.display = 'block';
+                    fileName.textContent = file.name || 'Image uploaded';
+                    
+                    document.getElementById('generateBtn').disabled = false;
+                };
+                img.src = uploadedImage;
+                
+                // Save to recent images
+                const imageData = {
+                    data: uploadedImage,
+                    name: file.name,
+                    timestamp: Date.now()
+                };
+                // Stage 3 (#12): bound the stored history. The count was
+                // already capped at 10, but each entry is a full data URL
+                // (unbounded bytes) — skip images over 250 KB and keep the
+                // total stored history under ~1 MB.
+                if (uploadedImage && uploadedImage.length < 250 * 1024) {
+                    recentImages.unshift(imageData);
+                    recentImages = recentImages.slice(0, 10);
+                    while (recentImages.length > 0 &&
+                           JSON.stringify(recentImages).length > 1024 * 1024) {
+                        recentImages.pop();
+                    }
+                    localStorage.setItem('recent-images', JSON.stringify(recentImages));
+                }
+                
+                // Extract dominant colors from image for texturing
+                extractImageColors(uploadedImage);
+            };
+            reader.readAsDataURL(file);
+        }
+
+        // Extract dominant colors from image
+        function extractImageColors(imageSrc) {
+            const img = new Image();
+            img.onload = () => {
+                const canvas = document.createElement('canvas');
+                const ctx = canvas.getContext('2d');
+                canvas.width = img.width;
+                canvas.height = img.height;
+                ctx.drawImage(img, 0, 0);
+                
+                const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+                const pixels = imageData.data;
+                
+                // Sample pixels and get average color
+                let r = 0, g = 0, b = 0;
+                const sampleSize = 100;
+                const step = Math.floor(pixels.length / (sampleSize * 4));
+                
+                for (let i = 0; i < pixels.length; i += step * 4) {
+                    r += pixels[i];
+                    g += pixels[i + 1];
+                    b += pixels[i + 2];
+                }
+                
+                r = Math.floor(r / sampleSize);
+                g = Math.floor(g / sampleSize);
+                b = Math.floor(b / sampleSize);
+                
+                // Store for texture use
+                localStorage.setItem('extracted-color', JSON.stringify({ r, g, b }));
+            };
+            img.src = imageSrc;
+        }
+
+        // Tab switching
+        document.querySelectorAll('.tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+                const tabName = tab.dataset.tab;
+                document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                tab.classList.add('active');
+                
+                // Show/hide content
+                document.getElementById('imageTab').style.display = tabName === 'image' ? 'block' : 'none';
+                document.getElementById('promptTab').style.display = tabName === 'prompt' ? 'block' : 'none';
+            });
+        });
+
+        // Navigation mode switching
+        document.querySelectorAll('.nav-item').forEach(item => {
+            item.addEventListener('click', () => {
+                let mode = item.dataset.mode;
+                document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
+                item.classList.add('active');
+                
+                // Log mode switch
+                logAction('mode_switch', { mode });
+                
+                // Hide all mode panels
+                document.querySelectorAll('.mode-panel').forEach(panel => panel.classList.remove('active'));
+                
+                // Show selected mode panel
+                const modeMap = {
+                    'image': 'imageMode',
+                    'model': 'modelMode',
+                    'refine': 'refineMode',
+                    'texture': 'textureMode',
+                    'animate': 'animateMode',
+                    'structures': 'structuresMode',
+                    'favorites': 'favoritesMode'
+                };
+                
+                const targetPanel = document.getElementById(modeMap[mode]);
+                if (targetPanel) {
+                    targetPanel.classList.add('active');
+                }
+            });
+        });
+
+
+        // Prompt character counter
+        const promptInput = document.getElementById('promptInput');
+        const charCounter = document.getElementById('charCounter');
+        if (promptInput) {
+            promptInput.addEventListener('input', () => {
+                const length = promptInput.value.length;
+                charCounter.textContent = `${length}/ 800`;
+                document.getElementById('generatePromptBtn').disabled = length === 0;
+            });
+        }
+
+        // Image strength slider
+        const strengthSlider = document.getElementById('strengthSlider');
+        const strengthValue = document.getElementById('strengthValue');
+        if (strengthSlider) {
+            strengthSlider.addEventListener('input', () => {
+                strengthValue.textContent = strengthSlider.value;
+            });
+        }
+
+        // Reference image upload for prompt tab
+        const refImageArea = document.getElementById('refImageArea');
+        const refImageInput = document.getElementById('refImageInput');
+        if (refImageArea) {
+            refImageArea.addEventListener('click', () => refImageInput.click());
+            refImageInput.addEventListener('change', (e) => {
+                const file = e.target.files[0];
+                if (file) {
+                    refImageArea.innerHTML = `<div style="font-size: 11px; color: var(--accent-1);">✓ ${file.name}</div>`;
+                }
+            });
+        }
+
+        // Prompt tab generate button
+        document.getElementById('generatePromptBtn')?.addEventListener('click', async () => {
+            const promptText = document.getElementById('promptInput').value;
+            if (!promptText) return;
+            
+            // TODO: Implement text-to-image generation
+            // For now, show a placeholder message
+            alert('Text-to-image generation is not available in this build. Upload an image on the Image tab instead — no Nano Banana / Flux models are connected.');
+        });
+
+        // Aspect ratio buttons
+        document.querySelectorAll('.aspect-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.aspect-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+            });
+        });
+
+        // Timer helper functions
+        function formatTime(seconds) {
+            const mins = Math.floor(seconds / 60);
+            const secs = seconds % 60;
+            return `${mins}:${secs.toString().padStart(2, '0')}`;
+        }
+        
+        function getAverageTime() {
+            if (generationTimes.length === 0) return 150; // Default 2:30
+            const sum = generationTimes.reduce((a, b) => a + b, 0);
+            return Math.round(sum / generationTimes.length);
+        }
+        
+        function startTimer() {
+            generationStartTime = Date.now();
+            const elapsedEl = document.getElementById('elapsedTime');
+            const remainingEl = document.getElementById('remainingTime');
+            const avgEl = document.getElementById('avgTime');
+            
+            // Set average time
+            avgEl.textContent = formatTime(getAverageTime());
+            
+            timerInterval = setInterval(() => {
+                const elapsed = Math.floor((Date.now() - generationStartTime) / 1000);
+                elapsedEl.textContent = formatTime(elapsed);
+                
+                // Estimate remaining based on average and current progress
+                const currentPercent = parseInt(document.getElementById('loadingPercent').textContent) || 0;
+                const avgTime = getAverageTime();
+                const estimatedTotal = Math.max(avgTime, elapsed / (currentPercent / 100));
+                const remaining = Math.max(0, Math.ceil(estimatedTotal - elapsed));
+                remainingEl.textContent = '~' + formatTime(remaining);
+            }, 1000);
+        }
+        
+        function stopTimer() {
+            if (timerInterval) {
+                clearInterval(timerInterval);
+                timerInterval = null;
+            }
+            
+            // Save generation time
+            const totalTime = Math.floor((Date.now() - generationStartTime) / 1000);
+            generationTimes.push(totalTime);
+            // Keep last 20 times
+            if (generationTimes.length > 20) {
+                generationTimes.shift();
+            }
+            localStorage.setItem('generation-times', JSON.stringify(generationTimes));
+        }
+
+        // Socket.IO wiring for real-time progress
+        const socket = io();
+        socket.on('generation_started', () => {
+            const overlay = document.getElementById('loadingOverlay');
+            overlay.classList.add('active');
+            startTimer();
+        });
+        socket.on('progress', (data) => {
+            const progressFill = document.getElementById('progressFill');
+            const statusText = document.getElementById('loadingStatus');
+            const percentText = document.getElementById('loadingPercent');
+            const map = { loading: 'Loading...', extract: 'Extracting mesh geometry...', texture: 'Baking texture...' };
+            progressFill.style.width = `${data.percent}%`;
+            percentText.textContent = `${data.percent}%`;
+            statusText.textContent = map[data.stage] || 'Processing...';
+        });
+        socket.on('generation_complete', async (data) => {
+            try { await loadModel(data.preview_path); } catch (e) { console.error(e); }
+            stopTimer();
+            document.getElementById('loadingOverlay').classList.remove('active');
+            loadAssets();
+            loadUserProfile(); // Refresh quota after completion
+        });
+        socket.on('models_changed', () => loadAssets());
+
+        // Generate button
+        document.getElementById('generateBtn').addEventListener('click', async () => {
+            if (!uploadedImage) return;
+            
+            const overlay = document.getElementById('loadingOverlay');
+            const emptyState = document.getElementById('emptyState');
+            const progressFill = document.getElementById('progressFill');
+            const statusText = document.getElementById('loadingStatus');
+            const percentText = document.getElementById('loadingPercent');
+            const model = document.getElementById('modelSelect').value;
+            
+            // Log generation start
+            logAction('generation_start', { backend: model });
+            
+            overlay.classList.add('active');
+            emptyState.style.display = 'none';
+            startTimer();
+            
+            try {
+                // Stage 1: Preparing (2%)
+                progressFill.style.width = '2%';
+                statusText.textContent = 'Preparing generation...';
+                percentText.textContent = '2%';
+                await new Promise(resolve => setTimeout(resolve, 300));
+                
+                // Stage 2: Uploading (5%)
+                progressFill.style.width = '5%';
+                statusText.textContent = 'Uploading image...';
+                percentText.textContent = '5%';
+                
+                const formData = new FormData();
+                // Convert data URL to blob directly (fetch can fail on data URLs)
+                const dataURLtoBlob = (dataURL) => {
+                    const arr = dataURL.split(',');
+                    const mime = arr[0].match(/:(.*?);/)[1];
+                    const bstr = atob(arr[1]);
+                    let n = bstr.length;
+                    const u8arr = new Uint8Array(n);
+                    while(n--){
+                        u8arr[n] = bstr.charCodeAt(n);
+                    }
+                    return new Blob([u8arr], {type:mime});
+                };
+                const blob = dataURLtoBlob(uploadedImage);
+                formData.append('image', blob, 'upload.jpg');
+                formData.append('backend', model);
+                formData.append('texture', document.getElementById('textureSelect')?.value || 'native');
+                
+                // Stage 3: Loading model weights (10%)
+                progressFill.style.width = '10%';
+                statusText.textContent = 'Loading model weights...';
+                percentText.textContent = '10%';
+                await new Promise(resolve => setTimeout(resolve, 500));
+                
+                // Stage 4: Preprocessing (15%)
+                progressFill.style.width = '15%';
+                statusText.textContent = 'Preprocessing image...';
+                percentText.textContent = '15%';
+                
+                const generatePromise = fetch('/api/generate', {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                // The POST only queues the job — poll the real task status
+                // (Stage 3, #11). The old code faked progress to 95% over
+                // ~8 s while the real job takes minutes, then called
+                // loadModel(data.preview_path) on a queued response that has
+                // no preview_path (loadModel(undefined)).
+                const response = await generatePromise;
+
+                if (!response.ok) {
+                    if (response.status === 429) {
+                        const data = await response.json();
+                        const remaining = data.quota?.remaining || 0;
+                        const used = data.quota?.used_this_week || 0;
+                        const limit = data.quota?.weekly_limit || 10;
+                        throw new Error(`Weekly quota exceeded! You've used ${used}/${limit} free models this week. Quota resets on ${new Date(data.quota.reset_date).toLocaleDateString()}.`);
+                    }
+                    const data = await response.json().catch(() => ({}));
+                    throw new Error(data.error || 'Generation failed');
+                }
+
+                const queued = await response.json();
+                const taskId = queued.task_id;
+                if (!taskId) throw new Error('Server did not return a task id');
+                statusText.textContent = 'Queued — waiting for a worker...';
+                // Poll the real task status until it completes or fails.
+                let previewPath = null;
+                for (;;) {
+                    const stResp = await fetch(`/api/task/${taskId}/status`);
+                    if (!stResp.ok) throw new Error('Could not read task status');
+                    const st = await stResp.json();
+                    const elapsed = Math.floor((Date.now() - generationStartTime) / 1000);
+                    if (st.status === 'completed') {
+                        previewPath = st.result && st.result.preview_path;
+                        break;
+                    }
+                    if (st.status === 'failed' || st.status === 'cancelled') {
+                        throw new Error(st.error || 'Generation failed');
+                    }
+                    // Progress tied to real state: queued shows position and
+                    // estimated wait; processing advances slowly with elapsed
+                    // time and never pretends to be nearly done.
+                    if (st.status === 'queued') {
+                        const wait = st.estimated_wait_seconds || 0;
+                        statusText.textContent = `Queued — position ${st.position || '?'} of ${st.queue_length || '?'} (est. wait ${Math.ceil(wait / 60)} min)`;
+                        const pct = Math.min(20, 5 + Math.floor(elapsed / 10));
+                        progressFill.style.width = pct + '%';
+                        percentText.textContent = pct + '%';
+                    } else {
+                        statusText.textContent = `Processing… ${Math.floor(elapsed / 60)}:${String(elapsed % 60).padStart(2, '0')} elapsed`;
+                        const pct = Math.min(90, 25 + Math.floor(elapsed / 12));
+                        progressFill.style.width = pct + '%';
+                        percentText.textContent = pct + '%';
+                    }
+                    await new Promise(resolve => setTimeout(resolve, 2000));
+                }
+                if (!previewPath) throw new Error('Generation finished but returned no model path');
+                progressFill.style.width = '100%';
+                statusText.textContent = 'Finalizing...';
+                percentText.textContent = '100%';
+                logAction('generation_complete', {
+                    path: previewPath,
+                    duration: Math.floor((Date.now() - generationStartTime) / 1000)
+                });
+                await loadModel(previewPath);
+                loadAssets(); // Refresh asset list
+                loadUserProfile(); // Refresh quota
+            } catch (error) {
+                console.error('Generation error:', error);
+                logAction('generation_error', { error: error.message });
+                alert('Generation failed: ' + error.message);
+            }
+            
+            stopTimer();
+            overlay.classList.remove('active');
+            progressFill.style.width = '0%';
+            percentText.textContent = '0%';
+        });
+
+        // Currently loaded generated texture (sibling .png of the model),
+        // or null when the model has none. Texture display defaults on.
+        let currentTexture = null;
+        window.__textureOn = true;
+
+        // (Re)apply the material for the loaded mesh: the real generated
+        // texture when display is on and one exists, else the clay colour
+        // (extracted image colour, or the theme accent). Stage 3 (#12):
+        // the viewer used to always show clay, even for textured models.
+        function applyModelMaterial() {
+            if (!currentMesh) return;
+            currentMesh.traverse((child) => {
+                if (!child.isMesh) return;
+                if (window.__textureOn && currentTexture) {
+                    child.material = new THREE.MeshStandardMaterial({
+                        map: currentTexture,
+                        metalness: 0.1,
+                        roughness: 0.85,
+                        envMapIntensity: 0.5
+                    });
+                } else {
+                    let color = 0xd4a574; // Default clay color
+                    const extractedColor = localStorage.getItem('extracted-color');
+                    if (extractedColor) {
+                        try {
+                            const { r, g, b } = JSON.parse(extractedColor);
+                            color = (r << 16) | (g << 8) | b;
+                        } catch (e) {
+                            console.warn('Failed to parse extracted color:', e);
+                        }
+                    } else {
+                        const accentColor = getComputedStyle(document.documentElement)
+                            .getPropertyValue('--accent-1').trim();
+                        if (accentColor && accentColor.startsWith('#')) {
+                            color = parseInt(accentColor.substring(1), 16);
+                        }
+                    }
+                    child.material = new THREE.MeshStandardMaterial({
+                        color: color,
+                        metalness: 0.2,
+                        roughness: 0.8,
+                        envMapIntensity: 0.5
+                    });
+                }
+                child.castShadow = true;
+                child.receiveShadow = true;
+            });
+        }
+
+        // Load and display 3D model
+        async function loadModel(path) {
+            if (currentMesh) {
+                scene.remove(currentMesh);
+            }
+            
+            const loader = new OBJLoader();
+            const obj = await loader.loadAsync(path);
+            
+            obj.traverse((child) => {
+                if (child.isMesh) {
+                    child.scale.x *= -1; // Fix mirror
+                }
+            });
+
+            // Load the generated texture when it exists so the viewer shows
+            // the real texture instead of always clay. Real filenames:
+            //  TripoSR (baked): <stem>.png next to the model.
+            //  Native planar texture: <refined-stem>_albedo.png.
+            // Try each in turn; a missing file 404s and is caught.
+            currentTexture = null;
+            const texCandidates = [
+                path.replace(/\.obj$/i, '.png'),
+                path.replace(/\.obj$/i, '_albedo.png'),
+            ];
+            for (const texPath of texCandidates) {
+                try {
+                    currentTexture = await new THREE.TextureLoader().loadAsync(texPath);
+                    if (currentTexture) { currentTexture.colorSpace = THREE.SRGBColorSpace; break; }
+                } catch (e) { currentTexture = null; }
+            }
+            currentMesh = obj;
+            scene.add(obj);
+            applyModelMaterial();
+            updateDownloadLinks(path);
+
+            // Center and scale BEFORE rotation for proper bounds
+            const box = new THREE.Box3().setFromObject(obj);
+            const center = box.getCenter(new THREE.Vector3());
+            const size = box.getSize(new THREE.Vector3());
+            const scale = 2 / Math.max(size.x, size.y, size.z);
+            
+            obj.position.sub(center.multiplyScalar(scale));
+            obj.scale.multiplyScalar(scale);
+            
+            // Fix orientation - rotate to face forward (TripoSR outputs in different coordinate system)
+            obj.rotation.x = -Math.PI / 2; // Rotate 90 degrees to stand upright
+            
+            // Hide empty state when model loads
+            const emptyState = document.getElementById('emptyState');
+            if (emptyState) {
+                emptyState.style.display = 'none';
+            }
+            
+            // Remember last loaded model
+            lastLoadedModel = path;
+            localStorage.setItem('last-loaded-model', path);
+            
+            // Update model selector dropdown
+            updateModelSelector();
+        }
+
+        // Update model selector with last loaded model
+        function updateModelSelector() {
+            const selector = document.getElementById('loadModelSelect');
+            const refineSelector = document.getElementById('refineModelSelect');
+            
+            if (lastLoadedModel && selector) {
+                const modelName = lastLoadedModel.split('/').pop().replace('.obj', '');
+                selector.innerHTML = `
+                    <option value="${lastLoadedModel}" selected>${modelName} (Current)</option>
+                    <option value="">Load another model...</option>
+                `;
+            }
+            
+            if (lastLoadedModel && refineSelector) {
+                const modelName = lastLoadedModel.split('/').pop().replace('.obj', '');
+                refineSelector.innerHTML = `
+                    <option value="${lastLoadedModel}" selected>${modelName} (Current)</option>
+                    <option value="">Choose from recent generations...</option>
+                `;
+            }
+        }
+
+        // Load assets from server
+        let latestModelPath = null;
+        async function loadAssets() {
+            try {
+                try {
+                    const favResp = await fetch('/api/favorites/list');
+                    const favData = await favResp.json();
+                    window.__favPaths = (favData.favorites || []).map(f => f.model_path);
+                    const favList = document.getElementById('favoritesList');
+                    if (favList) {
+                        if (!window.__favPaths.length) {
+                            favList.innerHTML = `<div style="text-align: center; padding: 40px 20px; color: var(--text-sub);">
+                                <div style="font-size: 48px; margin-bottom: 16px;">⭐</div>
+                                <h3 style="margin-bottom: 8px; color: var(--text-main);">No Favorites Yet</h3>
+                                <p style="font-size: 13px;">Click the star icon on a model to add it here</p>
+                            </div>`;
+                        } else {
+                            favList.innerHTML = window.__favPaths.map(p =>
+                                `<div style="padding: 8px; border-bottom: 1px solid var(--border-soft); cursor: pointer;" onclick="loadModel('${p}')">${p.split('/').pop()}</div>`
+                            ).join('');
+                        }
+                    }
+                } catch (e) { console.warn('Could not load favorites:', e); }
+                const response = await fetch('/api/models');
+                const models = await response.json();
+                
+                const assetsList = document.getElementById('assetsList');
+                const collections = {};
+                
+                // Group by collection
+                models.forEach(model => {
+                    const collection = 'Recent Generations';
+                    if (!collections[collection]) {
+                        collections[collection] = [];
+                    }
+                    collections[collection].push(model);
+                });
+                
+                // Add recent images section
+                let recentImagesHTML = '';
+                if (recentImages.length > 0) {
+                    recentImagesHTML = `
+                        <div class="collection">
+                            <div class="collection-header">
+                                <span class="collection-title">Recent Images</span>
+                                <span class="collection-count">${recentImages.length} uploaded ›</span>
+                            </div>
+                            <div class="assets-grid">
+                                ${recentImages.slice(0, 6).map((img, index) => {
+                                    return `
+                                    <div class="asset-card" onclick="openImageLightbox(${index})" title="Click to view full size" style="position: relative;">
+                                        <div class="asset-thumbnail">
+                                            <img src="${img.data}" style="width: 100%; height: 100%; object-fit: cover;">
+                                        </div>
+                                        <div class="asset-info">
+                                            <div class="asset-name">${img.name}</div>
+                                            <div class="asset-stats">Source Image</div>
+                                        </div>
+                                    </div>
+                                `}).join('')}
+                            </div>
+                        </div>
+                    `;
+                }
+                
+                // Render collections
+                assetsList.innerHTML = recentImagesHTML + Object.entries(collections).map(([name, assets]) => `
+                    <div class="collection">
+                        <div class="collection-header">
+                            <span class="collection-title">${name}</span>
+                            <span class="collection-count">All ${assets.length} assets ›</span>
+                        </div>
+                        <div class="assets-grid">
+                            ${assets.slice(0, 6).map(asset => `
+                                <div class="asset-card" onclick="loadModel('${asset.path}')">
+                                    <div class="favorite-star ${(window.__favPaths || []).includes(asset.path) ? 'favorited' : ''}" onclick="event.stopPropagation(); toggleFavorite('${asset.path}')" title="${(window.__favPaths || []).includes(asset.path) ? 'Remove from favorites' : 'Add to favorites'}">
+                                        ${(window.__favPaths || []).includes(asset.path) ? '⭐' : '☆'}
+                                    </div>
+                                    <div class="asset-thumbnail">
+                                        <img src="/api/thumbnail?path=${encodeURIComponent(asset.path)}" 
+                                             onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22100%22 height=%22100%22%3E%3Crect fill=%22%231a1a1a%22 width=%22100%22 height=%22100%22/%3E%3Ctext x=%2250%25%22 y=%2250%25%22 text-anchor=%22middle%22 dy=%22.3em%22 fill=%22%23666%22%3E3D%3C/text%3E%3C/svg%3E'">
+                                    </div>
+                                    <div class="asset-info">
+                                        <div class="asset-name">${asset.name}</div>
+                                        <div class="asset-stats">${(asset.vertices || 0).toLocaleString()} verts</div>
+                                    </div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                `).join('');
+                
+                // Populate model selectors
+                const loadModelSelect = document.getElementById('loadModelSelect');
+                const refineModelSelect = document.getElementById('refineModelSelect');
+                
+                // Auto-load newest model if it's new
+                if (models.length > 0) {
+                    const newest = models[0];
+                    if (newest && newest.path && newest.path !== latestModelPath) {
+                        latestModelPath = newest.path;
+                        // If user hasn't loaded anything yet or a new model appeared, auto-load
+                        if (!lastLoadedModel || newest.modified > (Date.now()/1000 - 10)) {
+                            try { await loadModel(newest.path); } catch(e) { console.warn('Auto-load failed:', e); }
+                        }
+                    }
+                }
+
+                if (models.length > 0 && loadModelSelect) {
+                    const options = models.map(model => 
+                        `<option value="${model.path}">${model.name}</option>`
+                    ).join('');
+                    loadModelSelect.innerHTML = `
+                        <option value="">Select a model...</option>
+                        ${options}
+                    `;
+                    
+                    // Set last loaded model if exists
+                    if (lastLoadedModel) {
+                        loadModelSelect.value = lastLoadedModel;
+                    }
+                }
+                
+                if (models.length > 0 && refineModelSelect) {
+                    const options = models.map(model => 
+                        `<option value="${model.path}">${model.name}</option>`
+                    ).join('');
+                    refineModelSelect.innerHTML = `
+                        <option value="">Choose from recent generations...</option>
+                        ${options}
+                    `;
+                    
+                    // Set last loaded model if exists
+                    if (lastLoadedModel) {
+                        refineModelSelect.value = lastLoadedModel;
+                    }
+                }
+            } catch (error) {
+                console.error('Error loading assets:', error);
+            }
+        }
+
+        // Export functions for buttons
+        window.toggleWireframe = function() {
+            // Stage 3 (#12): was an empty stub. Toggles the real wireframe
+            // display mode on the loaded mesh.
+            const isWire = document.getElementById('wireBtn')?.classList.contains('active');
+            setDisplayMode(isWire ? 'solid' : 'wireframe');
+        };
+
+        window.toggleTexture = function() {
+            // Stage 3 (#12): was an empty stub. Switches the loaded mesh
+            // between its generated texture (when one exists) and clay.
+            if (!currentMesh) return;
+            window.__textureOn = !window.__textureOn;
+            applyModelMaterial();
+        };
+
+        // Download links for the currently loaded model (Stage 3, #12).
+        function updateDownloadLinks(modelPath) {
+            const set = (id, href) => {
+                const el = document.getElementById(id);
+                if (el) el.href = href || '#';
+            };
+            if (!modelPath) { set('downloadObjBtn'); set('downloadMtlBtn'); set('downloadPngBtn'); return; }
+            const base = '/' + modelPath.replace(/^\/+/, '');
+            set('downloadObjBtn', base);
+            set('downloadMtlBtn', base.replace(/\.obj$/i, '.mtl'));
+            set('downloadPngBtn', base.replace(/\.obj$/i, '.png'));
+        }
+
+        // Favorite toggle, wired to the server API (Stage 3, #12).
+        // The old code called toggleFavorite() but never defined it.
+        async function toggleFavorite(modelPath) {
+            const isFav = (window.__favPaths || []).includes(modelPath);
+            const url = isFav ? '/api/favorites/remove' : '/api/favorites/add';
+            try {
+                const resp = await fetch(url, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ model_path: modelPath })
+                });
+                if (!resp.ok) { console.warn('Favorite toggle failed:', resp.status); return; }
+                const favs = await (await fetch('/api/favorites/list')).json();
+                window.__favPaths = (favs.favorites || []).map(f => f.model_path);
+                loadAssets();
+            } catch (e) { console.error('Favorite toggle failed:', e); }
+        }
+        window.toggleFavorite = toggleFavorite;
+
+        window.resetCamera = function() {
+            camera.position.set(0, 1.5, 3.5);
+            controls.target.set(0, 0, 0);
+            controls.update();
+            logAction('camera_reset', {});
+        };
+
+        let screenshotCooldownTimer = null;
+        
+        // Last Event Notification System
+        window.showLastEvent = function(message, type = 'error') {
+            const notification = document.getElementById('lastEventNotification');
+            if (!notification) return;
+            
+            notification.textContent = message;
+            notification.style.display = 'block';
+            notification.style.color = type === 'error' ? '#ef4444' : type === 'success' ? '#22c55e' : '#fbbf24';
+            
+            // Auto-clear after 5 seconds
+            setTimeout(() => {
+                notification.style.display = 'none';
+            }, 5000);
+        };
+        
+        // Initialize screenshot cooldown on page load
+        async function initScreenshotCooldown() {
+            try {
+                const response = await fetch('/api/screenshot/cooldown');
+                const data = await response.json();
+                
+                if (data.on_cooldown && data.remaining_seconds > 0) {
+                    startScreenshotCooldown(data.remaining_seconds);
+                }
+            } catch (error) {
+                console.warn('Could not check screenshot cooldown:', error);
+            }
+        }
+        
+        window.exportScreenshot = async function() {
+            const btn = document.getElementById('screenshotBtn');
+            const cooldownText = document.getElementById('screenshotCooldown');
+            
+            // Check if on cooldown
+            if (btn.disabled) {
+                return;
+            }
+            
+            renderer.render(scene, camera);
+            const dataURL = renderer.domElement.toDataURL('image/png');
+            
+            // Download locally
+            const link = document.createElement('a');
+            const timestamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, -5);
+            link.download = `ai3d_screenshot_${timestamp}.png`;
+            link.href = dataURL;
+            link.click();
+            
+            // Send to server for logging
+            try {
+                const response = await fetch('/api/screenshot', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ image: dataURL })
+                });
+                
+                if (response.ok) {
+                    const result = await response.json();
+                    console.log('Screenshot saved to server:', result.path);
+                    await logAction('screenshot_captured', {
+                        filename: result.filename,
+                        path: result.path
+                    });
+                    
+                    // Start cooldown timer
+                    startScreenshotCooldown(result.cooldown || 60);
+                } else if (response.status === 429) {
+                    // Rate limited - start cooldown anyway
+                    const errorData = await response.json();
+                    startScreenshotCooldown(60);
+                    showLastEvent(errorData.message || 'Screenshot limit reached. Please wait 1 minute.');
+                } else {
+                    const errorData = await response.json();
+                    showLastEvent(errorData.error || 'Failed to save screenshot');
+                }
+            } catch (error) {
+                console.warn('Could not save screenshot to server:', error);
+            }
+        };
+        
+        function startScreenshotCooldown(seconds) {
+            const btn = document.getElementById('screenshotBtn');
+            const cooldownText = document.getElementById('screenshotCooldown');
+            
+            // Disable button
+            btn.disabled = true;
+            btn.style.opacity = '0.5';
+            btn.style.cursor = 'not-allowed';
+            
+            // Show countdown
+            cooldownText.style.display = 'block';
+            
+            let remaining = seconds;
+            
+            // Clear any existing timer
+            if (screenshotCooldownTimer) {
+                clearInterval(screenshotCooldownTimer);
+            }
+            
+            // Update countdown every second
+            screenshotCooldownTimer = setInterval(() => {
+                remaining--;
+                
+                if (remaining <= 0) {
+                    // Cooldown finished
+                    clearInterval(screenshotCooldownTimer);
+                    btn.disabled = false;
+                    btn.style.opacity = '1';
+                    btn.style.cursor = 'pointer';
+                    cooldownText.style.display = 'none';
+                } else {
+                    // Update countdown display
+                    cooldownText.textContent = `Wait ${remaining}s`;
+                }
+            }, 1000);
+            
+            // Initial display
+            cooldownText.textContent = `Wait ${remaining}s`;
+        }
+
+        window.loadModel = async function(path) {
+            await logAction('model_load_start', { path });
+            return loadModel(path).then(() => {
+                logAction('model_load_complete', { path });
+            }).catch(error => {
+                logAction('model_load_error', { path, error: error.message });
+                throw error;
+            });
+        };
+        
+        // Image lightbox functions
+        window.openImageLightbox = function(index) {
+            const image = recentImages[index];
+            if (!image) return;
+            
+            const lightbox = document.getElementById('imageLightbox');
+            const lightboxImage = document.getElementById('lightboxImage');
+            
+            lightboxImage.src = image.data;
+            lightboxImage.alt = image.name;
+            lightbox.classList.add('active');
+        };
+        
+        window.closeLightbox = function() {
+            const lightbox = document.getElementById('imageLightbox');
+            lightbox.classList.remove('active');
+        };
+        
+        // Close lightbox on background click
+        document.getElementById('imageLightbox')?.addEventListener('click', (e) => {
+            if (e.target.id === 'imageLightbox') {
+                closeLightbox();
+            }
+        });
+        
+        // Close lightbox with Escape key
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                closeLightbox();
+            }
+        });
+        
+        // Load recent image back into upload area by index
+        window.loadRecentImageByIndex = function(index) {
+            const image = recentImages[index];
+            if (!image) return;
+            
+            // Set as current uploaded image
+            uploadedImage = image.data;
+            
+            // Update UI
+            const preview = document.getElementById('uploadPreview');
+            const prompt = document.getElementById('uploadPrompt');
+            const footer = document.getElementById('uploadFooter');
+            const fileName = document.getElementById('uploadFileName');
+            
+            preview.src = uploadedImage;
+            preview.style.display = 'block';
+            prompt.style.display = 'none';
+            footer.style.display = 'block';
+            fileName.textContent = image.name;
+            
+            document.getElementById('generateBtn').disabled = false;
+            
+            // Extract colors again
+            extractImageColors(uploadedImage);
+            
+            // Switch to Image mode and Image tab
+            document.querySelector('.nav-item[data-mode="image"]')?.click();
+            document.querySelector('.tab[data-tab="image"]')?.click();
+        };
+        
+        // Initial asset load; subsequent updates pushed via socket
+        loadAssets();
+        
+        // Model selector change handler
+        document.getElementById('loadModelSelect')?.addEventListener('change', (e) => {
+            const path = e.target.value;
+            if (path) {
+                loadModel(path);
+            }
+        });
+
+        // Color preset buttons
+        document.querySelectorAll('[data-color]').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const colorType = btn.dataset.color;
+                logAction('color_change', { type: colorType });
+                applyModelColor(colorType);
+            });
+        });
+
+        // Custom color picker
+        document.getElementById('customColor')?.addEventListener('change', (e) => {
+            const hex = e.target.value;
+            const color = parseInt(hex.substring(1), 16);
+            updateModelColor(color);
+        });
+
+        // Material selector
+        document.getElementById('materialSelect')?.addEventListener('change', (e) => {
+            logAction('material_change', { type: e.target.value });
+            applyMaterial(e.target.value);
+        });
+
+        // Display mode buttons
+        document.getElementById('solidBtn')?.addEventListener('click', () => {
+            logAction('display_mode_change', { mode: 'solid' });
+            setDisplayMode('solid');
+        });
+        document.getElementById('wireBtn')?.addEventListener('click', () => {
+            logAction('display_mode_change', { mode: 'wireframe' });
+            setDisplayMode('wireframe');
+        });
+        document.getElementById('pointsBtn')?.addEventListener('click', () => {
+            logAction('display_mode_change', { mode: 'points' });
+            setDisplayMode('points');
+        });
+
+        // Shading selector
+        document.getElementById('shadingSelect')?.addEventListener('change', (e) => {
+            logAction('shading_change', { type: e.target.value });
+            setShading(e.target.value);
+        });
+
+        // Color application function
+        function applyModelColor(type) {
+            let color;
+            switch(type) {
+                case 'theme-1':
+                    color = 0xa855f7; // Purple
+                    break;
+                case 'theme-2':
+                    color = 0x22d3ee; // Cyan
+                    break;
+                case 'theme-3':
+                    color = 0x9ca3af; // Grey
+                    break;
+                case 'theme-4':
+                    color = 0xf97373; // Red
+                    break;
+                case 'theme-5':
+                    color = 0x14b8a6; // Teal
+                    break;
+                case 'theme-6':
+                    color = 0x22c55e; // Green (Meshy)
+                    break;
+                case 'extracted':
+                    const extracted = localStorage.getItem('extracted-color');
+                    if (extracted) {
+                        const { r, g, b } = JSON.parse(extracted);
+                        color = (r << 16) | (g << 8) | b;
+                    }
+                    break;
+                case 'clay':
+                    color = 0xd4a574;
+                    break;
+                case 'white':
+                    color = 0xffffff;
+                    break;
+                case 'gray':
+                    color = 0x808080;
+                    break;
+                case 'red':
+                    color = 0xff4444;
+                    break;
+                case 'blue':
+                    color = 0x4488ff;
+                    break;
+                case 'green':
+                    color = 0x44ff88;
+                    break;
+                case 'black':
+                    color = 0x000000;
+                    break;
+            }
+            if (color !== undefined) {
+                updateModelColor(color);
+            }
+        }
+
+        function updateModelColor(color) {
+            if (currentMesh) {
+                currentMesh.traverse((child) => {
+                    if (child.isMesh && child.material) {
+                        child.material.color.setHex(color);
+                    }
+                });
+            }
+        }
+
+        function applyMaterial(type) {
+            if (!currentMesh) return;
+            currentMesh.traverse((child) => {
+                if (child.isMesh) {
+                    const currentColor = child.material.color.getHex();
+                    let newMaterial;
+                    switch(type) {
+                        case 'standard':
+                            newMaterial = new THREE.MeshStandardMaterial({
+                                color: currentColor,
+                                metalness: 0.0,
+                                roughness: 1.0
+                            });
+                            break;
+                        case 'glossy':
+                            newMaterial = new THREE.MeshStandardMaterial({
+                                color: currentColor,
+                                metalness: 0.1,
+                                roughness: 0.3
+                            });
+                            break;
+                        case 'metal':
+                            newMaterial = new THREE.MeshStandardMaterial({
+                                color: currentColor,
+                                metalness: 1.0,
+                                roughness: 0.2
+                            });
+                            break;
+                        case 'plastic':
+                            newMaterial = new THREE.MeshStandardMaterial({
+                                color: currentColor,
+                                metalness: 0.0,
+                                roughness: 0.5
+                            });
+                            break;
+                        case 'clay':
+                            newMaterial = new THREE.MeshStandardMaterial({
+                                color: currentColor,
+                                metalness: 0.2,
+                                roughness: 0.8
+                            });
+                            break;
+                    }
+                    child.material = newMaterial;
+                }
+            });
+        }
+
+        function setDisplayMode(mode) {
+            if (!currentMesh) return;
+            document.querySelectorAll('#solidBtn, #wireBtn, #pointsBtn').forEach(b => b.classList.remove('active'));
+            currentMesh.traverse((child) => {
+                if (child.isMesh) {
+                    if (mode === 'solid') {
+                        child.material.wireframe = false;
+                        child.visible = true;
+                        document.getElementById('solidBtn').classList.add('active');
+                    } else if (mode === 'wireframe') {
+                        child.material.wireframe = true;
+                        child.visible = true;
+                        document.getElementById('wireBtn').classList.add('active');
+                    } else if (mode === 'points') {
+                        // Points mode would need PointsMaterial
+                        child.material.wireframe = false;
+                        document.getElementById('pointsBtn').classList.add('active');
+                    }
+                }
+            });
+        }
+
+        function setShading(type) {
+            if (!currentMesh) return;
+            currentMesh.traverse((child) => {
+                if (child.isMesh && child.geometry) {
+                    if (type === 'flat') {
+                        child.geometry.computeVertexNormals();
+                        child.material.flatShading = true;
+                    } else {
+                        child.geometry.computeVertexNormals();
+                        child.material.flatShading = false;
+                    }
+                    child.material.needsUpdate = true;
+                }
+            });
+        }
+
+        // View mode buttons - switch between sections
+        document.querySelectorAll('.view-mode-btn').forEach((btn, index) => {
+            btn.addEventListener('click', () => {
+                const viewModes = ['all', 'images', 'models'];
+                logAction('view_filter_change', { filter: viewModes[index] });
+                
+                document.querySelectorAll('.view-mode-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                
+                const collections = document.querySelectorAll('#assetsList .collection');
+                
+                if (index === 0) {
+                    // Show all sections
+                    collections.forEach(col => col.style.display = 'block');
+                } else if (index === 1) {
+                    // Show only Recent Images
+                    collections.forEach((col, idx) => {
+                        if (idx === 0 && col.querySelector('.collection-title')?.textContent === 'Recent Images') {
+                            col.style.display = 'block';
+                        } else {
+                            col.style.display = 'none';
+                        }
+                    });
+                } else if (index === 2) {
+                    // Show only Recent Generations
+                    collections.forEach(col => {
+                        if (col.querySelector('.collection-title')?.textContent === 'Recent Generations') {
+                            col.style.display = 'block';
+                        } else {
+                            col.style.display = 'none';
+                        }
+                    });
+                }
+            });
+        });
+
+        // Restore last loaded model from localStorage
+        const savedModel = localStorage.getItem('last-loaded-model');
+        if (savedModel) {
+            lastLoadedModel = savedModel;
+        }
+        
+        // Keyboard shortcuts
+        document.addEventListener('keydown', async (e) => {
+            // Cmd+S or Ctrl+S for screenshot
+            if ((e.metaKey || e.ctrlKey) && e.key === 's') {
+                e.preventDefault();
+                await window.exportScreenshot();
+            }
+            
+            // Escape to close lightbox
+            if (e.key === 'Escape') {
+                closeLightbox();
+            }
+        });
+        
+        // Load user profile and quota info
+        async function loadUserProfile() {
+            try {
+                const response = await fetch('/api/user/profile');
+                if (response.ok) {
+                    const profile = await response.json();
+                    
+                    // Update UI elements
+                    document.getElementById('userName').textContent = profile.name;
+                    document.getElementById('userAvatar').src = profile.picture || '/assets/default-avatar.png';
+                    
+                    // Update badge
+                    const badgeEl = document.getElementById('userBadge');
+                    badgeEl.textContent = profile.badge_name;
+                    badgeEl.style.background = profile.badge_color;
+                    badgeEl.style.color = '#fff';
+                    
+                    // Update quota display
+                    const quotaEl = document.getElementById('userQuota');
+                    const usedCount = profile.quota.used_this_week;
+                    const totalCount = profile.quota.weekly_limit;
+                    const remaining = profile.quota.remaining;
+                    
+                    quotaEl.textContent = `${usedCount} / ${totalCount} this week`;
+                    
+                    // Warning color if quota is low
+                    if (remaining <= 2) {
+                        quotaEl.style.color = 'var(--accent-1)';
+                    } else if (remaining === 0) {
+                        quotaEl.style.color = '#f43f5e';
+                        quotaEl.textContent = 'Quota exceeded';
+                    }
+                    
+                    console.log('User profile loaded:', profile);
+                } else {
+                    console.error('Failed to load user profile');
+                }
+            } catch (error) {
+                console.error('Error loading user profile:', error);
+            }
+        }
+
+        // Log viewer session start
+        logAction('viewer_started', {
+            theme: localStorage.getItem('selected-theme') || '6',
+            hasRecentImages: recentImages.length > 0,
+            lastModel: lastLoadedModel
+        });
+
+        // Initialize
+        initScene();
+        loadAssets();
+        loadUserProfile(); // Load user profile on startup
+        initScreenshotCooldown(); // Check screenshot cooldown on page load
+    </script>
+
+    <!-- Support Floating Button -->
+    <button class="support-floating-btn" onclick="openSupportModal()" title="Need help?">💬</button>
+
+    <!-- Support Modal -->
+    <div class="support-modal" id="member-support-modal" onclick="if(event.target === this) closeSupportModal()">
+        <div class="support-modal-content">
+            <button class="support-close-btn" onclick="closeSupportModal()">×</button>
+            <h2>💬 Get Support</h2>
+            <p>Having an issue? Your account info will be automatically included.</p>
+            
+            <form id="member-support-form">
+                <textarea id="member-support-message" class="form-input" placeholder="Describe your issue..." rows="5" style="resize: vertical; min-height: 120px; font-family: inherit; width: 100%; padding: 12px; background: var(--bg-soft); border: 1px solid var(--border-soft); border-radius: 8px; color: var(--text-main);" required></textarea>
+                <button type="submit" class="generate-btn" id="member-support-submit-btn" style="width: 100%; margin-top: 16px;">Send Message</button>
+            </form>
+            <div id="member-support-message-container" style="margin-top: 16px;"></div>
+        </div>
+    </div>
+
+    <script>
+        // Support Modal Functions
+        function openSupportModal() {
+            document.getElementById('member-support-modal').style.display = 'flex';
+        }
+
+        function closeSupportModal() {
+            document.getElementById('member-support-modal').style.display = 'none';
+            document.getElementById('member-support-form').reset();
+            document.getElementById('member-support-message-container').innerHTML = '';
+        }
+
+        // Member Support Form Handler
+        document.getElementById('member-support-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const message = document.getElementById('member-support-message').value.trim();
+            const btn = document.getElementById('member-support-submit-btn');
+            const msgContainer = document.getElementById('member-support-message-container');
+            
+            if (!message) {
+                msgContainer.innerHTML = '<div style="padding: 12px; background: rgba(239, 68, 68, 0.1); border: 1px solid #ef4444; border-radius: 8px; color: #ef4444; font-size: 13px;">❌ Please describe your issue</div>';
+                return;
+            }
+            
+            btn.disabled = true;
+            btn.textContent = 'Sending...';
+            msgContainer.innerHTML = '';
+            
+            try {
+                // Fetch current user profile for name and email
+                const profileResponse = await fetch('/api/user/profile');
+                const profile = await profileResponse.json();
+                
+                const response = await fetch('/api/support/submit', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ 
+                        name: profile.name, 
+                        email: profile.email, 
+                        message, 
+                        is_member: true 
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    msgContainer.innerHTML = '<div style="padding: 12px; background: rgba(34, 197, 94, 0.1); border: 1px solid #22c55e; border-radius: 8px; color: #22c55e; font-size: 13px;">✅ Message sent! We\'ll get back to you soon.</div>';
+                    document.getElementById('member-support-form').reset();
+                    setTimeout(() => {
+                        closeSupportModal();
+                    }, 2000);
+                } else {
+                    msgContainer.innerHTML = `<div style="padding: 12px; background: rgba(239, 68, 68, 0.1); border: 1px solid #ef4444; border-radius: 8px; color: #ef4444; font-size: 13px;">❌ ${data.error || 'Failed to send message'}</div>`;
+                }
+            } catch (error) {
+                msgContainer.innerHTML = '<div style="padding: 12px; background: rgba(239, 68, 68, 0.1); border: 1px solid #ef4444; border-radius: 8px; color: #ef4444; font-size: 13px;">❌ Network error. Please try again.</div>';
+            } finally {
+                btn.disabled = false;
+                btn.textContent = 'Send Message';
+            }
+        });
+    </script>
+
+    <script src="themeSwitcher.js"></script>
+</body>
+</html>

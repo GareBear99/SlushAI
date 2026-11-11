@@ -1,0 +1,20 @@
+# SlushAI core deps: everything the Flask server needs at startup.
+# (The Mac's system python is 3.13.7 — pins here must have cp313 wheels.)
+# Pipeline libs (numpy/Pillow/trimesh/xatlas/PyMCubes) live in
+# requirements-pipeline.txt and install in the background job.
+Flask==3.1.0
+Flask-CORS==5.0.0
+Flask-SocketIO==5.3.6
+Flask-Login==0.6.3
+Flask-Limiter==3.12.0
+Authlib==1.3.2
+# cryptography is Authlib's dep. Unpinned pip picks 50.0.2, which has NO cp313
+# x86_64 wheel — it then tries a Rust/maturin source build that fails (no
+# OpenSSL dev headers / pkg-config on the Mac). 44.0.3 ships a cp313 wheel.
+cryptography==44.0.3
+python-dotenv==1.0.1
+requests==2.32.3
+stripe==16.1.0
+bcrypt==4.1.2
+PyJWT==2.8.0
+tqdm==4.66.4

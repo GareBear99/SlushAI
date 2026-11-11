@@ -1,0 +1,1316 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SlushAI 3D Modeller - Sign In</title>
+    <link rel="stylesheet" href="themes.css" />
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--bg);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow-y: auto;
+            overflow-x: hidden;
+        }
+
+        .landing-container {
+            text-align: center;
+            max-width: 500px;
+            padding: 40px;
+            margin: 40px auto;
+        }
+
+        .logo {
+            font-size: 64px;
+            margin-bottom: 20px;
+            background: linear-gradient(135deg, var(--accent-1), var(--accent-2));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-weight: 800;
+        }
+
+        h1 {
+            font-size: 42px;
+            font-weight: 700;
+            margin-bottom: 12px;
+            background: linear-gradient(135deg, var(--accent-1), var(--accent-2));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .subtitle {
+            font-size: 18px;
+            color: var(--text-sub);
+            margin-bottom: 40px;
+        }
+
+        .features {
+            display: grid;
+            gap: 16px;
+            margin-bottom: 40px;
+            text-align: left;
+        }
+
+        .feature {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 16px;
+            background: var(--card);
+            border-radius: 12px;
+            border: 1px solid var(--border-soft);
+        }
+
+        .badge-section {
+            margin: 40px 0;
+            padding: 24px;
+            background: var(--card);
+            border-radius: 12px;
+            border: 1px solid var(--border-soft);
+        }
+
+        .badge-section h3 {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 16px;
+            text-align: center;
+        }
+
+        .badge-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 12px;
+            margin-top: 16px;
+        }
+
+        .badge-item {
+            text-align: center;
+            padding: 12px;
+            background: var(--bg-soft);
+            border-radius: 8px;
+        }
+
+        .badge-icon {
+            font-size: 32px;
+            margin-bottom: 8px;
+        }
+
+        .badge-name {
+            font-size: 12px;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .badge-req {
+            font-size: 11px;
+            color: var(--text-sub);
+        }
+
+        .pricing-preview {
+            margin: 40px 0;
+            padding: 24px;
+            background: var(--card);
+            border-radius: 12px;
+            border: 1px solid var(--border-soft);
+        }
+
+        .pricing-preview h3 {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 16px;
+            text-align: center;
+        }
+
+        .pricing-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 16px;
+            margin-top: 16px;
+        }
+
+        .pricing-tier {
+            padding: 16px;
+            background: var(--bg-soft);
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .tier-name {
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .tier-price {
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--accent-1);
+            margin-bottom: 8px;
+        }
+
+        .tier-quota {
+            font-size: 12px;
+            color: var(--text-sub);
+        }
+
+        .feature-icon {
+            font-size: 24px;
+            min-width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--bg-soft);
+            border-radius: 8px;
+        }
+
+        .feature-text h3 {
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .feature-text p {
+            font-size: 12px;
+            color: var(--text-sub);
+        }
+
+        .google-signin-btn {
+            width: 100%;
+            padding: 16px 24px;
+            background: white;
+            color: #1f2937;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            transition: all 0.2s;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+        }
+
+        .google-signin-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 24px rgba(0, 0, 0, 0.2);
+        }
+
+        .google-icon {
+            width: 20px;
+            height: 20px;
+        }
+
+        .facebook-signin-btn {
+            width: 100%;
+            padding: 16px 24px;
+            background: #1877f2;
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            transition: all 0.2s;
+            box-shadow: 0 4px 20px rgba(24, 119, 242, 0.3);
+            margin-top: 12px;
+        }
+
+        .facebook-signin-btn:hover {
+            background: #166fe5;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 24px rgba(24, 119, 242, 0.4);
+        }
+
+        .signin-divider {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin: 20px 0;
+            color: var(--text-sub);
+            font-size: 13px;
+        }
+
+        .signin-divider::before,
+        .signin-divider::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: var(--border-soft);
+        }
+
+        .quota-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 8px 16px;
+            background: var(--accent-soft);
+            border-radius: 20px;
+            font-size: 13px;
+            color: var(--accent-1);
+            margin-top: 20px;
+        }
+
+        .email-form {
+            width: 100%;
+            margin-top: 20px;
+        }
+
+        .form-toggle {
+            display: flex;
+            gap: 8px;
+            justify-content: center;
+            margin-bottom: 16px;
+        }
+
+        .toggle-option {
+            padding: 8px 24px;
+            background: var(--bg-soft);
+            border: 1px solid var(--border-soft);
+            border-radius: 6px;
+            font-size: 14px;
+            color: var(--text-sub);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .toggle-option.active {
+            background: var(--accent-1);
+            color: white;
+            border-color: var(--accent-1);
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 12px 16px;
+            background: var(--bg-soft);
+            border: 1px solid var(--border-soft);
+            border-radius: 8px;
+            color: var(--text-main);
+            font-size: 14px;
+            margin-bottom: 12px;
+            transition: all 0.2s;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: var(--accent-1);
+            background: var(--card);
+        }
+
+        .form-input::placeholder {
+            color: var(--text-sub);
+        }
+
+        .form-button {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, var(--accent-1), var(--accent-2));
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .form-button:hover {
+            transform: scale(1.02);
+            box-shadow: 0 8px 20px var(--accent-soft);
+        }
+
+        .form-button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .error-message {
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            color: #ef4444;
+            padding: 12px;
+            border-radius: 8px;
+            font-size: 13px;
+            margin-bottom: 12px;
+        }
+
+        .success-message {
+            background: rgba(34, 197, 94, 0.1);
+            border: 1px solid rgba(34, 197, 94, 0.3);
+            color: #22c55e;
+            padding: 12px;
+            border-radius: 8px;
+            font-size: 13px;
+            margin-bottom: 12px;
+        }
+
+        .password-strength {
+            font-size: 12px;
+            margin-top: -8px;
+            margin-bottom: 12px;
+            padding: 4px 8px;
+            border-radius: 4px;
+        }
+
+        .strength-weak { color: #ef4444; }
+        .strength-medium { color: #f59e0b; }
+        .strength-strong { color: #22c55e; }
+
+        .newsletter-checkbox {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 16px;
+            font-size: 13px;
+            color: var(--text-sub);
+        }
+
+        .newsletter-checkbox input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+            accent-color: var(--accent-1);
+        }
+
+        .newsletter-checkbox label {
+            cursor: pointer;
+        }
+
+        .animated-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            opacity: 0.3;
+        }
+
+        .animated-bg::before {
+            content: '';
+            position: absolute;
+            width: 500px;
+            height: 500px;
+            background: radial-gradient(circle, var(--accent-1), transparent 70%);
+            top: -250px;
+            left: -250px;
+            animation: float 20s infinite;
+        }
+
+        .animated-bg::after {
+            content: '';
+            position: absolute;
+            width: 600px;
+            height: 600px;
+            background: radial-gradient(circle, var(--accent-2), transparent 70%);
+            bottom: -300px;
+            right: -300px;
+            animation: float 25s infinite reverse;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translate(0, 0); }
+            50% { transform: translate(100px, 100px); }
+        }
+
+        .footer {
+            margin-top: 40px;
+            font-size: 12px;
+            color: var(--text-sub);
+        }
+
+        .docs-link {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 10px 20px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            color: var(--text-main);
+            text-decoration: none;
+            font-size: 13px;
+            font-weight: 500;
+            transition: all 0.2s;
+            backdrop-filter: blur(10px);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .docs-link:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: var(--accent-1);
+            transform: translateY(-2px);
+        }
+
+        /* Support Button */
+        .support-floating-btn {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--accent-1), var(--accent-2));
+            color: white;
+            font-size: 28px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            border: none;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+            transition: all 0.2s;
+            z-index: 1000;
+        }
+
+        .support-floating-btn:hover {
+            transform: scale(1.1);
+            box-shadow: 0 12px 32px rgba(0, 0, 0, 0.4);
+        }
+
+        /* Support Modal */
+        .support-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 2000;
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(8px);
+        }
+
+        .support-modal-content {
+            position: relative;
+            background: var(--card);
+            border-radius: 20px;
+            padding: 40px;
+            max-width: 500px;
+            width: 90%;
+            border: 1px solid var(--border-soft);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .support-modal h2 {
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 8px;
+            background: linear-gradient(135deg, var(--accent-1), var(--accent-2));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .support-modal-content > p {
+            color: var(--text-sub);
+            margin-bottom: 24px;
+            font-size: 14px;
+        }
+
+        .support-close-btn {
+            position: absolute;
+            top: 16px;
+            right: 16px;
+            background: none;
+            border: none;
+            font-size: 32px;
+            color: var(--text-sub);
+            cursor: pointer;
+            line-height: 1;
+            padding: 8px;
+            transition: all 0.2s;
+        }
+
+        .support-close-btn:hover {
+            color: var(--text-main);
+        }
+    </style>
+</head>
+<body class="app-bg">
+    <div class="animated-bg"></div>
+    
+    <a href="/docs" class="docs-link">
+        <span>📚</span>
+        <span>Documentation</span>
+    </a>
+    
+    <a href="/users" class="docs-link" style="top: 80px;">
+        <span>👥</span>
+        <span>Users</span>
+    </a>
+    
+    <div class="landing-container">
+        <div class="logo">✨</div>
+        <h1>SlushAI 3D Modeller</h1>
+        <div class="subtitle">Spatial Latent Understanding & Synthetic Hyper-Accuracy Intelligence</div>
+        <div class="subtitle" style="font-size: 16px; margin-top: 8px;">Transform images into 3D models instantly</div>
+
+        <!-- Sign In Buttons at Top -->
+        <a href="/auth/login" style="text-decoration: none;">
+            <button class="google-signin-btn">
+                <svg class="google-icon" viewBox="0 0 24 24">
+                    <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+                    <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+                    <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+                    <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+                </svg>
+                Sign in with Google
+            </button>
+        </a>
+
+        <div class="signin-divider">or</div>
+
+        <a href="/auth/facebook" style="text-decoration: none;">
+            <button class="facebook-signin-btn">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="white">
+                    <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+                </svg>
+                Sign in with Facebook
+            </button>
+        </a>
+
+        <div class="signin-divider">or sign up with email</div>
+
+        <!-- Email Form -->
+        <div class="email-form">
+            <div class="form-toggle">
+                <div class="toggle-option active" onclick="toggleForm('signup')" id="signup-toggle">Sign Up</div>
+                <div class="toggle-option" onclick="toggleForm('login')" id="login-toggle">Login</div>
+            </div>
+
+            <div id="message-container"></div>
+
+            <!-- Sign Up Form -->
+            <form id="signup-form" style="display: block;">
+                <input type="text" id="signup-name" class="form-input" placeholder="Full Name" required>
+                <input type="text" id="signup-username" class="form-input" placeholder="Username (3-20 characters)" pattern="[a-zA-Z][a-zA-Z0-9_]{2,19}" required oninput="checkUsernameAvailability()">
+                <div id="username-feedback" style="font-size: 12px; margin: -8px 0 12px 0; padding-left: 4px;"></div>
+                <input type="email" id="signup-email" class="form-input" placeholder="Email Address" required>
+                <input type="password" id="signup-password" class="form-input" placeholder="Password (min 8 chars)" required oninput="checkPasswordStrength()">
+                <div id="password-strength" class="password-strength"></div>
+                <input type="password" id="signup-confirm-password" class="form-input" placeholder="Confirm Password" required>
+                <div class="newsletter-checkbox">
+                    <input type="checkbox" id="newsletter-opt-in" checked>
+                    <label for="newsletter-opt-in">📧 Send me updates and news about SlushAI</label>
+                </div>
+                <button type="submit" class="form-button" id="signup-btn">Create Account</button>
+            </form>
+
+            <!-- Login Form -->
+            <form id="login-form" style="display: none;">
+                <input type="text" id="login-email" class="form-input" placeholder="Email or Username" required>
+                <input type="password" id="login-password" class="form-input" placeholder="Password" required>
+                <div class="newsletter-checkbox">
+                    <input type="checkbox" id="remember-me" checked>
+                    <label for="remember-me">🔒 Remember me for 30 days</label>
+                </div>
+                <button type="submit" class="form-button" id="login-btn">Sign In</button>
+                <div style="text-align: center; margin-top: 12px;">
+                    <a href="#" onclick="showForgotPasswordForm(); return false;" style="color: var(--accent-1); text-decoration: none; font-size: 13px;">Forgot Password?</a>
+                </div>
+            </form>
+
+            <!-- Forgot Password Form -->
+            <div id="forgot-password-form" style="display: none;">
+                <h3 style="font-size: 18px; margin-bottom: 12px;">🔒 Reset Password</h3>
+                <p style="font-size: 14px; color: var(--text-sub); margin-bottom: 16px;">
+                    Enter your email address and we'll send you a link to reset your password
+                </p>
+                <input type="email" id="reset-email" class="form-input" placeholder="Email Address" required>
+                <button type="button" class="form-button" id="reset-request-btn">Send Reset Link</button>
+                <button type="button" onclick="toggleForm('login')" style="margin-top: 12px; background: none; border: none; color: var(--text-sub); cursor: pointer; font-size: 13px; width: 100%;">← Back to Login</button>
+            </div>
+
+            <!-- Verification Code Form -->
+            <div id="verification-form" style="display: none;">
+                <h3 style="font-size: 18px; margin-bottom: 12px;">📧 Check Your Email</h3>
+                <p style="font-size: 14px; color: var(--text-sub); margin-bottom: 16px;">
+                    We sent a 6-digit verification code to <strong id="verify-email"></strong>
+                </p>
+                <input type="text" id="verification-code" class="form-input" placeholder="Enter 6-digit code" maxlength="6" inputmode="numeric" pattern="[0-9]{6}" autocomplete="off" style="text-align: center; font-size: 24px; letter-spacing: 8px; font-family: monospace; position: relative; z-index: 10;" required autofocus>
+                <div id="code-timer" style="font-size: 14px; color: var(--accent-1); margin: 12px 0; font-weight: 500;"></div>
+                <button type="button" class="form-button" id="verify-code-btn">Verify Code</button>
+                <button type="button" class="form-button" id="resend-code-btn" style="background: var(--bg-soft); color: var(--text-main); margin-top: 8px;" disabled>Resend Code (60s)</button>
+                <button type="button" onclick="showSignupForm()" style="margin-top: 12px; background: none; border: none; color: var(--text-sub); cursor: pointer; font-size: 13px;">← Back to Sign Up</button>
+            </div>
+        </div>
+
+        <div class="quota-badge">
+            <div>Claim your 🎁</div>
+            <div style="margin-top: 4px;">
+                <span>10 free models per week</span>
+            </div>
+        </div>
+
+        <div class="features">
+            <div class="feature">
+                <div class="feature-icon">⚡</div>
+                <div class="feature-text">
+                    <h3>Lightning Fast</h3>
+                    <p>Generate 3D models in 3 minutes with TripoSR</p>
+                </div>
+            </div>
+            <div class="feature">
+                <div class="feature-icon">🎯</div>
+                <div class="feature-text">
+                    <h3>Professional Quality</h3>
+                    <p>200K+ vertices with 2K texture maps</p>
+                </div>
+            </div>
+            <div class="feature">
+                <div class="feature-icon">🎁</div>
+                <div class="feature-text">
+                    <h3>Free Weekly Quota</h3>
+                    <p>10 free model generations per week</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Badge System -->
+        <div class="badge-section">
+            <h3>🏆 Earn Badges as You Create</h3>
+            <p style="text-align: center; font-size: 13px; color: var(--text-sub); margin-bottom: 16px;">Level up with every model you generate and unlock rewards!</p>
+            <div class="badge-grid">
+                <div class="badge-item">
+                    <div class="badge-icon" style="color: #94a3b8;">🔰</div>
+                    <div class="badge-name" style="color: #94a3b8;">Newcomer</div>
+                    <div class="badge-req">0-9 models</div>
+                </div>
+                <div class="badge-item">
+                    <div class="badge-icon" style="color: #3b82f6;">⭐</div>
+                    <div class="badge-name" style="color: #3b82f6;">Creator</div>
+                    <div class="badge-req">10-49 models</div>
+                </div>
+                <div class="badge-item">
+                    <div class="badge-icon" style="color: #8b5cf6;">✨</div>
+                    <div class="badge-name" style="color: #8b5cf6;">Artist</div>
+                    <div class="badge-req">50-199 models</div>
+                </div>
+                <div class="badge-item">
+                    <div class="badge-icon" style="color: #f59e0b;">👑</div>
+                    <div class="badge-name" style="color: #f59e0b;">Master</div>
+                    <div class="badge-req">200-499 models</div>
+                </div>
+                <div class="badge-item">
+                    <div class="badge-icon" style="color: #ef4444;">🔥</div>
+                    <div class="badge-name" style="color: #ef4444;">Legend</div>
+                    <div class="badge-req">500+ models</div>
+                </div>
+                <div class="badge-item" style="opacity: 0.6; cursor: help;" title="Secret badge - how do you unlock this?">
+                    <div class="badge-icon" style="color: #a855f7;">❓</div>
+                    <div class="badge-name" style="color: #a855f7;">???</div>
+                    <div class="badge-req">Mystery</div>
+                </div>
+            </div>
+            <p style="text-align: center; font-size: 12px; color: var(--accent-1); margin-top: 16px;">✨ Get quota reset rewards when you reach each level!</p>
+        </div>
+
+        <!-- Pricing Preview -->
+        <div class="pricing-preview">
+            <h3>💎 Flexible Pricing Plans</h3>
+            <div class="pricing-grid">
+                <div class="pricing-tier">
+                    <div class="tier-name">Free</div>
+                    <div class="tier-price">$0 USD/week</div>
+                    <div class="tier-quota">10 models/week</div>
+                </div>
+                <div class="pricing-tier" style="border: 2px solid var(--accent-1);">
+                    <div class="tier-name">Standard</div>
+                    <div class="tier-price">$3.47 USD<span style="font-size: 14px;">/week</span></div>
+                    <div class="tier-quota">40 models/week</div>
+                    <div style="font-size: 11px; color: #22c55e; margin-top: 4px;">
+                        💰 <span style="text-decoration: line-through; opacity: 0.6;">$180</span> $72 USD/year (save 60%)
+                    </div>
+                </div>
+                <div class="pricing-tier">
+                    <div class="tier-name">Pro</div>
+                    <div class="tier-price">$7.89 USD<span style="font-size: 14px;">/week</span></div>
+                    <div class="tier-quota">120 models/week</div>
+                    <div style="font-size: 11px; color: #22c55e; margin-top: 4px;">
+                        💰 <span style="text-decoration: line-through; opacity: 0.6;">$410</span> $164 USD/year (save 60%)
+                    </div>
+                </div>
+                <div class="pricing-tier" style="background: linear-gradient(135deg, rgba(59, 130, 246, 0.1), rgba(139, 92, 246, 0.1)); border: 1px solid rgba(59, 130, 246, 0.3);">
+                    <div class="tier-name">⚡ Quick Refill</div>
+                    <div class="tier-price">$1.00 USD</div>
+                    <div class="tier-quota">+10 models instantly</div>
+                </div>
+            </div>
+            <p style="text-align: center; font-size: 12px; color: var(--text-sub); margin-top: 16px;">
+                💳 Pay with Credit Card or 🪙 Crypto (BTC/ETH) • 
+                <a href="/docs" style="color: var(--accent-1); text-decoration: none;">View documentation →</a>
+            </p>
+        </div>
+
+        <div class="footer">
+            By signing in, you agree to our <a href="/docs" style="color: var(--accent-1); text-decoration: none;">Terms of Service and Privacy Policy</a>
+        </div>
+    </div>
+
+    <!-- Support Floating Button -->
+    <button class="support-floating-btn" onclick="openSupportModal()" title="Need help?">💬</button>
+
+    <!-- Support Modal -->
+    <div class="support-modal" id="support-modal" onclick="if(event.target === this) closeSupportModal()">
+        <div class="support-modal-content">
+            <button class="support-close-btn" onclick="closeSupportModal()">×</button>
+            <h2>💬 Get Support</h2>
+            <p>Having an issue? Send us a message and we'll get back to you soon!</p>
+            
+            <form id="support-form">
+                <input type="text" id="support-name" class="form-input" placeholder="Your Name" required>
+                <input type="email" id="support-email" class="form-input" placeholder="Your Email" required>
+                <textarea id="support-message" class="form-input" placeholder="Describe your issue..." rows="5" style="resize: vertical; min-height: 120px; font-family: inherit;" required></textarea>
+                <button type="submit" class="form-button" id="support-submit-btn">Send Message</button>
+            </form>
+            <div id="support-message-container"></div>
+        </div>
+    </div>
+
+    <script src="themeSwitcher.js"></script>
+    <script>
+        // Support Modal Functions
+        function openSupportModal() {
+            document.getElementById('support-modal').style.display = 'flex';
+        }
+
+        function closeSupportModal() {
+            document.getElementById('support-modal').style.display = 'none';
+            document.getElementById('support-form').reset();
+            document.getElementById('support-message-container').innerHTML = '';
+        }
+
+        // Support Form Handler
+        document.getElementById('support-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const name = document.getElementById('support-name').value.trim();
+            const email = document.getElementById('support-email').value.trim();
+            const message = document.getElementById('support-message').value.trim();
+            const btn = document.getElementById('support-submit-btn');
+            const msgContainer = document.getElementById('support-message-container');
+            
+            if (!name || !email || !message) {
+                msgContainer.innerHTML = '<div class="error-message">All fields are required</div>';
+                return;
+            }
+            
+            btn.disabled = true;
+            btn.textContent = 'Sending...';
+            msgContainer.innerHTML = '';
+            
+            try {
+                const response = await fetch('/api/support/submit', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ name, email, message, is_member: false })
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    msgContainer.innerHTML = '<div class="success-message">✅ Message sent! We\'ll get back to you soon.</div>';
+                    document.getElementById('support-form').reset();
+                    setTimeout(() => {
+                        closeSupportModal();
+                    }, 2000);
+                } else {
+                    msgContainer.innerHTML = `<div class="error-message">❌ ${data.error || 'Failed to send message'}</div>`;
+                }
+            } catch (error) {
+                msgContainer.innerHTML = '<div class="error-message">❌ Network error. Please try again.</div>';
+            } finally {
+                btn.disabled = false;
+                btn.textContent = 'Send Message';
+            }
+        });
+
+        function toggleForm(type) {
+            const signupForm = document.getElementById('signup-form');
+            const loginForm = document.getElementById('login-form');
+            const forgotForm = document.getElementById('forgot-password-form');
+            const verificationForm = document.getElementById('verification-form');
+            const signupToggle = document.getElementById('signup-toggle');
+            const loginToggle = document.getElementById('login-toggle');
+            const messageContainer = document.getElementById('message-container');
+            
+            messageContainer.innerHTML = '';
+            
+            // Hide all forms first
+            signupForm.style.display = 'none';
+            loginForm.style.display = 'none';
+            forgotForm.style.display = 'none';
+            verificationForm.style.display = 'none';
+            
+            if (type === 'signup') {
+                signupForm.style.display = 'block';
+                signupToggle.classList.add('active');
+                loginToggle.classList.remove('active');
+            } else {
+                loginForm.style.display = 'block';
+                signupToggle.classList.remove('active');
+                loginToggle.classList.add('active');
+            }
+        }
+        
+        function showForgotPasswordForm() {
+            document.getElementById('signup-form').style.display = 'none';
+            document.getElementById('login-form').style.display = 'none';
+            document.getElementById('verification-form').style.display = 'none';
+            document.getElementById('forgot-password-form').style.display = 'block';
+            document.getElementById('message-container').innerHTML = '';
+            document.getElementById('signup-toggle').classList.remove('active');
+            document.getElementById('login-toggle').classList.add('active');
+        }
+
+        function checkPasswordStrength() {
+            const password = document.getElementById('signup-password').value;
+            const strengthDiv = document.getElementById('password-strength');
+            
+            if (!password) {
+                strengthDiv.innerHTML = '';
+                return;
+            }
+            
+            let strength = 0;
+            if (password.length >= 8) strength++;
+            if (password.length >= 12) strength++;
+            if (/[a-z]/.test(password)) strength++;
+            if (/[A-Z]/.test(password)) strength++;
+            if (/[0-9]/.test(password)) strength++;
+            if (/[^a-zA-Z0-9]/.test(password)) strength++;
+            
+            if (strength < 3) {
+                strengthDiv.innerHTML = '⚠️ Weak password';
+                strengthDiv.className = 'password-strength strength-weak';
+            } else if (strength < 5) {
+                strengthDiv.innerHTML = '✓ Medium password';
+                strengthDiv.className = 'password-strength strength-medium';
+            } else {
+                strengthDiv.innerHTML = '✓✓ Strong password';
+                strengthDiv.className = 'password-strength strength-strong';
+            }
+        }
+
+        function showMessage(message, isError = false) {
+            const messageContainer = document.getElementById('message-container');
+            messageContainer.innerHTML = `<div class="${isError ? 'error-message' : 'success-message'}">${message}</div>`;
+        }
+
+        let currentUserId = null;
+        let currentEmail = null;
+        let codeExpiryTime = null;
+        let resendAllowedTime = null;
+        let countdownInterval = null;
+        let resendInterval = null;
+        let isPrivilegedLogin = false;
+        let userTier = null;
+        let rememberMeValue = true;
+
+        function showVerificationForm(userId, email, isPinVerification = false, tier = null) {
+            currentUserId = userId;
+            currentEmail = email;
+            isPrivilegedLogin = isPinVerification;
+            userTier = tier;
+            
+            // Hide signup/login forms
+            document.getElementById('signup-form').style.display = 'none';
+            document.getElementById('login-form').style.display = 'none';
+            document.getElementById('verification-form').style.display = 'block';
+            document.getElementById('verify-email').textContent = email;
+            
+            // Update text for PIN vs email verification
+            const headerText = document.querySelector('#verification-form h3');
+            if (isPinVerification) {
+                headerText.innerHTML = `🔒 ${tier.toUpperCase()} Account Security`;
+                document.querySelector('#verification-form p').innerHTML = 
+                    `A 6-digit login PIN has been sent to <strong id="verify-email">${email}</strong> for additional security`;
+            } else {
+                headerText.innerHTML = '📧 Check Your Email';
+                document.querySelector('#verification-form p').innerHTML = 
+                    `We sent a 6-digit verification code to <strong id="verify-email">${email}</strong>`;
+            }
+            
+            // Set expiry times
+            codeExpiryTime = Date.now() + (10 * 60 * 1000); // 10 minutes
+            resendAllowedTime = Date.now() + (60 * 1000); // 60 seconds
+            
+            // Start countdown timers
+            startCodeTimer();
+            startResendTimer();
+            
+            // Clear message
+            document.getElementById('message-container').innerHTML = '';
+            
+            // Clear and focus the verification input
+            const codeInput = document.getElementById('verification-code');
+            codeInput.value = '';
+            codeInput.disabled = false;
+            codeInput.readOnly = false;
+            setTimeout(() => {
+                codeInput.focus();
+                codeInput.click();
+            }, 100);
+        }
+
+        function showSignupForm() {
+            document.getElementById('signup-form').style.display = 'block';
+            document.getElementById('login-form').style.display = 'none';
+            document.getElementById('verification-form').style.display = 'none';
+            document.getElementById('signup-toggle').classList.add('active');
+            document.getElementById('login-toggle').classList.remove('active');
+            
+            // Clear timers
+            if (countdownInterval) clearInterval(countdownInterval);
+            if (resendInterval) clearInterval(resendInterval);
+            
+            currentUserId = null;
+            currentEmail = null;
+        }
+
+        function startCodeTimer() {
+            if (countdownInterval) clearInterval(countdownInterval);
+            
+            function updateTimer() {
+                const now = Date.now();
+                const remaining = Math.max(0, codeExpiryTime - now);
+                
+                if (remaining === 0) {
+                    document.getElementById('code-timer').innerHTML = '⌛ Code expired. Please request a new one.';
+                    document.getElementById('verify-code-btn').disabled = true;
+                    clearInterval(countdownInterval);
+                    return;
+                }
+                
+                const minutes = Math.floor(remaining / 60000);
+                const seconds = Math.floor((remaining % 60000) / 1000);
+                document.getElementById('code-timer').innerHTML = `⏱️ Code expires in ${minutes}:${seconds.toString().padStart(2, '0')}`;
+            }
+            
+            updateTimer();
+            countdownInterval = setInterval(updateTimer, 1000);
+        }
+
+        function startResendTimer() {
+            if (resendInterval) clearInterval(resendInterval);
+            
+            function updateResendButton() {
+                const now = Date.now();
+                const remaining = Math.max(0, resendAllowedTime - now);
+                const resendBtn = document.getElementById('resend-code-btn');
+                
+                if (remaining === 0) {
+                    resendBtn.disabled = false;
+                    resendBtn.textContent = 'Resend Code';
+                    clearInterval(resendInterval);
+                    return;
+                }
+                
+                const seconds = Math.ceil(remaining / 1000);
+                resendBtn.disabled = true;
+                resendBtn.textContent = `Resend Code (${seconds}s)`;
+            }
+            
+            updateResendButton();
+            resendInterval = setInterval(updateResendButton, 1000);
+        }
+
+        // Username availability check
+        let usernameCheckTimeout;
+        async function checkUsernameAvailability() {
+            const usernameInput = document.getElementById('signup-username');
+            const feedback = document.getElementById('username-feedback');
+            const username = usernameInput.value.trim();
+            
+            if (!username || username.length < 3) {
+                feedback.textContent = '';
+                return;
+            }
+            
+            clearTimeout(usernameCheckTimeout);
+            usernameCheckTimeout = setTimeout(async () => {
+                try {
+                    const response = await fetch('/api/check-username', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ username })
+                    });
+                    
+                    const data = await response.json();
+                    
+                    if (data.available) {
+                        feedback.textContent = '✓ Username available';
+                        feedback.style.color = '#22c55e';
+                    } else {
+                        feedback.textContent = '✗ ' + data.message;
+                        feedback.style.color = '#ef4444';
+                    }
+                } catch (error) {
+                    feedback.textContent = '';
+                }
+            }, 500);
+        }
+
+        // Sign Up Form Handler
+        document.getElementById('signup-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const btn = document.getElementById('signup-btn');
+            const name = document.getElementById('signup-name').value.trim();
+            const username = document.getElementById('signup-username').value.trim();
+            const email = document.getElementById('signup-email').value.trim();
+            const password = document.getElementById('signup-password').value;
+            const confirmPassword = document.getElementById('signup-confirm-password').value;
+            const newsletter = document.getElementById('newsletter-opt-in').checked;
+            
+            // Check if passwords match
+            if (password !== confirmPassword) {
+                showMessage('❌ Passwords do not match', true);
+                return;
+            }
+            
+            btn.disabled = true;
+            btn.textContent = 'Creating Account...';
+            
+            try {
+                const response = await fetch('/auth/email/signup', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ name, username, email, password, newsletter })
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    // Show verification form
+                    showVerificationForm(data.user_id, email);
+                    if (data.email_sent) {
+                        showMessage('✅ Account created! Check your email for the verification code.', false);
+                    } else {
+                        showMessage('⚠️ Account created but email failed to send. Click "Resend Code".', true);
+                    }
+                } else {
+                    showMessage('❌ ' + (data.error || 'Failed to create account'), true);
+                }
+            } catch (error) {
+                showMessage('❌ Network error. Please try again.', true);
+            } finally {
+                btn.disabled = false;
+                btn.textContent = 'Create Account';
+            }
+        });
+
+        // Login Form Handler
+        document.getElementById('login-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const btn = document.getElementById('login-btn');
+            btn.disabled = true;
+            btn.textContent = 'Signing In...';
+            
+            const email = document.getElementById('login-email').value;
+            const password = document.getElementById('login-password').value;
+            const rememberMe = document.getElementById('remember-me').checked;
+            rememberMeValue = rememberMe; // Store for PIN verification
+            
+            try {
+                const response = await fetch('/auth/email/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, password, remember_me: rememberMe })
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok && data.success) {
+                    showMessage('✅ Signed in successfully! Redirecting...', false);
+                    setTimeout(() => {
+                        window.location.href = '/viewer';
+                    }, 1000);
+                } else if (response.ok && data.requires_pin) {
+                    // Privileged account - requires PIN
+                    showVerificationForm(data.user_id, email, true, data.tier);
+                    if (data.pin_sent) {
+                        showMessage(`🔒 ${data.tier.toUpperCase()} Account Security: Check your email for a login PIN`, false);
+                    } else {
+                        showMessage('⚠️ Login PIN failed to send. Please try again.', true);
+                    }
+                } else if (response.status === 403 && data.user_id) {
+                    // Email not verified - show verification form
+                    showVerificationForm(data.user_id, email, false);
+                    showMessage('⚠️ Please verify your email first. Check your inbox for the code.', true);
+                } else {
+                    showMessage('❌ ' + (data.error || 'Invalid credentials'), true);
+                }
+            } catch (error) {
+                showMessage('❌ Network error. Please try again.', true);
+            } finally {
+                btn.disabled = false;
+                btn.textContent = 'Sign In';
+            }
+        });
+
+        // Verify Code Handler
+        document.getElementById('verify-code-btn').addEventListener('click', async () => {
+            const code = document.getElementById('verification-code').value.trim();
+            const btn = document.getElementById('verify-code-btn');
+            
+            if (!code || code.length !== 6) {
+                showMessage('❌ Please enter a valid 6-digit code', true);
+                return;
+            }
+            
+            btn.disabled = true;
+            btn.textContent = 'Verifying...';
+            
+            try {
+                // Use PIN verification endpoint for privileged accounts
+                const endpoint = isPrivilegedLogin ? '/auth/email/verify-pin' : '/auth/email/verify-code';
+                const payload = isPrivilegedLogin 
+                    ? { user_id: currentUserId, pin: code, remember_me: rememberMeValue }
+                    : { user_id: currentUserId, code };
+                
+                const response = await fetch(endpoint, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    if (isPrivilegedLogin) {
+                        // PIN verified - redirect to viewer
+                        showMessage(`✅ ${userTier.toUpperCase()} login successful! Redirecting...`, false);
+                        setTimeout(() => {
+                            window.location.href = '/viewer';
+                        }, 1000);
+                    } else {
+                        // Email verified - redirect to login
+                        showMessage('✅ Email verified! Redirecting to login...', false);
+                        setTimeout(() => {
+                            toggleForm('login');
+                            document.getElementById('login-email').value = currentEmail;
+                        }, 1500);
+                    }
+                } else {
+                    showMessage('❌ ' + (data.error || 'Verification failed'), true);
+                    btn.disabled = false;
+                    btn.textContent = 'Verify Code';
+                }
+            } catch (error) {
+                showMessage('❌ Network error. Please try again.', true);
+                btn.disabled = false;
+                btn.textContent = 'Verify Code';
+            }
+        });
+
+        // Resend Code Handler
+        document.getElementById('resend-code-btn').addEventListener('click', async () => {
+            const btn = document.getElementById('resend-code-btn');
+            btn.disabled = true;
+            btn.textContent = 'Sending...';
+            
+            try {
+                const response = await fetch('/auth/email/resend-code', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ user_id: currentUserId })
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    showMessage('✅ New code sent! Check your email.', false);
+                    // Reset timers
+                    codeExpiryTime = Date.now() + (10 * 60 * 1000);
+                    resendAllowedTime = Date.now() + (60 * 1000);
+                    startCodeTimer();
+                    startResendTimer();
+                    // Re-enable verify button
+                    document.getElementById('verify-code-btn').disabled = false;
+                } else {
+                    showMessage('❌ ' + (data.error || 'Failed to resend code'), true);
+                    // If throttled, the error message contains wait time
+                    btn.disabled = false;
+                    btn.textContent = 'Resend Code';
+                }
+            } catch (error) {
+                showMessage('❌ Network error. Please try again.', true);
+                btn.disabled = false;
+                btn.textContent = 'Resend Code';
+            }
+        });
+
+        // Allow only digits in verification code input
+        document.getElementById('verification-code').addEventListener('input', (e) => {
+            e.target.value = e.target.value.replace(/[^0-9]/g, '');
+        });
+        
+        // Forgot Password Handler
+        document.getElementById('reset-request-btn').addEventListener('click', async () => {
+            const email = document.getElementById('reset-email').value.trim();
+            const btn = document.getElementById('reset-request-btn');
+            
+            if (!email) {
+                showMessage('❌ Please enter your email address', true);
+                return;
+            }
+            
+            btn.disabled = true;
+            btn.textContent = 'Sending...';
+            
+            try {
+                const response = await fetch('/auth/password-reset/request', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email })
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    showMessage('✅ ' + data.message, false);
+                    // Clear the form
+                    document.getElementById('reset-email').value = '';
+                    // Show message to check email
+                    setTimeout(() => {
+                        showMessage('📧 If your account exists, you\'ll receive a password reset link shortly. Check your email!', false);
+                    }, 2000);
+                } else {
+                    showMessage('❌ ' + (data.error || 'Failed to send reset link'), true);
+                }
+            } catch (error) {
+                showMessage('❌ Network error. Please try again.', true);
+            } finally {
+                btn.disabled = false;
+                btn.textContent = 'Send Reset Link';
+            }
+        });
+    </script>
+</body>
+</html>

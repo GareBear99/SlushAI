@@ -1,0 +1,91 @@
+# SlushAI 3D Modeller - Crontab Configuration Example
+#
+# To install this crontab:
+# 1. Copy this file to a safe location
+# 2. Edit the path below to match your installation directory
+# 3. Run: crontab -e
+# 4. Copy the lines below into your crontab
+# 5. Save and exit
+#
+# To view your current crontab: crontab -l
+# To remove all cron jobs: crontab -r
+
+# ============================================================================
+# MONTHLY ANALYTICS REPORT
+# ============================================================================
+# Runs at 2:00 AM on the 1st of every month
+# Generates analytics report and cleans up old daily stats
+#
+# Format: minute hour day month dayofweek command
+# 0 2 1 * * = 2:00 AM on the 1st of each month
+#
+# IMPORTANT: Replace /path/to/AI3DModeller with your actual installation path!
+# Example: /Users/YourName/Desktop/Projects/AI3DModeller
+
+0 2 1 * * cd /path/to/AI3DModeller && /usr/bin/python3 scripts/generate_monthly_report.py >> logs/cron.log 2>&1
+
+# ============================================================================
+# OPTIONAL: DATABASE MAINTENANCE
+# ============================================================================
+# Vacuum database weekly to reclaim space
+# Runs at 3:00 AM every Sunday
+#
+# Uncomment the line below to enable:
+# 0 3 * * 0 cd /path/to/AI3DModeller && /usr/bin/sqlite3 logs/analytics.db "VACUUM;" >> logs/cron.log 2>&1
+
+# ============================================================================
+# OPTIONAL: BACKUP DATABASES
+# ============================================================================
+# Backup user and analytics databases daily at 4:00 AM
+# Keeps last 7 days of backups
+#
+# Uncomment the lines below to enable:
+# 0 4 * * * cd /path/to/AI3DModeller && cp logs/users.db logs/backups/users_$(date +\%Y\%m\%d).db && find logs/backups/ -name "users_*.db" -mtime +7 -delete >> logs/cron.log 2>&1
+# 0 4 * * * cd /path/to/AI3DModeller && cp logs/analytics.db logs/backups/analytics_$(date +\%Y\%m\%d).db && find logs/backups/ -name "analytics_*.db" -mtime +7 -delete >> logs/cron.log 2>&1
+
+# ============================================================================
+# CRON TIME SYNTAX REFERENCE
+# ============================================================================
+# * * * * * command to execute
+# ┬ ┬ ┬ ┬ ┬
+# │ │ │ │ │
+# │ │ │ │ └─── Day of week (0-7, Sunday=0 or 7)
+# │ │ │ └───── Month (1-12)
+# │ │ └─────── Day of month (1-31)
+# │ └───────── Hour (0-23)
+# └─────────── Minute (0-59)
+#
+# Examples:
+# 0 0 * * * = Daily at midnight
+# 0 2 1 * * = Monthly at 2 AM on the 1st
+# 0 */4 * * * = Every 4 hours
+# 30 9 * * 1-5 = Weekdays at 9:30 AM
+# 0 0 * * 0 = Weekly on Sunday at midnight
+
+# ============================================================================
+# TROUBLESHOOTING
+# ============================================================================
+# If cron isn't working:
+#
+# 1. Check cron is running:
+#    - Linux: sudo systemctl status cron
+#    - macOS: sudo launchctl list | grep cron
+#
+# 2. Check cron logs:
+#    - Linux: grep CRON /var/log/syslog
+#    - macOS: grep cron /var/log/system.log
+#
+# 3. Verify Python path:
+#    which python3
+#    (Use this path instead of /usr/bin/python3 if different)
+#
+# 4. Test command manually:
+#    cd /path/to/AI3DModeller && python3 scripts/generate_monthly_report.py
+#
+# 5. Check permissions:
+#    chmod +x scripts/generate_monthly_report.py
+#    mkdir -p logs/backups
+#
+# 6. macOS only: Grant cron Full Disk Access
+#    System Preferences > Security & Privacy > Full Disk Access
+#    Add /usr/sbin/cron or Terminal app

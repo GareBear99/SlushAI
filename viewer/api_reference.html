@@ -1,0 +1,764 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>API Reference - SlushAI 3D Modeller</title>
+    <link rel="stylesheet" href="themes.css" />
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #1e1b4b 0%, #312e81 100%);
+            color: #fff;
+            min-height: 100vh;
+            padding: 40px 20px;
+            line-height: 1.7;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 60px;
+            padding: 40px;
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border: 2px solid rgba(59, 130, 246, 0.3);
+            border-radius: 20px;
+        }
+
+        .header-icon {
+            font-size: 64px;
+            margin-bottom: 20px;
+        }
+
+        h1 {
+            font-size: 42px;
+            font-weight: 700;
+            margin-bottom: 12px;
+            background: linear-gradient(135deg, #3b82f6, #60a5fa);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .subtitle {
+            font-size: 16px;
+            color: rgba(255, 255, 255, 0.7);
+            margin-bottom: 8px;
+        }
+
+        .content {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            padding: 50px;
+            margin-bottom: 40px;
+        }
+
+        h2 {
+            font-size: 28px;
+            font-weight: 700;
+            color: #3b82f6;
+            margin-top: 48px;
+            margin-bottom: 20px;
+            padding-bottom: 12px;
+            border-bottom: 2px solid rgba(59, 130, 246, 0.3);
+        }
+
+        h2:first-child {
+            margin-top: 0;
+        }
+
+        h3 {
+            font-size: 20px;
+            font-weight: 600;
+            color: #22c55e;
+            margin-top: 32px;
+            margin-bottom: 16px;
+        }
+
+        p {
+            font-size: 15px;
+            color: rgba(255, 255, 255, 0.85);
+            margin-bottom: 16px;
+        }
+
+        ul {
+            margin: 16px 0;
+            padding-left: 32px;
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        li {
+            font-size: 15px;
+            margin-bottom: 10px;
+            line-height: 1.6;
+        }
+
+        strong {
+            color: #fff;
+            font-weight: 600;
+        }
+
+        .endpoint-box {
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(59, 130, 246, 0.4);
+            border-radius: 12px;
+            padding: 24px;
+            margin: 24px 0;
+            transition: all 0.3s;
+        }
+
+        .endpoint-box:hover {
+            border-color: #3b82f6;
+            box-shadow: 0 8px 24px rgba(59, 130, 246, 0.2);
+            transform: translateY(-2px);
+        }
+
+        .endpoint-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
+        .method {
+            display: inline-block;
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-weight: 700;
+            font-size: 13px;
+            font-family: 'Courier New', monospace;
+        }
+
+        .method.get {
+            background: rgba(34, 197, 94, 0.2);
+            color: #22c55e;
+            border: 1px solid rgba(34, 197, 94, 0.4);
+        }
+
+        .method.post {
+            background: rgba(59, 130, 246, 0.2);
+            color: #60a5fa;
+            border: 1px solid rgba(59, 130, 246, 0.4);
+        }
+
+        .endpoint-path {
+            font-family: 'Courier New', monospace;
+            font-size: 16px;
+            color: #f97316;
+            font-weight: 600;
+        }
+
+        .rate-limit {
+            display: inline-block;
+            padding: 4px 10px;
+            background: rgba(249, 115, 22, 0.15);
+            border: 1px solid rgba(249, 115, 22, 0.3);
+            border-radius: 12px;
+            font-size: 12px;
+            color: #fb923c;
+            font-weight: 600;
+            margin-left: auto;
+        }
+
+        .rate-limit.none {
+            background: rgba(34, 197, 94, 0.15);
+            border-color: rgba(34, 197, 94, 0.3);
+            color: #4ade80;
+        }
+
+        .code-block {
+            background: #0f172a;
+            border: 1px solid rgba(59, 130, 246, 0.3);
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+            overflow-x: auto;
+            position: relative;
+        }
+
+        .code-block pre {
+            margin: 0;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            line-height: 1.6;
+            color: #e2e8f0;
+        }
+
+        .code-block .keyword {
+            color: #c792ea;
+            font-weight: 600;
+        }
+
+        .code-block .function {
+            color: #82aaff;
+        }
+
+        .code-block .string {
+            color: #c3e88d;
+        }
+
+        .code-block .number {
+            color: #f78c6c;
+        }
+
+        .code-block .comment {
+            color: #546e7a;
+            font-style: italic;
+        }
+
+        .code-block .property {
+            color: #89ddff;
+        }
+
+        .code-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px 20px;
+            background: rgba(15, 23, 42, 0.8);
+            border-bottom: 1px solid rgba(59, 130, 246, 0.2);
+            border-radius: 10px 10px 0 0;
+            margin: 20px 0 0 0;
+        }
+
+        .code-label {
+            font-size: 12px;
+            color: #94a3b8;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .copy-btn {
+            padding: 6px 12px;
+            background: rgba(59, 130, 246, 0.2);
+            border: 1px solid rgba(59, 130, 246, 0.4);
+            border-radius: 6px;
+            color: #60a5fa;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .copy-btn:hover {
+            background: rgba(59, 130, 246, 0.3);
+            border-color: #3b82f6;
+        }
+
+        .field-list {
+            background: rgba(59, 130, 246, 0.05);
+            border-left: 3px solid #3b82f6;
+            border-radius: 6px;
+            padding: 16px;
+            margin: 16px 0;
+        }
+
+        .field-item {
+            margin-bottom: 12px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .field-item:last-child {
+            margin-bottom: 0;
+            padding-bottom: 0;
+            border-bottom: none;
+        }
+
+        .field-name {
+            font-family: 'Courier New', monospace;
+            color: #22c55e;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .field-desc {
+            color: rgba(255, 255, 255, 0.75);
+            font-size: 14px;
+            margin-top: 4px;
+        }
+
+        .info-box {
+            background: rgba(59, 130, 246, 0.1);
+            border-left: 4px solid #3b82f6;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 24px 0;
+        }
+
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 14px 28px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+            color: #fff;
+            text-decoration: none;
+            font-size: 15px;
+            font-weight: 600;
+            transition: all 0.3s;
+            margin: 0 6px;
+        }
+
+        .back-link:hover {
+            background: rgba(255, 255, 255, 0.15);
+            border-color: #3b82f6;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 16px rgba(59, 130, 246, 0.3);
+        }
+
+        .button-row {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-top: 50px;
+        }
+
+        .nav-legend {
+            background: rgba(59, 130, 246, 0.05);
+            border: 1px solid rgba(59, 130, 246, 0.3);
+            border-radius: 12px;
+            padding: 24px;
+            margin: 24px 0;
+        }
+
+        .nav-legend h3 {
+            color: #60a5fa;
+            font-size: 18px;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .nav-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 12px;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 14px;
+            background: rgba(59, 130, 246, 0.1);
+            border: 1px solid rgba(59, 130, 246, 0.2);
+            border-radius: 8px;
+            color: #fff;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+
+        .nav-item:hover {
+            background: rgba(59, 130, 246, 0.2);
+            border-color: #3b82f6;
+            transform: translateX(4px);
+        }
+
+        .nav-item .icon {
+            font-size: 16px;
+        }
+
+        @media (max-width: 768px) {
+            .content {
+                padding: 30px 24px;
+            }
+            
+            h1 {
+                font-size: 32px;
+            }
+            
+            h2 {
+                font-size: 24px;
+            }
+
+            .endpoint-header {
+                flex-wrap: wrap;
+            }
+
+            .rate-limit {
+                margin-left: 0;
+                margin-top: 8px;
+            }
+
+            .nav-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="header-icon">💻</div>
+            <h1>API Reference</h1>
+            <p class="subtitle">RESTful API for SlushAI 3D Modeller Platform</p>
+        </div>
+
+        <div class="content">
+            <div class="info-box">
+                <p style="margin: 0;"><strong>📡 Base URL:</strong> <code style="background: rgba(0,0,0,0.3); padding: 4px 8px; border-radius: 4px; color: #22c55e;">http://localhost:5000</code></p>
+                <p style="margin: 8px 0 0 0;"><strong>🔄 Response Format:</strong> All endpoints return JSON. Successful responses include <code style="background: rgba(0,0,0,0.3); padding: 2px 6px; border-radius: 4px; color: #60a5fa;">_meta</code> field with endpoint documentation.</p>
+            </div>
+
+            <div class="nav-legend">
+                <h3><span>📑</span> Quick Navigation</h3>
+                <div class="nav-grid">
+                    <a href="#endpoints" class="nav-item">
+                        <span class="icon">🌐</span>
+                        <span>Public Endpoints</span>
+                    </a>
+                    <a href="#health" class="nav-item">
+                        <span class="icon">🟢</span>
+                        <span>GET /api/health</span>
+                    </a>
+                    <a href="#capacity" class="nav-item">
+                        <span class="icon">🟢</span>
+                        <span>GET /api/capacity</span>
+                    </a>
+                    <a href="#check-username" class="nav-item">
+                        <span class="icon">🟣</span>
+                        <span>POST /check-username</span>
+                    </a>
+                    <a href="#example-usage" class="nav-item">
+                        <span class="icon">📝</span>
+                        <span>Example Usage</span>
+                    </a>
+                    <a href="#rate-limits" class="nav-item">
+                        <span class="icon">⚡</span>
+                        <span>Rate Limits</span>
+                    </a>
+                    <a href="#authentication" class="nav-item">
+                        <span class="icon">🔒</span>
+                        <span>Authentication</span>
+                    </a>
+                </div>
+            </div>
+
+            <h2 id="endpoints">🌐 Public API Endpoints</h2>
+            <p>These endpoints are publicly accessible without authentication. All responses include a <code style="background: rgba(0,0,0,0.3); padding: 2px 6px; border-radius: 4px; color: #60a5fa;">_meta</code> field with endpoint descriptions and field documentation.</p>
+
+            <div class="endpoint-box" id="health">
+                <div class="endpoint-header">
+                    <span class="method get">GET</span>
+                    <span class="endpoint-path">/api/health</span>
+                    <span class="rate-limit none">No rate limit</span>
+                </div>
+                <p><strong>Purpose:</strong> Server health check and status verification. Returns server timestamp and operational status.</p>
+                
+                <h4 style="color: #60a5fa; margin-top: 16px; margin-bottom: 12px;">Response Fields:</h4>
+                <div class="field-list">
+                    <div class="field-item">
+                        <div class="field-name">ok</div>
+                        <div class="field-desc">Boolean indicating server is operational</div>
+                    </div>
+                    <div class="field-item">
+                        <div class="field-name">time</div>
+                        <div class="field-desc">Current Unix timestamp (seconds since epoch)</div>
+                    </div>
+                    <div class="field-item">
+                        <div class="field-name">outputs_dir</div>
+                        <div class="field-desc">Absolute path to model outputs directory</div>
+                    </div>
+                    <div class="field-item">
+                        <div class="field-name">_meta</div>
+                        <div class="field-desc">Endpoint metadata with field descriptions</div>
+                    </div>
+                </div>
+
+                <div class="code-header">
+                    <span class="code-label">JavaScript Example</span>
+                    <button class="copy-btn" onclick="copyCode(this)">📋 Copy</button>
+                </div>
+                <div class="code-block">
+                    <pre><span class="comment">// Check server health</span>
+<span class="function">fetch</span>(<span class="string">'http://localhost:5000/api/health'</span>)
+  .<span class="function">then</span>(<span class="keyword">res</span> => <span class="keyword">res</span>.<span class="function">json</span>())
+  .<span class="function">then</span>(<span class="keyword">data</span> => {
+    <span class="keyword">console</span>.<span class="function">log</span>(<span class="string">'Server status:'</span>, <span class="keyword">data</span>.<span class="property">ok</span>);
+    <span class="keyword">console</span>.<span class="function">log</span>(<span class="string">'Timestamp:'</span>, <span class="keyword">data</span>.<span class="property">time</span>);
+    <span class="keyword">console</span>.<span class="function">log</span>(<span class="string">'Outputs dir:'</span>, <span class="keyword">data</span>.<span class="property">outputs_dir</span>);
+  });</pre>
+                </div>
+            </div>
+
+            <div class="endpoint-box" id="capacity">
+                <div class="endpoint-header">
+                    <span class="method get">GET</span>
+                    <span class="endpoint-path">/api/capacity</span>
+                    <span class="rate-limit none">No rate limit</span>
+                </div>
+                <p><strong>Purpose:</strong> Real-time platform capacity and usage statistics across all subscription tiers. Shows user counts, available slots, worker status, and processing queue.</p>
+                
+                <h4 style="color: #60a5fa; margin-top: 16px; margin-bottom: 12px;">Response Structure:</h4>
+                <div class="field-list">
+                    <div class="field-item">
+                        <div class="field-name">capacity.{tier}.current</div>
+                        <div class="field-desc">Number of registered users in this tier</div>
+                    </div>
+                    <div class="field-item">
+                        <div class="field-name">capacity.{tier}.max</div>
+                        <div class="field-desc">Maximum allowed users for this tier</div>
+                    </div>
+                    <div class="field-item">
+                        <div class="field-name">capacity.{tier}.available</div>
+                        <div class="field-desc">Remaining slots available for new users</div>
+                    </div>
+                    <div class="field-item">
+                        <div class="field-name">capacity.{tier}.percent_full</div>
+                        <div class="field-desc">Percentage of tier capacity currently used</div>
+                    </div>
+                    <div class="field-item">
+                        <div class="field-name">capacity.workers.active</div>
+                        <div class="field-desc">Current number of active worker processes (1-20)</div>
+                    </div>
+                    <div class="field-item">
+                        <div class="field-name">capacity.workers.processing</div>
+                        <div class="field-desc">Number of models currently being generated</div>
+                    </div>
+                    <div class="field-item">
+                        <div class="field-name">capacity.workers.queue_length</div>
+                        <div class="field-desc">Number of pending generation tasks in queue</div>
+                    </div>
+                    <div class="field-item">
+                        <div class="field-name">capacity.workers.total_processed</div>
+                        <div class="field-desc">Total models generated since server start</div>
+                    </div>
+                </div>
+
+                <div class="code-header">
+                    <span class="code-label">JavaScript Example</span>
+                    <button class="copy-btn" onclick="copyCode(this)">📋 Copy</button>
+                </div>
+                <div class="code-block">
+                    <pre><span class="comment">// Fetch platform capacity</span>
+<span class="function">fetch</span>(<span class="string">'http://localhost:5000/api/capacity'</span>)
+  .<span class="function">then</span>(<span class="keyword">res</span> => <span class="keyword">res</span>.<span class="function">json</span>())
+  .<span class="function">then</span>(<span class="keyword">data</span> => {
+    <span class="keyword">console</span>.<span class="function">log</span>(<span class="string">'Metadata:'</span>, <span class="keyword">data</span>.<span class="property">_meta</span>);
+    <span class="keyword">console</span>.<span class="function">log</span>(<span class="string">'Free tier:'</span>, <span class="keyword">data</span>.<span class="property">capacity</span>.<span class="property">free</span>);
+    <span class="keyword">console</span>.<span class="function">log</span>(<span class="string">'Workers:'</span>, <span class="keyword">data</span>.<span class="property">capacity</span>.<span class="property">workers</span>);
+    
+    <span class="comment">// Check if tier has availability</span>
+    <span class="keyword">const</span> free = <span class="keyword">data</span>.<span class="property">capacity</span>.<span class="property">free</span>;
+    <span class="keyword">if</span> (free.<span class="property">available</span> > <span class="number">0</span>) {
+      <span class="keyword">console</span>.<span class="function">log</span>(<span class="string">`Free tier: </span><span class="keyword">${</span>free.<span class="property">available</span><span class="keyword">}</span><span class="string"> slots available`</span>);
+    } <span class="keyword">else</span> {
+      <span class="keyword">console</span>.<span class="function">log</span>(<span class="string">'Free tier at capacity'</span>);
+    }
+  });</pre>
+                </div>
+
+                <div class="code-header">
+                    <span class="code-label">Example Response</span>
+                    <button class="copy-btn" onclick="copyCode(this)">📋 Copy</button>
+                </div>
+                <div class="code-block">
+                    <pre>{
+  <span class="property">"success"</span>: <span class="keyword">true</span>,
+  <span class="property">"capacity"</span>: {
+    <span class="property">"free"</span>: {
+      <span class="property">"current"</span>: <span class="number">45</span>,
+      <span class="property">"max"</span>: <span class="number">200</span>,
+      <span class="property">"available"</span>: <span class="number">155</span>,
+      <span class="property">"percent_full"</span>: <span class="number">22.5</span>
+    },
+    <span class="property">"standard"</span>: {
+      <span class="property">"current"</span>: <span class="number">12</span>,
+      <span class="property">"max"</span>: <span class="number">50</span>,
+      <span class="property">"available"</span>: <span class="number">38</span>,
+      <span class="property">"percent_full"</span>: <span class="number">24.0</span>
+    },
+    <span class="property">"workers"</span>: {
+      <span class="property">"active"</span>: <span class="number">3</span>,
+      <span class="property">"max"</span>: <span class="number">20</span>,
+      <span class="property">"processing"</span>: <span class="number">2</span>,
+      <span class="property">"queue_length"</span>: <span class="number">5</span>,
+      <span class="property">"total_processed"</span>: <span class="number">1247</span>
+    }
+  }
+}</pre>
+                </div>
+            </div>
+
+            <div class="endpoint-box" id="check-username">
+                <div class="endpoint-header">
+                    <span class="method post">POST</span>
+                    <span class="endpoint-path">/api/check-username</span>
+                    <span class="rate-limit">30/min per IP</span>
+                </div>
+                <p><strong>Purpose:</strong> Check if a username is available for registration. Used for real-time validation during signup.</p>
+                
+                <h4 style="color: #60a5fa; margin-top: 16px; margin-bottom: 12px;">Request Body:</h4>
+                <div class="code-block">
+                    <pre>{
+  <span class="property">"username"</span>: <span class="string">"string"</span>
+}</pre>
+                </div>
+
+                <h4 style="color: #60a5fa; margin-top: 16px; margin-bottom: 12px;">Response:</h4>
+                <div class="code-block">
+                    <pre>{
+  <span class="property">"available"</span>: <span class="keyword">boolean</span>,
+  <span class="property">"message"</span>: <span class="string">"string"</span>
+}</pre>
+                </div>
+
+                <h4 style="color: #60a5fa; margin-top: 16px; margin-bottom: 12px;">Validation Rules:</h4>
+                <ul style="margin-top: 12px;">
+                    <li>3-20 characters</li>
+                    <li>Alphanumeric + underscore only</li>
+                    <li>Must start with letter</li>
+                    <li>Case-insensitive uniqueness check</li>
+                </ul>
+
+                <div class="code-header">
+                    <span class="code-label">JavaScript Example</span>
+                    <button class="copy-btn" onclick="copyCode(this)">📋 Copy</button>
+                </div>
+                <div class="code-block">
+                    <pre><span class="comment">// Check username availability</span>
+<span class="function">fetch</span>(<span class="string">'http://localhost:5000/api/check-username'</span>, {
+  <span class="property">method</span>: <span class="string">'POST'</span>,
+  <span class="property">headers</span>: {
+    <span class="string">'Content-Type'</span>: <span class="string">'application/json'</span>
+  },
+  <span class="property">body</span>: <span class="function">JSON</span>.<span class="function">stringify</span>({
+    <span class="property">username</span>: <span class="string">'johndoe'</span>
+  })
+})
+  .<span class="function">then</span>(<span class="keyword">res</span> => <span class="keyword">res</span>.<span class="function">json</span>())
+  .<span class="function">then</span>(<span class="keyword">data</span> => {
+    <span class="keyword">if</span> (<span class="keyword">data</span>.<span class="property">available</span>) {
+      <span class="keyword">console</span>.<span class="function">log</span>(<span class="string">'✓ Username available'</span>);
+    } <span class="keyword">else</span> {
+      <span class="keyword">console</span>.<span class="function">log</span>(<span class="string">'✗ '</span> + <span class="keyword">data</span>.<span class="property">message</span>);
+    }
+  });</pre>
+                </div>
+            </div>
+
+            <h2 id="example-usage">📝 Example Usage</h2>
+            
+            <div class="code-header">
+                <span class="code-label">Complete Integration Example</span>
+                <button class="copy-btn" onclick="copyCode(this)">📋 Copy</button>
+            </div>
+            <div class="code-block">
+                <pre><span class="comment">// Complete SlushAI API integration example</span>
+
+<span class="keyword">class</span> <span class="function">SlushAI</span> {
+  <span class="function">constructor</span>(<span class="keyword">baseURL</span> = <span class="string">'http://localhost:5000'</span>) {
+    <span class="keyword">this</span>.<span class="property">baseURL</span> = <span class="keyword">baseURL</span>;
+  }
+
+  <span class="keyword">async</span> <span class="function">checkHealth</span>() {
+    <span class="keyword">const</span> response = <span class="keyword">await</span> <span class="function">fetch</span>(<span class="string">`</span><span class="keyword">${this.baseURL}</span><span class="string">/api/health`</span>);
+    <span class="keyword">return await</span> <span class="keyword">response</span>.<span class="function">json</span>();
+  }
+
+  <span class="keyword">async</span> <span class="function">getCapacity</span>() {
+    <span class="keyword">const</span> response = <span class="keyword">await</span> <span class="function">fetch</span>(<span class="string">`</span><span class="keyword">${this.baseURL}</span><span class="string">/api/capacity`</span>);
+    <span class="keyword">return await</span> <span class="keyword">response</span>.<span class="function">json</span>();
+  }
+
+  <span class="keyword">async</span> <span class="function">checkUsername</span>(<span class="keyword">username</span>) {
+    <span class="keyword">const</span> response = <span class="keyword">await</span> <span class="function">fetch</span>(<span class="string">`</span><span class="keyword">${this.baseURL}</span><span class="string">/api/check-username`</span>, {
+      <span class="property">method</span>: <span class="string">'POST'</span>,
+      <span class="property">headers</span>: { <span class="string">'Content-Type'</span>: <span class="string">'application/json'</span> },
+      <span class="property">body</span>: <span class="function">JSON</span>.<span class="function">stringify</span>({ <span class="property">username</span> })
+    });
+    <span class="keyword">return await</span> <span class="keyword">response</span>.<span class="function">json</span>();
+  }
+
+  <span class="keyword">async</span> <span class="function">displayDashboard</span>() {
+    <span class="keyword">const</span> [health, capacity] = <span class="keyword">await</span> <span class="function">Promise</span>.<span class="function">all</span>([
+      <span class="keyword">this</span>.<span class="function">checkHealth</span>(),
+      <span class="keyword">this</span>.<span class="function">getCapacity</span>()
+    ]);
+
+    <span class="keyword">console</span>.<span class="function">log</span>(<span class="string">'=== SlushAI Dashboard ==='</span>);
+    <span class="keyword">console</span>.<span class="function">log</span>(<span class="string">'Server Status:'</span>, health.<span class="property">ok</span> ? <span class="string">'✅ Online'</span> : <span class="string">'❌ Offline'</span>);
+    <span class="keyword">console</span>.<span class="function">log</span>(<span class="string">'Free Tier:'</span>, <span class="string">`</span><span class="keyword">${</span>capacity.<span class="property">capacity</span>.<span class="property">free</span>.<span class="property">available</span><span class="keyword">}</span><span class="string"> slots available`</span>);
+    <span class="keyword">console</span>.<span class="function">log</span>(<span class="string">'Workers Active:'</span>, capacity.<span class="property">capacity</span>.<span class="property">workers</span>.<span class="property">active</span>);
+    <span class="keyword">console</span>.<span class="function">log</span>(<span class="string">'Queue Length:'</span>, capacity.<span class="property">capacity</span>.<span class="property">workers</span>.<span class="property">queue_length</span>);
+  }
+}
+
+<span class="comment">// Usage</span>
+<span class="keyword">const</span> api = <span class="keyword">new</span> <span class="function">SlushAI</span>();
+api.<span class="function">displayDashboard</span>();</pre>
+            </div>
+
+            <h2 id="rate-limits">⚡ Rate Limits</h2>
+            <p>Different endpoints have different rate limits to ensure fair usage:</p>
+            <ul>
+                <li><strong>No limit:</strong> /api/health, /api/capacity</li>
+                <li><strong>30/min per IP:</strong> /api/check-username</li>
+                <li><strong>100/min per IP:</strong> Public documentation pages</li>
+                <li><strong>5/hour per IP:</strong> Signup, support requests</li>
+            </ul>
+            <p>Rate limit exceeded responses return HTTP 429 with <code style="background: rgba(0,0,0,0.3); padding: 2px 6px; border-radius: 4px; color: #ef4444;">Retry-After</code> header.</p>
+
+            <h2 id="authentication">🔒 Authentication</h2>
+            <p>Protected endpoints require authentication via session cookies. Public endpoints listed above do not require authentication.</p>
+        </div>
+
+        <div class="button-row">
+            <a href="/docs" class="back-link">
+                <span>📚</span>
+                <span>Documentation</span>
+            </a>
+            <a href="/" class="back-link">
+                <span>←</span>
+                <span>Back to Home</span>
+            </a>
+        </div>
+    </div>
+
+    <script>
+        function copyCode(button) {
+            const codeBlock = button.closest('.code-header').nextElementSibling;
+            const code = codeBlock.querySelector('pre').textContent;
+            
+            navigator.clipboard.writeText(code).then(() => {
+                const originalText = button.textContent;
+                button.textContent = '✓ Copied!';
+                button.style.background = 'rgba(34, 197, 94, 0.2)';
+                button.style.borderColor = 'rgba(34, 197, 94, 0.4)';
+                button.style.color = '#22c55e';
+                
+                setTimeout(() => {
+                    button.textContent = originalText;
+                    button.style.background = 'rgba(59, 130, 246, 0.2)';
+                    button.style.borderColor = 'rgba(59, 130, 246, 0.4)';
+                    button.style.color = '#60a5fa';
+                }, 2000);
+            });
+        }
+    </script>
+</body>
+</html>

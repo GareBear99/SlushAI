@@ -1,0 +1,762 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Community Issues - SlushAI</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header {
+            background: white;
+            border-radius: 16px;
+            padding: 24px;
+            margin-bottom: 24px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header h1 {
+            font-size: 1.8rem;
+            color: #1f2937;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .header-buttons {
+            display: flex;
+            gap: 12px;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-secondary {
+            background: #f3f4f6;
+            color: #1f2937;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+
+        .stats-bar {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 24px;
+            display: flex;
+            justify-content: space-around;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        .stat {
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            color: #6b7280;
+            margin-top: 4px;
+        }
+
+        .tabs {
+            background: white;
+            border-radius: 12px;
+            padding: 8px;
+            margin-bottom: 24px;
+            display: flex;
+            gap: 8px;
+        }
+
+        .tab {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            background: transparent;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            color: #6b7280;
+        }
+
+        .tab.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .content {
+            background: white;
+            border-radius: 16px;
+            padding: 24px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            min-height: 400px;
+        }
+
+        .issue-card {
+            border: 2px solid #e5e7eb;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 16px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .issue-card:hover {
+            border-color: #667eea;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.2);
+        }
+
+        .issue-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: start;
+            margin-bottom: 12px;
+        }
+
+        .issue-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #1f2937;
+            margin-bottom: 8px;
+        }
+
+        .issue-meta {
+            font-size: 0.85rem;
+            color: #6b7280;
+        }
+
+        .issue-description {
+            color: #4b5563;
+            font-size: 0.95rem;
+            margin-bottom: 12px;
+            line-height: 1.5;
+        }
+
+        .issue-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-top: 12px;
+            border-top: 1px solid #e5e7eb;
+        }
+
+        .status-badge {
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .status-open {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+
+        .status-fixed {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .status-ignored {
+            background: #f3f4f6;
+            color: #6b7280;
+        }
+
+        .comment-count {
+            font-size: 0.9rem;
+            color: #6b7280;
+        }
+
+        .form-group {
+            margin-bottom: 16px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #1f2937;
+        }
+
+        .form-group input,
+        .form-group textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            font-family: inherit;
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .form-group textarea {
+            min-height: 120px;
+            resize: vertical;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(4px);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 16px;
+            padding: 32px;
+            max-width: 600px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+        }
+
+        .modal-title {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #1f2937;
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #6b7280;
+        }
+
+        .close-btn:hover {
+            color: #1f2937;
+        }
+
+        .comment-box {
+            background: #f9fafb;
+            border-left: 4px solid #667eea;
+            padding: 16px;
+            border-radius: 8px;
+            margin-bottom: 16px;
+        }
+
+        .comment-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+        }
+
+        .comment-author {
+            font-weight: 600;
+            color: #1f2937;
+        }
+
+        .admin-badge {
+            background: #667eea;
+            color: white;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            margin-left: 8px;
+        }
+
+        .comment-date {
+            font-size: 0.85rem;
+            color: #6b7280;
+        }
+
+        .comment-text {
+            color: #4b5563;
+            line-height: 1.5;
+        }
+
+        .admin-controls {
+            background: #fffbeb;
+            border: 2px solid #fbbf24;
+            border-radius: 12px;
+            padding: 20px;
+            margin-top: 20px;
+        }
+
+        .admin-controls h3 {
+            color: #92400e;
+            margin-bottom: 16px;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #6b7280;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #6b7280;
+        }
+
+        .empty-state-icon {
+            font-size: 3rem;
+            margin-bottom: 16px;
+        }
+
+        .alert {
+            padding: 12px 16px;
+            border-radius: 8px;
+            margin-bottom: 16px;
+            font-size: 0.95rem;
+        }
+
+        .alert-success {
+            background: #d1fae5;
+            color: #065f46;
+            border-left: 4px solid #10b981;
+        }
+
+        .alert-error {
+            background: #fee2e2;
+            color: #991b1b;
+            border-left: 4px solid #ef4444;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>
+                <span>🐛</span>
+                Community Issues
+            </h1>
+            <div class="header-buttons">
+                <button class="btn btn-primary" onclick="openNewIssueModal()">Report Issue</button>
+                <a href="/viewer" class="btn btn-secondary">Back to Viewer</a>
+            </div>
+        </div>
+
+        <div class="stats-bar">
+            <div class="stat">
+                <div class="stat-value" id="openCount">-</div>
+                <div class="stat-label">Open</div>
+            </div>
+            <div class="stat">
+                <div class="stat-value" id="fixedCount">-</div>
+                <div class="stat-label">Fixed</div>
+            </div>
+            <div class="stat">
+                <div class="stat-value" id="ignoredCount">-</div>
+                <div class="stat-label">Ignored</div>
+            </div>
+            <div class="stat">
+                <div class="stat-value" id="totalCount">-</div>
+                <div class="stat-label">Total</div>
+            </div>
+        </div>
+
+        <div class="tabs">
+            <button class="tab active" data-filter="all" onclick="filterIssues('all')">All Issues</button>
+            <button class="tab" data-filter="recent" onclick="filterIssues('recent')">Recent (7 days)</button>
+            <button class="tab" data-filter="open" onclick="filterIssues('open')">Open</button>
+            <button class="tab" data-filter="fixed" onclick="filterIssues('fixed')">Fixed</button>
+            <button class="tab" data-filter="ignored" onclick="filterIssues('ignored')">Ignored</button>
+        </div>
+
+        <div class="content">
+            <div id="issuesList"></div>
+        </div>
+    </div>
+
+    <!-- New Issue Modal -->
+    <div class="modal" id="newIssueModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">Report New Issue</h2>
+                <button class="close-btn" onclick="closeNewIssueModal()">&times;</button>
+            </div>
+            <div id="alertContainer"></div>
+            <form onsubmit="submitIssue(event)">
+                <div class="form-group">
+                    <label>Title *</label>
+                    <input type="text" id="issueTitle" placeholder="Brief description of the issue" required>
+                </div>
+                <div class="form-group">
+                    <label>Description *</label>
+                    <textarea id="issueDescription" placeholder="Detailed description of the issue, steps to reproduce, etc." required></textarea>
+                </div>
+                <button type="submit" class="btn btn-primary" style="width: 100%;">Submit Issue</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Issue Details Modal -->
+    <div class="modal" id="issueDetailsModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">Issue Details</h2>
+                <button class="close-btn" onclick="closeIssueDetailsModal()">&times;</button>
+            </div>
+            <div id="issueDetailsContent"></div>
+        </div>
+    </div>
+
+    <script>
+        let currentFilter = 'all';
+        let isAdmin = false;
+        let currentIssueId = null;
+
+        async function loadStats() {
+            try {
+                const response = await fetch('/api/issues/stats');
+                const data = await response.json();
+
+                if (data.success) {
+                    document.getElementById('openCount').textContent = data.stats.open;
+                    document.getElementById('fixedCount').textContent = data.stats.fixed;
+                    document.getElementById('ignoredCount').textContent = data.stats.ignored;
+                    document.getElementById('totalCount').textContent = data.stats.total;
+                    isAdmin = data.is_admin;
+                }
+            } catch (error) {
+                console.error('Failed to load stats:', error);
+            }
+        }
+
+        async function loadIssues(filter = 'all') {
+            const container = document.getElementById('issuesList');
+            container.innerHTML = '<div class="loading">Loading issues...</div>';
+
+            try {
+                let url = '/api/issues';
+                
+                if (filter === 'recent') {
+                    url = '/api/issues/recent';
+                } else if (filter !== 'all') {
+                    url = `/api/issues?status=${filter}`;
+                }
+
+                const response = await fetch(url);
+                const data = await response.json();
+
+                if (data.success && data.issues.length > 0) {
+                    container.innerHTML = data.issues.map(issue => `
+                        <div class="issue-card" onclick="viewIssue(${issue.issue_id})">
+                            <div class="issue-header">
+                                <div>
+                                    <div class="issue-title">${escapeHtml(issue.title)}</div>
+                                    <div class="issue-meta">
+                                        Posted by ${escapeHtml(issue.user_name)} • ${formatDate(issue.created_at)}
+                                    </div>
+                                </div>
+                                <span class="status-badge status-${issue.status}">${issue.status}</span>
+                            </div>
+                            <div class="issue-description">${escapeHtml(issue.description.substring(0, 150))}${issue.description.length > 150 ? '...' : ''}</div>
+                            <div class="issue-footer">
+                                <span class="comment-count">💬 ${issue.comment_count} comments</span>
+                            </div>
+                        </div>
+                    `).join('');
+                } else {
+                    container.innerHTML = `
+                        <div class="empty-state">
+                            <div class="empty-state-icon">📭</div>
+                            <h3>No issues found</h3>
+                            <p>Be the first to report an issue!</p>
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                console.error('Failed to load issues:', error);
+                container.innerHTML = `
+                    <div class="alert alert-error">
+                        Failed to load issues. Please try again.
+                    </div>
+                `;
+            }
+        }
+
+        async function viewIssue(issueId) {
+            currentIssueId = issueId;
+            const modal = document.getElementById('issueDetailsModal');
+            const content = document.getElementById('issueDetailsContent');
+            
+            content.innerHTML = '<div class="loading">Loading...</div>';
+            modal.classList.add('active');
+
+            try {
+                const response = await fetch(`/api/issues/${issueId}`);
+                const data = await response.json();
+
+                if (data.success) {
+                    const issue = data.issue;
+                    
+                    content.innerHTML = `
+                        <div class="issue-header">
+                            <h3>${escapeHtml(issue.title)}</h3>
+                            <span class="status-badge status-${issue.status}">${issue.status}</span>
+                        </div>
+                        <div class="issue-meta" style="margin: 12px 0;">
+                            Posted by ${escapeHtml(issue.user_name)} • ${formatDate(issue.created_at)}
+                        </div>
+                        <div class="issue-description" style="margin: 20px 0; padding: 16px; background: #f9fafb; border-radius: 8px;">
+                            ${escapeHtml(issue.description)}
+                        </div>
+                        
+                        ${issue.resolution_note ? `
+                            <div class="alert alert-success">
+                                <strong>Resolution:</strong> ${escapeHtml(issue.resolution_note)}
+                            </div>
+                        ` : ''}
+                        
+                        <h4 style="margin: 24px 0 12px;">Comments (${issue.comments.length})</h4>
+                        ${issue.comments.map(comment => `
+                            <div class="comment-box">
+                                <div class="comment-header">
+                                    <div>
+                                        <span class="comment-author">${escapeHtml(comment.user_name)}</span>
+                                        ${comment.is_admin ? '<span class="admin-badge">ADMIN</span>' : ''}
+                                    </div>
+                                    <span class="comment-date">${formatDate(comment.created_at)}</span>
+                                </div>
+                                <div class="comment-text">${escapeHtml(comment.comment)}</div>
+                            </div>
+                        `).join('')}
+                        
+                        <div class="form-group" style="margin-top: 20px;">
+                            <label>Add Comment</label>
+                            <textarea id="commentText" placeholder="Type your comment here..."></textarea>
+                            <button class="btn btn-primary" onclick="addComment()" style="margin-top: 8px;">Post Comment</button>
+                        </div>
+                        
+                        ${data.is_admin && issue.status === 'open' ? `
+                            <div class="admin-controls">
+                                <h3>⚡ Admin Controls</h3>
+                                <div class="form-group">
+                                    <label>Resolution Note *</label>
+                                    <textarea id="resolutionNote" placeholder="Describe how this issue was resolved or why it's being ignored..."></textarea>
+                                </div>
+                                <div style="display: flex; gap: 12px;">
+                                    <button class="btn btn-primary" onclick="markIssue('fixed')" style="flex: 1;">Mark as Fixed</button>
+                                    <button class="btn btn-secondary" onclick="markIssue('ignored')" style="flex: 1;">Mark as Ignored</button>
+                                </div>
+                            </div>
+                        ` : ''}
+                    `;
+                }
+            } catch (error) {
+                console.error('Failed to load issue:', error);
+                content.innerHTML = '<div class="alert alert-error">Failed to load issue details.</div>';
+            }
+        }
+
+        async function addComment() {
+            const commentText = document.getElementById('commentText').value.trim();
+            
+            if (!commentText) {
+                alert('Please enter a comment');
+                return;
+            }
+
+            try {
+                const response = await fetch(`/api/issues/${currentIssueId}/comments`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ comment: commentText })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    viewIssue(currentIssueId); // Reload issue
+                } else {
+                    alert(data.error || 'Failed to post comment');
+                }
+            } catch (error) {
+                alert('Failed to post comment');
+            }
+        }
+
+        async function markIssue(status) {
+            const resolutionNote = document.getElementById('resolutionNote').value.trim();
+            
+            if (!resolutionNote) {
+                alert('Please enter a resolution note');
+                return;
+            }
+
+            if (!confirm(`Are you sure you want to mark this issue as ${status}?`)) {
+                return;
+            }
+
+            try {
+                const response = await fetch(`/api/issues/${currentIssueId}/status`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ status, resolution_note: resolutionNote })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    closeIssueDetailsModal();
+                    loadStats();
+                    loadIssues(currentFilter);
+                    alert(`Issue marked as ${status}!`);
+                } else {
+                    alert(data.error || 'Failed to update issue');
+                }
+            } catch (error) {
+                alert('Failed to update issue');
+            }
+        }
+
+        function filterIssues(filter) {
+            currentFilter = filter;
+            
+            // Update active tab
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.classList.remove('active');
+                if (tab.dataset.filter === filter) {
+                    tab.classList.add('active');
+                }
+            });
+            
+            loadIssues(filter);
+        }
+
+        function openNewIssueModal() {
+            document.getElementById('newIssueModal').classList.add('active');
+            document.getElementById('issueTitle').value = '';
+            document.getElementById('issueDescription').value = '';
+            document.getElementById('alertContainer').innerHTML = '';
+        }
+
+        function closeNewIssueModal() {
+            document.getElementById('newIssueModal').classList.remove('active');
+        }
+
+        function closeIssueDetailsModal() {
+            document.getElementById('issueDetailsModal').classList.remove('active');
+        }
+
+        async function submitIssue(event) {
+            event.preventDefault();
+            
+            const title = document.getElementById('issueTitle').value.trim();
+            const description = document.getElementById('issueDescription').value.trim();
+            const alertContainer = document.getElementById('alertContainer');
+            
+            try {
+                const response = await fetch('/api/issues', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ title, description })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    alertContainer.innerHTML = '<div class="alert alert-success">Issue submitted successfully!</div>';
+                    setTimeout(() => {
+                        closeNewIssueModal();
+                        loadStats();
+                        loadIssues(currentFilter);
+                    }, 1500);
+                } else {
+                    alertContainer.innerHTML = `<div class="alert alert-error">${data.error}</div>`;
+                }
+            } catch (error) {
+                alertContainer.innerHTML = '<div class="alert alert-error">Failed to submit issue. Please try again.</div>';
+            }
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        function formatDate(dateStr) {
+            const date = new Date(dateStr);
+            const now = new Date();
+            const diff = now - date;
+            const minutes = Math.floor(diff / 60000);
+            const hours = Math.floor(minutes / 60);
+            const days = Math.floor(hours / 24);
+
+            if (minutes < 60) return `${minutes}m ago`;
+            if (hours < 24) return `${hours}h ago`;
+            if (days < 7) return `${days}d ago`;
+            return date.toLocaleDateString();
+        }
+
+        // Initialize
+        loadStats();
+        loadIssues();
+    </script>
+</body>
+</html>

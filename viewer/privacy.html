@@ -1,0 +1,560 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Privacy Policy - SlushAI 3D Modeller</title>
+    <link rel="stylesheet" href="themes.css" />
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #1e1b4b 0%, #312e81 100%);
+            color: #fff;
+            min-height: 100vh;
+            padding: 40px 20px;
+            line-height: 1.7;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 60px;
+            padding: 40px;
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border: 2px solid rgba(34, 197, 94, 0.3);
+            border-radius: 20px;
+        }
+
+        .header-icon {
+            font-size: 64px;
+            margin-bottom: 20px;
+        }
+
+        h1 {
+            font-size: 42px;
+            font-weight: 700;
+            margin-bottom: 12px;
+            background: linear-gradient(135deg, #22c55e, #10b981);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .subtitle {
+            font-size: 16px;
+            color: rgba(255, 255, 255, 0.7);
+            margin-bottom: 8px;
+        }
+
+        .founder {
+            font-size: 14px;
+            color: #fbbf24;
+            font-weight: 600;
+        }
+
+        .last-updated {
+            display: inline-block;
+            padding: 8px 16px;
+            background: rgba(59, 130, 246, 0.2);
+            border: 1px solid rgba(59, 130, 246, 0.4);
+            border-radius: 20px;
+            font-size: 13px;
+            color: #60a5fa;
+            margin-top: 16px;
+        }
+
+        .content {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            padding: 50px;
+            margin-bottom: 40px;
+        }
+
+        h2 {
+            font-size: 28px;
+            font-weight: 700;
+            color: #22c55e;
+            margin-top: 48px;
+            margin-bottom: 20px;
+            padding-bottom: 12px;
+            border-bottom: 2px solid rgba(34, 197, 94, 0.3);
+        }
+
+        h2:first-child {
+            margin-top: 0;
+        }
+
+        h3 {
+            font-size: 20px;
+            font-weight: 600;
+            color: #60a5fa;
+            margin-top: 32px;
+            margin-bottom: 16px;
+        }
+
+        h4 {
+            font-size: 16px;
+            font-weight: 600;
+            color: #f97316;
+            margin-top: 20px;
+            margin-bottom: 12px;
+        }
+
+        p {
+            font-size: 15px;
+            color: rgba(255, 255, 255, 0.85);
+            margin-bottom: 16px;
+        }
+
+        ul, ol {
+            margin: 16px 0;
+            padding-left: 32px;
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        li {
+            font-size: 15px;
+            margin-bottom: 10px;
+            line-height: 1.6;
+        }
+
+        strong {
+            color: #fff;
+            font-weight: 600;
+        }
+
+        .highlight-box {
+            background: rgba(59, 130, 246, 0.1);
+            border-left: 4px solid #3b82f6;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 24px 0;
+        }
+
+        .warning-box {
+            background: rgba(239, 68, 68, 0.1);
+            border-left: 4px solid #ef4444;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 24px 0;
+        }
+
+        .success-box {
+            background: rgba(34, 197, 94, 0.1);
+            border-left: 4px solid #22c55e;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 24px 0;
+        }
+
+        .key-points {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 16px;
+            margin: 24px 0;
+        }
+
+        .key-point {
+            background: rgba(34, 197, 94, 0.1);
+            border: 1px solid rgba(34, 197, 94, 0.3);
+            border-radius: 8px;
+            padding: 16px;
+            font-size: 14px;
+        }
+
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 14px 28px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+            color: #fff;
+            text-decoration: none;
+            font-size: 15px;
+            font-weight: 600;
+            transition: all 0.3s;
+            margin: 0 6px;
+        }
+
+        .back-link:hover {
+            background: rgba(255, 255, 255, 0.15);
+            border-color: #22c55e;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 16px rgba(34, 197, 94, 0.3);
+        }
+
+        .button-row {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-top: 50px;
+        }
+
+        code {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            color: #22c55e;
+        }
+
+        @media (max-width: 768px) {
+            .content {
+                padding: 30px 24px;
+            }
+            
+            h1 {
+                font-size: 32px;
+            }
+            
+            h2 {
+                font-size: 24px;
+            }
+
+            .key-points {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="header-icon">🔒</div>
+            <h1>Privacy Policy</h1>
+            <p class="subtitle">Spatial Latent Understanding & Synthetic Hyper-Accuracy Intelligence</p>
+            <p class="founder">👑 Founded by Gary Richard Doman (@GareBearProductionz)</p>
+            <div class="last-updated">📅 Last Updated: November 28, 2025</div>
+        </div>
+
+        <div class="content">
+            <div class="highlight-box">
+                <p style="margin: 0;"><strong>🛡️ Our Commitment:</strong> Your privacy is paramount. This policy describes how we collect, use, and protect your information. We are committed to transparency and giving you control over your data.</p>
+            </div>
+
+            <h2>Key Privacy Principles</h2>
+            <div class="key-points">
+                <div class="key-point">✅ <strong>We do NOT sell your data</strong> to third parties</div>
+                <div class="key-point">✅ <strong>Email addresses are private</strong> - only visible to staff</div>
+                <div class="key-point">✅ <strong>User directory shows limited info</strong> - username, tier, badge, models only</div>
+                <div class="key-point">⚠️ <strong>IP addresses are hashed (SHA256) for lookup, but the original IP is also retained</strong> in the visitor log — they are not anonymized</div>
+                <div class="key-point">✅ <strong>Error logs kept for 3 months</strong> for security audits</div>
+                <div class="key-point">✅ <strong>You retain ownership</strong> of all images and 3D models</div>
+            </div>
+
+            <h2>1. Information We Collect</h2>
+            
+            <h3>1.1 Information You Provide Directly</h3>
+            <p><strong>Account Information:</strong></p>
+            <ul>
+                <li>Username (3-20 characters, alphanumeric + underscore)</li>
+                <li>Email address (for authentication and verification)</li>
+                <li>Password (hashed with bcrypt, 12+ rounds)</li>
+                <li>Profile settings and preferences</li>
+            </ul>
+
+            <p><strong>User-Generated Content:</strong></p>
+            <ul>
+                <li>Images you upload for 3D model generation</li>
+                <li>Generated 3D models (GLB/OBJ formats)</li>
+                <li>Favorited models</li>
+                <li>Model screenshots captured in viewer</li>
+                <li>Support requests and feedback</li>
+            </ul>
+
+            <h3>1.2 Information Collected Automatically</h3>
+            <p><strong>Usage Data:</strong></p>
+            <ul>
+                <li>IP address (hashed with SHA256 for lookup; the original IP is also retained in the visitor log)</li>
+                <li>Browser type and version</li>
+                <li>Operating system and device information</li>
+                <li>Pages visited and features used</li>
+                <li>Time and date of access</li>
+                <li>Session duration</li>
+            </ul>
+
+            <p><strong>Technical Data:</strong></p>
+            <ul>
+                <li>API request logs</li>
+                <li>Model generation parameters</li>
+                <li>Error logs and crash reports</li>
+                <li>Performance metrics</li>
+            </ul>
+
+            <p><strong>Security Data:</strong></p>
+            <ul>
+                <li>Rate limiting violations</li>
+                <li>Attack attempts (SQL injection, XSS, path traversal, etc.)</li>
+                <li>Blocked IP addresses</li>
+                <li>User agent strings</li>
+                <li>Request patterns</li>
+            </ul>
+
+            <h3>1.3 Cookies and Tracking</h3>
+            <div class="success-box">
+                <p><strong>Essential Cookies:</strong></p>
+                <ul>
+                    <li><code>session</code>: User authentication (expires on logout)</li>
+                    <li>Required for core functionality</li>
+                </ul>
+                <p><strong>Preference Cookies:</strong></p>
+                <ul>
+                    <li>UI settings stored in browser local storage</li>
+                    <li>Can be cleared via browser settings</li>
+                </ul>
+                <p style="margin: 0;"><strong>We do NOT use:</strong> Third-party tracking cookies, advertising networks, or analytics services.</p>
+            </div>
+
+            <h2>2. How We Use Your Information</h2>
+
+            <h3>2.1 Service Provision</h3>
+            <ul>
+                <li>Process your images and generate 3D models using TripoSR</li>
+                <li>Authenticate and maintain your user account</li>
+                <li>Store your favorites and preferences</li>
+                <li>Enable model downloads and screenshots</li>
+                <li>Manage the generation queue</li>
+                <li>Track weekly quotas and storage limits</li>
+            </ul>
+
+            <h3>2.2 Service Improvement</h3>
+            <ul>
+                <li>Analyze usage patterns to improve features</li>
+                <li>Debug and fix technical issues</li>
+                <li>Optimize performance and resource usage</li>
+                <li>Develop new features based on user needs</li>
+            </ul>
+
+            <h3>2.3 Security and Protection</h3>
+            <ul>
+                <li>Detect and prevent security threats</li>
+                <li>Block malicious users and attacks</li>
+                <li>Monitor for abuse and Terms violations</li>
+                <li>Enforce 4-level progressive blocking system</li>
+                <li>Investigate suspicious activity</li>
+            </ul>
+
+            <h2>3. Data Storage and Retention</h2>
+
+            <h3>3.1 Storage Location</h3>
+            <ul>
+                <li>Generated models stored locally on our servers</li>
+                <li>User data stored in SQLite databases</li>
+                <li>Logs stored in local file systems</li>
+                <li>All data stored in secure infrastructure (1000GB capacity)</li>
+            </ul>
+
+            <h3>3.2 Retention Periods by Tier</h3>
+            <p><strong>Free Tier:</strong></p>
+            <ul>
+                <li>Non-favorited models: 36 hours auto-deletion</li>
+                <li>Favorited models: Permanent (protected)</li>
+                <li>Maximum 32 models total, 10 favorites</li>
+            </ul>
+
+            <p><strong>Standard Tier:</strong></p>
+            <ul>
+                <li>Non-favorited models: 14 days auto-deletion</li>
+                <li>Favorited models: Permanent (protected)</li>
+                <li>Maximum 150 models total, 50 favorites</li>
+            </ul>
+
+            <p><strong>Pro Tier:</strong></p>
+            <ul>
+                <li>Non-favorited models: 30 days auto-deletion</li>
+                <li>Favorited models: Permanent (protected)</li>
+                <li>Maximum 500 models total, 150 favorites</li>
+            </ul>
+
+            <h3>3.3 Logs and Security Data</h3>
+            <ul>
+                <li><strong>Error logs:</strong> Retained for 3 months for security audits</li>
+                <li><strong>Regular logs:</strong> Truncate at 2,560 entries (no long-term storage)</li>
+                <li><strong>Activity logs:</strong> 30-day retention</li>
+                <li><strong>Security reports:</strong> Aggregated indefinitely</li>
+            </ul>
+
+            <h3>3.4 Uploaded Images</h3>
+            <ul>
+                <li>Images temporarily cached during generation</li>
+                <li>Original uploads deleted after model generation completes</li>
+                <li>Images are NOT retained for training purposes</li>
+                <li>Processing is fully automated and not manually reviewed</li>
+            </ul>
+
+            <h2>4. Data Sharing and Disclosure</h2>
+
+            <div class="success-box">
+                <p style="margin: 0;"><strong>✅ We do NOT sell your data</strong> to third parties. We do not rent, trade, or share your personal information for advertising purposes.</p>
+            </div>
+
+            <h3>4.1 Third-Party Services</h3>
+            <p><strong>Open-Source Dependencies:</strong></p>
+            <ul>
+                <li>TripoSR (3D model generation) - processing done locally</li>
+                <li>Three.js (3D rendering) - client-side only</li>
+                <li>Flask (web framework) - server-side only</li>
+                <li>Socket.IO (real-time communication) - direct server-client</li>
+            </ul>
+
+            <p><strong>Payment Processing:</strong></p>
+            <ul>
+                <li><strong>Stripe:</strong> Credit card payments (PCI-DSS compliant)</li>
+                <li><strong>Cryptocurrency:</strong> Bitcoin, Ethereum, Tron (blockchain public by nature)</li>
+            </ul>
+
+            <h3>4.2 Legal Requirements</h3>
+            <p>We may disclose information if required to:</p>
+            <ul>
+                <li>Comply with legal obligations</li>
+                <li>Respond to valid legal requests (subpoenas, court orders)</li>
+                <li>Protect our rights, property, or safety</li>
+                <li>Prevent fraud or security threats</li>
+                <li>Enforce our Terms of Service</li>
+            </ul>
+
+            <h2>5. Data Security</h2>
+
+            <h3>5.1 Security Measures</h3>
+            <div class="highlight-box">
+                <p><strong>4-Level Progressive Blocking System:</strong></p>
+                <ul>
+                    <li><strong>Level 1:</strong> Rate limit warning (429 error)</li>
+                    <li><strong>Level 2:</strong> Temporary block (1 hour for sustained &gt;100 req/min)</li>
+                    <li><strong>Level 3:</strong> Extended block (24 hours for attack patterns)</li>
+                    <li><strong>Level 4:</strong> Permanent ban (DDoS attacks &gt;1000 req/10s)</li>
+                </ul>
+            </div>
+
+            <p><strong>Attack Detection:</strong></p>
+            <ul>
+                <li>SQL injection detection and blocking</li>
+                <li>XSS (Cross-Site Scripting) prevention</li>
+                <li>Path traversal protection</li>
+                <li>Command injection prevention</li>
+                <li>DDoS protection</li>
+                <li>Brute force attack detection</li>
+            </ul>
+
+            <p><strong>Encryption & Authentication:</strong></p>
+            <ul>
+                <li>HTTPS/TLS for data in transit</li>
+                <li>Password hashing with bcrypt (12+ rounds)</li>
+                <li>Secure session management</li>
+                <li>IP address hashing (SHA256) for lookup, with the original IP retained in the visitor log</li>
+            </ul>
+
+            <h3>5.2 Security Limitations</h3>
+            <div class="warning-box">
+                <p><strong>⚠️ Important:</strong> No system is 100% secure. Despite our comprehensive security measures, you acknowledge the inherent risks of internet transmission.</p>
+                <p style="margin: 0;"><strong>User Responsibility:</strong> Use strong unique passwords, don't share credentials, report security vulnerabilities responsibly, keep your device updated.</p>
+            </div>
+
+            <h2>6. Your Rights and Choices</h2>
+
+            <h3>6.1 Access and Control</h3>
+            <p>You have the right to:</p>
+            <ul>
+                <li>Access your personal information</li>
+                <li>Update or correct your information</li>
+                <li>Delete your data (subject to legal requirements)</li>
+                <li>Export your data (download models)</li>
+                <li>Opt-out of non-essential communications</li>
+            </ul>
+
+            <h3>6.2 Managing Your Data</h3>
+            <p><strong>Through the Interface:</strong></p>
+            <ul>
+                <li>View and manage your favorites</li>
+                <li>Delete individual models</li>
+                <li>Update your preferences</li>
+                <li>View activity logs (30-day history)</li>
+                <li>Close your account</li>
+            </ul>
+
+            <h2>7. GDPR Compliance (EU Users)</h2>
+            <p>If you are in the European Union, you have additional rights:</p>
+            <ul>
+                <li><strong>Right to data portability:</strong> Export your models</li>
+                <li><strong>Right to restriction of processing:</strong> Limit how we use your data</li>
+                <li><strong>Right to object:</strong> Object to certain types of processing</li>
+                <li><strong>Right to lodge a complaint:</strong> Contact your local supervisory authority</li>
+            </ul>
+
+            <h2>8. CCPA Compliance (California Users)</h2>
+            <p>If you are a California resident, you have the right to:</p>
+            <ul>
+                <li>Know what personal information is collected</li>
+                <li>Know if personal information is sold or disclosed (we don't sell)</li>
+                <li>Request deletion of personal information</li>
+                <li>Non-discrimination for exercising your rights</li>
+            </ul>
+
+            <h2>9. Children's Privacy</h2>
+            <div class="warning-box">
+                <p style="margin: 0;"><strong>Age Restriction:</strong> The Service is not intended for children under 13. We do not knowingly collect personal information from children under 13. If you believe we have inadvertently collected such information, contact us immediately.</p>
+            </div>
+
+            <h2>10. Data Breach Notification</h2>
+            <p>In the event of a data breach affecting your personal information:</p>
+            <ul>
+                <li>We will investigate promptly</li>
+                <li>We will notify affected users within 72 hours (if legally required)</li>
+                <li>We will take remedial action to prevent future breaches</li>
+                <li>We will cooperate with authorities as required</li>
+            </ul>
+
+            <h2>11. Changes to This Policy</h2>
+            <p>We may update this Privacy Policy from time to time. Changes will be posted on this page with an updated "Last Updated" date. For significant changes, we may provide additional notice via email or in-app notification. Your continued use after changes constitutes acceptance of the updated policy.</p>
+
+            <h2>12. Contact Us</h2>
+            <p>For questions about this Privacy Policy or to exercise your data rights, contact us through the support form on the homepage. We will respond within 30 days.</p>
+
+            <div class="success-box" style="margin-top: 40px;">
+                <p><strong>📊 Summary:</strong></p>
+                <ul>
+                    <li>✅ <strong>We collect:</strong> Account info, uploaded images, usage data, security logs</li>
+                    <li>✅ <strong>We use it for:</strong> Service provision, security, improvement</li>
+                    <li>✅ <strong>We store it:</strong> Locally on our servers (36 hours to permanent)</li>
+                    <li>✅ <strong>We protect it:</strong> 4-level blocking, encryption, attack detection</li>
+                    <li>✅ <strong>We DON'T:</strong> Sell your data, share with advertisers, track across sites</li>
+                    <li>✅ <strong>You can:</strong> Access, update, delete your data anytime</li>
+                </ul>
+                <p style="margin: 0;"><strong>✅ By using SlushAI 3D Modeller, you acknowledge that you have read, understood, and agree to this Privacy Policy.</strong></p>
+            </div>
+        </div>
+
+        <div class="button-row">
+            <a href="/docs" class="back-link">
+                <span>📚</span>
+                <span>Documentation</span>
+            </a>
+            <a href="/docs/terms" class="back-link">
+                <span>📜</span>
+                <span>Terms of Service</span>
+            </a>
+            <a href="/" class="back-link">
+                <span>←</span>
+                <span>Back to Home</span>
+            </a>
+        </div>
+    </div>
+</body>
+</html>

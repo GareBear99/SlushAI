@@ -1,0 +1,536 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SlushAI 3D Modeller - Pricing</title>
+    <link rel="stylesheet" href="themes.css" />
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--bg);
+            color: var(--text-main);
+            line-height: 1.6;
+        }
+
+        .header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 100;
+            background: var(--card);
+            border-bottom: 1px solid var(--border-soft);
+            padding: 16px 32px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 20px;
+            font-weight: 600;
+            text-decoration: none;
+            color: var(--text-main);
+        }
+
+        .back-btn {
+            padding: 8px 16px;
+            background: var(--bg-soft);
+            border: 1px solid var(--border-soft);
+            border-radius: 6px;
+            color: var(--text-main);
+            text-decoration: none;
+            font-size: 14px;
+            transition: all 0.2s;
+        }
+
+        .back-btn:hover {
+            border-color: var(--accent-1);
+            color: var(--accent-1);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 120px 32px 80px;
+        }
+
+        .hero {
+            text-align: center;
+            margin-bottom: 80px;
+        }
+
+        .hero h1 {
+            font-size: 48px;
+            font-weight: 700;
+            margin-bottom: 16px;
+            background: linear-gradient(135deg, var(--accent-1), var(--accent-2));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .hero p {
+            font-size: 18px;
+            color: var(--text-sub);
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .billing-toggle {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            margin: 40px 0;
+            align-items: center;
+        }
+
+        .toggle-btn {
+            padding: 10px 24px;
+            background: var(--bg-soft);
+            border: 1px solid var(--border-soft);
+            border-radius: 8px;
+            color: var(--text-sub);
+            font-size: 15px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .toggle-btn.active {
+            background: linear-gradient(135deg, var(--accent-1), var(--accent-2));
+            color: white;
+            border-color: transparent;
+        }
+
+        .savings-badge {
+            padding: 4px 12px;
+            background: #22c55e;
+            color: white;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .pricing-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 24px;
+            margin-bottom: 60px;
+        }
+
+        .plan-card {
+            background: var(--card);
+            border: 2px solid var(--border-soft);
+            border-radius: 16px;
+            padding: 32px;
+            transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .plan-card:hover {
+            transform: translateY(-4px);
+            border-color: var(--accent-1);
+            box-shadow: 0 12px 40px var(--accent-soft);
+        }
+
+        .plan-card.popular {
+            border-color: var(--accent-1);
+            box-shadow: 0 8px 32px var(--accent-soft);
+        }
+
+        .popular-badge {
+            position: absolute;
+            top: 16px;
+            right: 16px;
+            padding: 4px 12px;
+            background: linear-gradient(135deg, var(--accent-1), var(--accent-2));
+            color: white;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .plan-name {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .plan-price {
+            font-size: 40px;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+
+        .plan-price span {
+            font-size: 18px;
+            color: var(--text-sub);
+            font-weight: 400;
+        }
+
+        .plan-period {
+            font-size: 14px;
+            color: var(--text-sub);
+            margin-bottom: 24px;
+        }
+
+        .plan-features {
+            list-style: none;
+            margin: 24px 0;
+        }
+
+        .plan-features li {
+            padding: 12px 0;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 14px;
+            border-top: 1px solid var(--border-soft);
+        }
+
+        .plan-features li:first-child {
+            border-top: none;
+        }
+
+        .check-icon {
+            color: var(--accent-1);
+            font-size: 16px;
+        }
+
+        .plan-button {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, var(--accent-1), var(--accent-2));
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            margin-top: 16px;
+        }
+
+        .plan-button:hover {
+            transform: scale(1.02);
+            box-shadow: 0 8px 20px var(--accent-soft);
+        }
+
+        .plan-button.secondary {
+            background: var(--bg-soft);
+            color: var(--text-main);
+        }
+
+        .plan-button.secondary:hover {
+            background: var(--border-soft);
+        }
+
+        .plan-button.current-plan {
+            background: var(--bg-soft);
+            color: var(--text-main);
+            cursor: default;
+            opacity: 0.85;
+        }
+
+        .checkout-banner {
+            max-width: 600px;
+            margin: 24px auto 0;
+            padding: 14px 20px;
+            border-radius: 8px;
+            text-align: center;
+            font-weight: 600;
+        }
+
+        .checkout-banner.success {
+            background: rgba(34, 197, 94, 0.15);
+            border: 1px solid rgba(34, 197, 94, 0.5);
+            color: #4ade80;
+        }
+
+        .checkout-banner.cancelled {
+            background: var(--bg-soft);
+            border: 1px solid var(--border-soft);
+            color: var(--text-main);
+        }
+
+        .refill-section {
+            max-width: 600px;
+            margin: 60px auto;
+            padding: 32px;
+            background: var(--card);
+            border: 2px solid var(--border-soft);
+            border-radius: 16px;
+            text-align: center;
+        }
+
+        .refill-section h3 {
+            font-size: 24px;
+            margin-bottom: 12px;
+        }
+
+        .refill-section p {
+            color: var(--text-sub);
+            margin-bottom: 24px;
+        }
+
+        .refill-card {
+            background: var(--bg-soft);
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 20px;
+        }
+
+        .refill-price {
+            font-size: 32px;
+            font-weight: 700;
+            color: var(--accent-1);
+            margin-bottom: 8px;
+        }
+
+        .refill-detail {
+            font-size: 14px;
+            color: var(--text-sub);
+        }
+
+        .disclaimer {
+            margin-top: 60px;
+            padding-top: 40px;
+            border-top: 1px solid var(--border-soft);
+            text-align: center;
+            font-size: 13px;
+            color: var(--text-sub);
+        }
+    </style>
+</head>
+<body class="app-bg theme-6">
+    <div class="header">
+        <a href="/viewer" class="logo">
+            <span>🎨</span>
+            <span>SlushAI 3D Modeller</span>
+        </a>
+        <a href="/viewer" class="back-btn">← Back to Studio</a>
+    </div>
+
+    <div class="container">
+        <div class="hero">
+            <h1>Simple, Transparent Pricing</h1>
+            <p>Start for free with 10 models per week. Upgrade anytime for more power.</p>
+        </div>
+
+        <div class="billing-toggle">
+            <button class="toggle-btn active" onclick="switchBilling('weekly')">Weekly</button>
+            <button class="toggle-btn" onclick="switchBilling('yearly')">Yearly</button>
+            <span class="savings-badge">Save 60%</span>
+        </div>
+
+        <div class="pricing-grid" id="pricingGrid">
+            <!-- Free Plan -->
+            <div class="plan-card">
+                <div class="plan-name">Free</div>
+                <div class="plan-price">$0<span>/week</span></div>
+                <div class="plan-period">Perfect for trying out</div>
+                <ul class="plan-features">
+                    <li><span class="check-icon">✓</span> 10 models per week</li>
+                    <li><span class="check-icon">✓</span> Standard queue</li>
+                    <li><span class="check-icon">✓</span> Basic resolution</li>
+                    <li><span class="check-icon">✓</span> Screenshot gallery</li>
+                </ul>
+                <button class="plan-button secondary" onclick="selectPlan('free', this)">Current Plan</button>
+            </div>
+
+            <!-- Standard Plan -->
+            <div class="plan-card popular">
+                <div class="popular-badge">Most Popular</div>
+                <div class="plan-name">Standard</div>
+                <div class="plan-price" id="standardPrice">$3.47<span>/week</span></div>
+                <div class="plan-period" id="standardPeriod">Great for regular creators</div>
+                <ul class="plan-features">
+                    <li><span class="check-icon">✓</span> <strong>40 models per week</strong></li>
+                    <li><span class="check-icon">✓</span> Priority queue</li>
+                    <li><span class="check-icon">✓</span> Higher resolution (512px)</li>
+                    <li><span class="check-icon">✓</span> Email support</li>
+                    <li class="yearly-only" style="display: none;"><span class="check-icon">✓</span> <strong>Save $108/year</strong></li>
+                </ul>
+                <button class="plan-button" onclick="selectPlan('standard_weekly', this)">Upgrade to Standard</button>
+            </div>
+
+            <!-- Pro Plan -->
+            <div class="plan-card">
+                <div class="plan-name">Pro</div>
+                <div class="plan-price" id="proPrice">$7.89<span>/week</span></div>
+                <div class="plan-period" id="proPeriod">For power users</div>
+                <ul class="plan-features">
+                    <li><span class="check-icon">✓</span> <strong>120 models per week</strong></li>
+                    <li><span class="check-icon">✓</span> Highest priority</li>
+                    <li><span class="check-icon">✓</span> Max resolution (1024px)</li>
+                    <li><span class="check-icon">✓</span> API access</li>
+                    <li><span class="check-icon">✓</span> Premium support</li>
+                    <li class="yearly-only" style="display: none;"><span class="check-icon">✓</span> <strong>Save $246/year</strong></li>
+                </ul>
+                <button class="plan-button" onclick="selectPlan('pro_weekly', this)">Upgrade to Pro</button>
+            </div>
+        </div>
+
+        <!-- Quick Refill Section -->
+        <div class="refill-section">
+            <h3>💎 Quick Refill</h3>
+            <p>Need more models this week? Get an instant boost!</p>
+            
+            <div class="refill-card">
+                <div class="refill-price">$1</div>
+                <div class="refill-detail">+10 models instantly added to your current quota</div>
+            </div>
+
+            <button class="plan-button" onclick="purchaseRefill(this)">Buy Refill</button>
+            
+            <p class="refill-detail" style="margin-top: 16px;">
+                Maximum 10 refills per week • No subscription required
+            </p>
+        </div>
+
+        <div id="checkoutBanner" class="checkout-banner" style="display: none;"></div>
+
+        <div class="disclaimer">
+            <p>All prices in USD. Subscriptions renew automatically and can be cancelled anytime.</p>
+            <p style="margin-top: 8px;">Secure payments powered by Stripe.</p>
+            <p style="margin-top: 8px;">Prefer crypto? <a href="/crypto-payment">Pay with BTC or ETH</a> — same plans, same prices.</p>
+        </div>
+    </div>
+
+    <script>
+        let currentBilling = 'weekly';
+
+        function switchBilling(type) {
+            currentBilling = type;
+            
+            // Update toggle buttons
+            document.querySelectorAll('.toggle-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+
+            // Update prices
+            if (type === 'yearly') {
+                document.getElementById('standardPrice').innerHTML = '$72<span>/year</span>';
+                document.getElementById('proPrice').innerHTML = '$164<span>/year</span>';
+                document.getElementById('standardPeriod').textContent = 'Save $108 per year';
+                document.getElementById('proPeriod').textContent = 'Save $246 per year';
+                document.querySelectorAll('.yearly-only').forEach(el => el.style.display = 'flex');
+            } else {
+                document.getElementById('standardPrice').innerHTML = '$3.47<span>/week</span>';
+                document.getElementById('proPrice').innerHTML = '$7.89<span>/week</span>';
+                document.getElementById('standardPeriod').textContent = 'Great for regular creators';
+                document.getElementById('proPeriod').textContent = 'For power users';
+                document.querySelectorAll('.yearly-only').forEach(el => el.style.display = 'none');
+            }
+        }
+
+        // Start a Stripe Checkout session server-side, then redirect the
+        // user to Stripe's hosted checkout page (no Stripe.js needed).
+        // If Stripe is not configured yet, offer the crypto option instead.
+        async function startStripeCheckout(plan, btn) {
+            const originalText = btn ? btn.textContent : '';
+            if (btn) { btn.disabled = true; btn.textContent = 'Starting checkout...'; }
+            try {
+                const response = await fetch('/api/stripe/create-checkout-session', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ plan: plan })
+                });
+                const data = await response.json();
+                if (response.ok && data.url) {
+                    window.location.href = data.url;
+                    return;
+                }
+                const msg = (data && data.error) || 'Checkout is not available right now.';
+                alert(msg + '\n\nYou can also pay with BTC or ETH — see "Prefer crypto?" below.');
+            } catch (error) {
+                console.error('Checkout failed:', error);
+                alert('Could not start checkout. Please try again, or pay with BTC or ETH (see "Prefer crypto?" below).');
+            } finally {
+                if (btn) { btn.disabled = false; btn.textContent = originalText; }
+            }
+        }
+
+        async function selectPlan(planKey, btn) {
+            if (currentBilling === 'yearly' && planKey !== 'free') {
+                planKey = planKey.replace('_weekly', '_yearly');
+            }
+
+            if (planKey === 'free') {
+                alert('You are currently on the Free plan');
+                return;
+            }
+
+            await startStripeCheckout(planKey, btn);
+        }
+
+        async function purchaseRefill(btn) {
+            // $1 for +10 models, max 10 per week — one-time Stripe payment.
+            await startStripeCheckout('refill', btn);
+        }
+
+        // Show the checkout result (Stripe redirects back here) and mark
+        // the user's current plan on the matching card.
+        function showCheckoutBanner() {
+            const params = new URLSearchParams(window.location.search);
+            const result = params.get('checkout');
+            if (!result) return;
+            const banner = document.getElementById('checkoutBanner');
+            if (!banner) return;
+            if (result === 'success') {
+                banner.textContent = 'Payment successful! Your new plan is active — it can take a few seconds to show here.';
+                banner.className = 'checkout-banner success';
+            } else if (result === 'cancelled') {
+                banner.textContent = 'Checkout cancelled — no charge was made.';
+                banner.className = 'checkout-banner cancelled';
+            } else {
+                return;
+            }
+            banner.style.display = 'block';
+            // Clean the URL so a refresh does not re-show the banner.
+            window.history.replaceState({}, '', window.location.pathname);
+        }
+
+        // Load user's current plan on page load
+        async function loadCurrentPlan() {
+            try {
+                const response = await fetch('/api/user/profile');
+                if (response.ok) {
+                    const user = await response.json();
+                    // Update UI to show current plan
+                    const tier = user.subscription_tier || 'free';
+                    console.log('Current plan:', tier);
+                    const planKey = tier === 'free' ? 'free'
+                        : tier.indexOf('standard') === 0 ? 'standard_weekly'
+                        : tier.indexOf('pro') === 0 ? 'pro_weekly' : null;
+                    if (planKey) {
+                        const btn = document.querySelector('button[onclick*="selectPlan(\'' + planKey + '\'"]');
+                        if (btn) {
+                            btn.textContent = 'Current Plan';
+                            btn.disabled = true;
+                            btn.classList.add('current-plan');
+                        }
+                    }
+                }
+            } catch (error) {
+                console.error('Failed to load user profile:', error);
+            }
+        }
+
+        showCheckoutBanner();
+        loadCurrentPlan();
+    </script>
+</body>
+</html>

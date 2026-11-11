@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Terms of Service - SlushAI 3D Modeller</title>
+    <link rel="stylesheet" href="themes.css" />
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #1e1b4b 0%, #312e81 100%);
+            color: #fff;
+            min-height: 100vh;
+            padding: 40px 20px;
+            line-height: 1.7;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 60px;
+            padding: 40px;
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border: 2px solid rgba(139, 92, 246, 0.3);
+            border-radius: 20px;
+        }
+
+        .header-icon {
+            font-size: 64px;
+            margin-bottom: 20px;
+        }
+
+        h1 {
+            font-size: 42px;
+            font-weight: 700;
+            margin-bottom: 12px;
+            background: linear-gradient(135deg, #f43f5e, #f97316);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .subtitle {
+            font-size: 16px;
+            color: rgba(255, 255, 255, 0.7);
+            margin-bottom: 8px;
+        }
+
+        .founder {
+            font-size: 14px;
+            color: #fbbf24;
+            font-weight: 600;
+        }
+
+        .last-updated {
+            display: inline-block;
+            padding: 8px 16px;
+            background: rgba(59, 130, 246, 0.2);
+            border: 1px solid rgba(59, 130, 246, 0.4);
+            border-radius: 20px;
+            font-size: 13px;
+            color: #60a5fa;
+            margin-top: 16px;
+        }
+
+        .content {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            padding: 50px;
+            margin-bottom: 40px;
+        }
+
+        h2 {
+            font-size: 28px;
+            font-weight: 700;
+            color: #f97316;
+            margin-top: 48px;
+            margin-bottom: 20px;
+            padding-bottom: 12px;
+            border-bottom: 2px solid rgba(249, 115, 22, 0.3);
+        }
+
+        h2:first-child {
+            margin-top: 0;
+        }
+
+        h3 {
+            font-size: 20px;
+            font-weight: 600;
+            color: #22c55e;
+            margin-top: 32px;
+            margin-bottom: 16px;
+        }
+
+        h4 {
+            font-size: 16px;
+            font-weight: 600;
+            color: #60a5fa;
+            margin-top: 20px;
+            margin-bottom: 12px;
+        }
+
+        p {
+            font-size: 15px;
+            color: rgba(255, 255, 255, 0.85);
+            margin-bottom: 16px;
+        }
+
+        ul, ol {
+            margin: 16px 0;
+            padding-left: 32px;
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        li {
+            font-size: 15px;
+            margin-bottom: 10px;
+            line-height: 1.6;
+        }
+
+        strong {
+            color: #fff;
+            font-weight: 600;
+        }
+
+        .highlight-box {
+            background: rgba(59, 130, 246, 0.1);
+            border-left: 4px solid #3b82f6;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 24px 0;
+        }
+
+        .warning-box {
+            background: rgba(239, 68, 68, 0.1);
+            border-left: 4px solid #ef4444;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 24px 0;
+        }
+
+        .success-box {
+            background: rgba(34, 197, 94, 0.1);
+            border-left: 4px solid #22c55e;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 24px 0;
+        }
+
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 14px 28px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+            color: #fff;
+            text-decoration: none;
+            font-size: 15px;
+            font-weight: 600;
+            transition: all 0.3s;
+            margin: 0 6px;
+        }
+
+        .back-link:hover {
+            background: rgba(255, 255, 255, 0.15);
+            border-color: #f97316;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 16px rgba(249, 115, 22, 0.3);
+        }
+
+        .button-row {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-top: 50px;
+        }
+
+        code {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            color: #22c55e;
+        }
+
+        @media (max-width: 768px) {
+            .content {
+                padding: 30px 24px;
+            }
+            
+            h1 {
+                font-size: 32px;
+            }
+            
+            h2 {
+                font-size: 24px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="header-icon">📜</div>
+            <h1>Terms of Service</h1>
+            <p class="subtitle">Spatial Latent Understanding & Synthetic Hyper-Accuracy Intelligence</p>
+            <p class="founder">👑 Founded by Gary Richard Doman (@GareBearProductionz)</p>
+            <div class="last-updated">📅 Last Updated: November 28, 2025</div>
+        </div>
+
+        <div class="content">
+            <div class="highlight-box">
+                <p style="margin: 0;"><strong>📌 Important:</strong> By accessing or using SlushAI 3D Modeller, you agree to be bound by these Terms of Service. If you do not agree to these Terms, do not use the Service. These Terms apply to all users, including free tier users, paid subscribers, staff members, and the Founder.</p>
+            </div>
+
+            <h2>1. Description of Service</h2>
+            <p>SlushAI 3D Modeller is an AI-powered web platform that transforms 2D images into high-quality 3D models using TripoSR technology.</p>
+            
+            <h3>Core Features</h3>
+            <ul>
+                <li><strong>AI-Powered Generation:</strong> Image-to-3D model conversion</li>
+                <li><strong>Interactive 3D Viewer:</strong> Real-time model preview with orbit controls</li>
+                <li><strong>Model Downloads:</strong> OBJ + MTL + PNG downloads (GLB export is not produced by this build)</li>
+                <li><strong>Screenshot Gallery:</strong> Capture model screenshots (1-minute cooldown)</li>
+                <li><strong>Smart Storage System:</strong> Save/favorite functionality with automatic cleanup</li>
+                <li><strong>Activity Tracking:</strong> Complete logs (30-day retention)</li>
+            </ul>
+
+            <h3>Account Features</h3>
+            <ul>
+                <li><strong>Multi-Authentication:</strong> Google OAuth, Facebook OAuth, or Email/Password</li>
+                <li><strong>Username System:</strong> Unique usernames (3-20 characters, alphanumeric + underscore)</li>
+                <li><strong>Email Verification:</strong> 6-digit codes, 10-minute expiry</li>
+                <li><strong>Badge Progression:</strong> 5 levels from Newcomer to Legend</li>
+                <li><strong>Benefactor Badge:</strong> Unlocked by donations ($1+ monthly renewal)</li>
+            </ul>
+
+            <h3>Subscription Tiers</h3>
+            <ul>
+                <li><strong>Free:</strong> 10 models/week, 10 favorites, 32 total models, 36-hour deletion</li>
+                <li><strong>Standard:</strong> 40 models/week, 50 favorites, 150 models, 14-day deletion</li>
+                <li><strong>Pro:</strong> 120 models/week, 150 favorites, 500 models, 30-day deletion</li>
+                <li><strong>Quick Refills:</strong> $1 for +10 models (max 100/week)</li>
+            </ul>
+
+            <h2>2. Account Creation & Requirements</h2>
+            
+            <h3>Registration Methods</h3>
+            <ul>
+                <li><strong>Google OAuth:</strong> Instant email verification</li>
+                <li><strong>Facebook OAuth:</strong> Instant email verification</li>
+                <li><strong>Email/Password:</strong> Requires 6-digit verification code</li>
+            </ul>
+
+            <h3>Account Requirements</h3>
+            <ul>
+                <li>Must provide accurate and complete information</li>
+                <li>Unique username: 3-20 characters, start with letter</li>
+                <li>Valid email address required</li>
+                <li>Must be 13 years or older</li>
+                <li><strong>IP Limit:</strong> Maximum 3 accounts per IP address</li>
+                <li><strong>Signup Rate Limit:</strong> 5 signups per hour per IP</li>
+            </ul>
+
+            <div class="warning-box">
+                <p style="margin: 0;"><strong>⚠️ Security:</strong> Passwords are hashed with bcrypt (12+ rounds). Multi-tier security system with progressive blocking. Attack detection for SQL injection, XSS, path traversal, command injection, and DDoS. Error logs kept for 3 months for security audits.</p>
+            </div>
+
+            <h2>3. Weekly Quotas & Storage Limits</h2>
+            
+            <h3>Weekly Generation Quotas</h3>
+            <ul>
+                <li><strong>Free Tier:</strong> 10 models/week (resets Monday 00:00 UTC)</li>
+                <li><strong>Standard Tier:</strong> 40 models/week</li>
+                <li><strong>Pro Tier:</strong> 120 models/week</li>
+                <li><strong>Staff:</strong> 500 models/week</li>
+                <li>Only successful completions count toward quota</li>
+                <li>Failed or cancelled generations do not consume quota</li>
+            </ul>
+
+            <h3>Storage Limits by Tier</h3>
+            <ul>
+                <li><strong>Free:</strong> 10 favorites max, 32 total models, 36-hour auto-deletion</li>
+                <li><strong>Standard:</strong> 50 favorites max, 150 total models, 14-day auto-deletion</li>
+                <li><strong>Pro:</strong> 150 favorites max, 500 total models, 30-day auto-deletion</li>
+                <li><strong>Favorited models are permanent</strong> and protected from deletion</li>
+            </ul>
+
+            <h2>4. Rate Limits & Security System</h2>
+            
+            <h3>API Rate Limits</h3>
+            <ul>
+                <li>Public endpoints (/api/health, /api/capacity): No limit</li>
+                <li>Public pages (/docs, /users): 100 req/min, 256,000 req/day per IP</li>
+                <li>Username validation: 30 req/min per IP</li>
+                <li>Signup: 5 req/hour per IP, 3 accounts max per IP</li>
+                <li>Protected endpoints: 30-60 req/min per user</li>
+                <li>Support: 5 req/hour per user/IP</li>
+            </ul>
+
+            <h3>4-Level Progressive Blocking System</h3>
+            <div class="success-box">
+                <ul style="margin: 0;">
+                    <li><strong>Level 1:</strong> Rate limit warning (429 error, retry after cooldown)</li>
+                    <li><strong>Level 2:</strong> Temporary block (1 hour for sustained &gt;100 req/min)</li>
+                    <li><strong>Level 3:</strong> Extended block (24 hours for attack patterns)</li>
+                    <li><strong>Level 4:</strong> Permanent ban (DDoS attacks &gt;1000 req/10s)</li>
+                </ul>
+            </div>
+
+            <h2>5. Badge System & Progression</h2>
+            
+            <h3>Badge Levels</h3>
+            <ul>
+                <li><strong>Newcomer</strong> (0-9 models): Gray badge, starting level</li>
+                <li><strong>Creator</strong> (10-49 models): Blue badge, one-time quota reset</li>
+                <li><strong>Artist</strong> (50-199 models): Purple badge, one-time quota reset</li>
+                <li><strong>Master</strong> (200-499 models): Orange badge, one-time quota reset</li>
+                <li><strong>Legend</strong> (500+ models): Red badge, one-time quota reset</li>
+                <li><strong>Benefactor</strong> (Mystery Badge): Purple badge, monthly renewal required</li>
+            </ul>
+
+            <h3>Benefactor Badge (Mystery Badge)</h3>
+            <div class="highlight-box">
+                <p><strong>Unlock Requirements:</strong></p>
+                <ul>
+                    <li>Donate $1 or more to SlushAI via /donate page</li>
+                    <li>Unlocks referral system access</li>
+                    <li>Badge displayed with purple color and special icon</li>
+                </ul>
+                <p><strong>Monthly Renewal:</strong></p>
+                <ul style="margin: 0;">
+                    <li>Badge expires on the 1st of each month at 00:00 UTC</li>
+                    <li>Must donate $1+ each month to renew</li>
+                    <li>Losing badge locks referral system</li>
+                    <li>Redeemable balance preserved but frozen until renewal</li>
+                </ul>
+            </div>
+
+            <h2>6. Referral System (Benefactor Members Only)</h2>
+            
+            <h3>Eligibility</h3>
+            <ul>
+                <li>Active Benefactor badge required</li>
+                <li>Must donate $1+ monthly to maintain access</li>
+                <li>System locks if badge expires</li>
+            </ul>
+
+            <h3>Earnings Structure</h3>
+            <ul>
+                <li>Earn $1 USD per week for each paying member you refer</li>
+                <li>Only Standard and Pro subscribers count as paying members</li>
+                <li>Free tier referrals do not generate earnings</li>
+                <li>Unlimited referrals - no cap on potential earnings</li>
+            </ul>
+
+            <h3>Earnings Distribution</h3>
+            <ol>
+                <li><strong>Pay Your Bill First:</strong> Earnings automatically pay your subscription cost</li>
+                <li><strong>Accumulate Profit:</strong> Excess earnings become redeemable balance</li>
+                <li><strong>Cash Out:</strong> Redeem when balance reaches minimum $5 threshold</li>
+            </ol>
+
+            <div class="success-box">
+                <p><strong>💡 Example:</strong></p>
+                <p style="margin: 0;">You have Standard plan ($3.50/week) and refer 10 paying members:<br>
+                • Weekly earnings: <strong>$10.00</strong><br>
+                • Minus subscription: <strong>-$3.50</strong><br>
+                • Redeemable profit: <strong>$6.50/week</strong><br>
+                Your subscription is essentially <strong>FREE</strong> + you earn passive income!</p>
+            </div>
+
+            <h3>Prohibited Referral Practices</h3>
+            <div class="warning-box">
+                <p>You agree NOT to:</p>
+                <ul>
+                    <li>Create fake accounts to generate referral earnings</li>
+                    <li>Use bots or automated systems to create referrals</li>
+                    <li>Spam or harass people with referral links</li>
+                    <li>Misrepresent the Service to potential referrals</li>
+                    <li>Pay users to sign up through your referral link</li>
+                </ul>
+                <p style="margin: 0;"><strong>Consequences:</strong> Referral abuse results in immediate account termination, all earnings forfeited, permanent ban from referral system.</p>
+            </div>
+
+            <h2>7. Subscription Plans & Payments</h2>
+            
+            <h3>Payment Processing</h3>
+            <ul>
+                <li><strong>Credit Cards:</strong> Processed securely through Stripe</li>
+                <li><strong>Cryptocurrency:</strong> Bitcoin (BTC), Ethereum (ETH), Tron (TRX)</li>
+                <li>Yearly plans receive additional 5% crypto discount</li>
+                <li>Real-time price conversion via CoinGecko</li>
+                <li>24-hour payment window</li>
+                <li>Incremental payments supported</li>
+            </ul>
+
+            <h3>Refunds & Cancellations</h3>
+            <ul>
+                <li>Subscriptions can be cancelled anytime through Account tab</li>
+                <li>No refunds for partial subscription periods</li>
+                <li>Unused quota does not roll over</li>
+                <li>Quick refills are non-refundable</li>
+                <li>Crypto payments are final and non-refundable</li>
+            </ul>
+
+            <h2>8. Platform Capacity Limits</h2>
+            <p><strong>User Registration Limits (1000GB Infrastructure):</strong></p>
+            <ul>
+                <li>Free Tier: 200 users maximum</li>
+                <li>Standard Tier: 50 users maximum</li>
+                <li>Pro Tier: 20 users maximum</li>
+                <li>When tier reaches capacity, signups for that tier are paused</li>
+                <li>Users can upgrade to higher tier with available capacity</li>
+            </ul>
+
+            <h2>9. Intellectual Property</h2>
+            <ul>
+                <li>You retain ownership of images you upload</li>
+                <li>Generated 3D models are provided to you for personal use</li>
+                <li>You may not resell or redistribute generated models without authorization</li>
+                <li>You grant us a license to process your images for model generation</li>
+            </ul>
+
+            <h2>10. Disclaimer & Limitation of Liability</h2>
+            <div class="warning-box">
+                <p>THE SERVICE IS PROVIDED "AS IS" WITHOUT WARRANTIES OF ANY KIND. We are not liable for any indirect, incidental, special, consequential, or punitive damages. Our total liability shall not exceed the amount you paid for the Service (if any) in the past 12 months.</p>
+            </div>
+
+            <h2>11. Privacy & Data Protection</h2>
+            <ul>
+                <li>Your use of the Service is governed by our Privacy Policy</li>
+                <li>We do NOT sell your data to third parties</li>
+                <li>Email addresses are private (only visible to staff)</li>
+                <li>IP addresses are anonymized with SHA256 hashing</li>
+                <li>Error logs kept for 3 months</li>
+                <li>GDPR and CCPA compliant</li>
+            </ul>
+
+            <h2>12. Modifications to Terms</h2>
+            <p>We reserve the right to modify these Terms at any time by posting updated Terms. Continued use after changes constitutes acceptance of new Terms.</p>
+
+            <h2>13. Contact</h2>
+            <p>For questions about these Terms, please contact support via the homepage.</p>
+
+            <div class="highlight-box" style="margin-top: 40px;">
+                <p style="margin: 0;"><strong>✅ By using SlushAI 3D Modeller, you acknowledge that you have read, understood, and agree to be bound by these Terms of Service.</strong></p>
+            </div>
+        </div>
+
+        <div class="button-row">
+            <a href="/docs" class="back-link">
+                <span>📚</span>
+                <span>Documentation</span>
+            </a>
+            <a href="/docs/privacy" class="back-link">
+                <span>🔒</span>
+                <span>Privacy Policy</span>
+            </a>
+            <a href="/" class="back-link">
+                <span>←</span>
+                <span>Back to Home</span>
+            </a>
+        </div>
+    </div>
+</body>
+</html>
