@@ -1,0 +1,711 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SlushAI 3D Modeller — Turn Images into 3D Models</title>
+    <link rel="stylesheet" href="themes.css" />
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--bg);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow-y: auto;
+            overflow-x: hidden;
+        }
+
+        .landing-container {
+            text-align: center;
+            max-width: 500px;
+            padding: 40px;
+            margin: 40px auto;
+        }
+
+        .logo {
+            font-size: 64px;
+            margin-bottom: 20px;
+            background: linear-gradient(135deg, var(--accent-1), var(--accent-2));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-weight: 800;
+        }
+
+        h1 {
+            font-size: 42px;
+            font-weight: 700;
+            margin-bottom: 12px;
+            background: linear-gradient(135deg, var(--accent-1), var(--accent-2));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .subtitle {
+            font-size: 18px;
+            color: var(--text-sub);
+            margin-bottom: 40px;
+        }
+
+        .features {
+            display: grid;
+            gap: 16px;
+            margin-bottom: 40px;
+            text-align: left;
+        }
+
+        .feature {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 16px;
+            background: var(--card);
+            border-radius: 12px;
+            border: 1px solid var(--border-soft);
+        }
+
+        .badge-section {
+            margin: 40px 0;
+            padding: 24px;
+            background: var(--card);
+            border-radius: 12px;
+            border: 1px solid var(--border-soft);
+        }
+
+        .badge-section h3 {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 16px;
+            text-align: center;
+        }
+
+        .badge-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 12px;
+            margin-top: 16px;
+        }
+
+        .badge-item {
+            text-align: center;
+            padding: 12px;
+            background: var(--bg-soft);
+            border-radius: 8px;
+        }
+
+        .badge-icon {
+            font-size: 32px;
+            margin-bottom: 8px;
+        }
+
+        .badge-name {
+            font-size: 12px;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .badge-req {
+            font-size: 11px;
+            color: var(--text-sub);
+        }
+
+        .pricing-preview {
+            margin: 40px 0;
+            padding: 24px;
+            background: var(--card);
+            border-radius: 12px;
+            border: 1px solid var(--border-soft);
+        }
+
+        .pricing-preview h3 {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 16px;
+            text-align: center;
+        }
+
+        .pricing-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 16px;
+            margin-top: 16px;
+        }
+
+        .pricing-tier {
+            padding: 16px;
+            background: var(--bg-soft);
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .tier-name {
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .tier-price {
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--accent-1);
+            margin-bottom: 8px;
+        }
+
+        .tier-quota {
+            font-size: 12px;
+            color: var(--text-sub);
+        }
+
+        .feature-icon {
+            font-size: 24px;
+            min-width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--bg-soft);
+            border-radius: 8px;
+        }
+
+        .feature-text h3 {
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .feature-text p {
+            font-size: 12px;
+            color: var(--text-sub);
+        }
+
+        .google-signin-btn {
+            width: 100%;
+            padding: 16px 24px;
+            background: white;
+            color: #1f2937;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            transition: all 0.2s;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+        }
+
+        .google-signin-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 24px rgba(0, 0, 0, 0.2);
+        }
+
+        .google-icon {
+            width: 20px;
+            height: 20px;
+        }
+
+        .facebook-signin-btn {
+            width: 100%;
+            padding: 16px 24px;
+            background: #1877f2;
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            transition: all 0.2s;
+            box-shadow: 0 4px 20px rgba(24, 119, 242, 0.3);
+            margin-top: 12px;
+        }
+
+        .facebook-signin-btn:hover {
+            background: #166fe5;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 24px rgba(24, 119, 242, 0.4);
+        }
+
+        .signin-divider {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin: 20px 0;
+            color: var(--text-sub);
+            font-size: 13px;
+        }
+
+        .signin-divider::before,
+        .signin-divider::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: var(--border-soft);
+        }
+
+        .quota-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 8px 16px;
+            background: var(--accent-soft);
+            border-radius: 20px;
+            font-size: 13px;
+            color: var(--accent-1);
+            margin-top: 20px;
+        }
+
+        .email-form {
+            width: 100%;
+            margin-top: 20px;
+        }
+
+        .form-toggle {
+            display: flex;
+            gap: 8px;
+            justify-content: center;
+            margin-bottom: 16px;
+        }
+
+        .toggle-option {
+            padding: 8px 24px;
+            background: var(--bg-soft);
+            border: 1px solid var(--border-soft);
+            border-radius: 6px;
+            font-size: 14px;
+            color: var(--text-sub);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .toggle-option.active {
+            background: var(--accent-1);
+            color: white;
+            border-color: var(--accent-1);
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 12px 16px;
+            background: var(--bg-soft);
+            border: 1px solid var(--border-soft);
+            border-radius: 8px;
+            color: var(--text-main);
+            font-size: 14px;
+            margin-bottom: 12px;
+            transition: all 0.2s;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: var(--accent-1);
+            background: var(--card);
+        }
+
+        .form-input::placeholder {
+            color: var(--text-sub);
+        }
+
+        .form-button {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, var(--accent-1), var(--accent-2));
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .form-button:hover {
+            transform: scale(1.02);
+            box-shadow: 0 8px 20px var(--accent-soft);
+        }
+
+        .form-button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .error-message {
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            color: #ef4444;
+            padding: 12px;
+            border-radius: 8px;
+            font-size: 13px;
+            margin-bottom: 12px;
+        }
+
+        .success-message {
+            background: rgba(34, 197, 94, 0.1);
+            border: 1px solid rgba(34, 197, 94, 0.3);
+            color: #22c55e;
+            padding: 12px;
+            border-radius: 8px;
+            font-size: 13px;
+            margin-bottom: 12px;
+        }
+
+        .password-strength {
+            font-size: 12px;
+            margin-top: -8px;
+            margin-bottom: 12px;
+            padding: 4px 8px;
+            border-radius: 4px;
+        }
+
+        .strength-weak { color: #ef4444; }
+        .strength-medium { color: #f59e0b; }
+        .strength-strong { color: #22c55e; }
+
+        .newsletter-checkbox {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 16px;
+            font-size: 13px;
+            color: var(--text-sub);
+        }
+
+        .newsletter-checkbox input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+            accent-color: var(--accent-1);
+        }
+
+        .newsletter-checkbox label {
+            cursor: pointer;
+        }
+
+        .animated-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            opacity: 0.3;
+        }
+
+        .animated-bg::before {
+            content: '';
+            position: absolute;
+            width: 500px;
+            height: 500px;
+            background: radial-gradient(circle, var(--accent-1), transparent 70%);
+            top: -250px;
+            left: -250px;
+            animation: float 20s infinite;
+        }
+
+        .animated-bg::after {
+            content: '';
+            position: absolute;
+            width: 600px;
+            height: 600px;
+            background: radial-gradient(circle, var(--accent-2), transparent 70%);
+            bottom: -300px;
+            right: -300px;
+            animation: float 25s infinite reverse;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translate(0, 0); }
+            50% { transform: translate(100px, 100px); }
+        }
+
+        .footer {
+            margin-top: 40px;
+            font-size: 12px;
+            color: var(--text-sub);
+        }
+
+        .docs-link {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 10px 20px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            color: var(--text-main);
+            text-decoration: none;
+            font-size: 13px;
+            font-weight: 500;
+            transition: all 0.2s;
+            backdrop-filter: blur(10px);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .docs-link:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: var(--accent-1);
+            transform: translateY(-2px);
+        }
+
+        /* Support Button */
+        .support-floating-btn {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--accent-1), var(--accent-2));
+            color: white;
+            font-size: 28px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            border: none;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+            transition: all 0.2s;
+            z-index: 1000;
+        }
+
+        .support-floating-btn:hover {
+            transform: scale(1.1);
+            box-shadow: 0 12px 32px rgba(0, 0, 0, 0.4);
+        }
+
+        /* Support Modal */
+        .support-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 2000;
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(8px);
+        }
+
+        .support-modal-content {
+            position: relative;
+            background: var(--card);
+            border-radius: 20px;
+            padding: 40px;
+            max-width: 500px;
+            width: 90%;
+            border: 1px solid var(--border-soft);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .support-modal h2 {
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 8px;
+            background: linear-gradient(135deg, var(--accent-1), var(--accent-2));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .support-modal-content > p {
+            color: var(--text-sub);
+            margin-bottom: 24px;
+            font-size: 14px;
+        }
+
+        .support-close-btn {
+            position: absolute;
+            top: 16px;
+            right: 16px;
+            background: none;
+            border: none;
+            font-size: 32px;
+            color: var(--text-sub);
+            cursor: pointer;
+            line-height: 1;
+            padding: 8px;
+            transition: all 0.2s;
+        }
+
+        .support-close-btn:hover {
+            color: var(--text-main);
+        }
+
+        .cta-block {
+            margin: 28px 0 8px 0;
+            text-align: center;
+        }
+
+        .cta-note {
+            font-size: 14px;
+            color: var(--text-sub);
+            margin-top: 16px;
+            line-height: 1.6;
+            max-width: 520px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+    </style>
+</head>
+<body class="app-bg">
+    <div class="animated-bg"></div>
+    
+    <a href="https://github.com/GareBear99/SlushAI/tree/main/docs" class="docs-link">
+        <span>📚</span>
+        <span>Documentation</span>
+    </a>
+<div class="landing-container">
+        <div class="logo">✨</div>
+        <h1>SlushAI 3D Modeller</h1>
+        <div class="subtitle">Spatial Latent Understanding & Synthetic Hyper-Accuracy Intelligence</div>
+        <div class="subtitle" style="font-size: 16px; margin-top: 8px;">Transform images into 3D models instantly</div>
+
+        <!-- Get SlushAI — static site, no sign-in here -->
+        <div class="cta-block">
+            <a href="https://github.com/GareBear99/SlushAI" style="text-decoration: none;">
+                <button class="google-signin-btn">
+                    <svg class="google-icon" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/>
+                    </svg>
+                    Get SlushAI on GitHub
+                </button>
+            </a>
+            <p class="cta-note">SlushAI is open-source and self-hosted — run it on your own hardware, sign in with Google in your own deployment, and turn images into 3D models with TripoSR.</p>
+        </div>
+
+        <div class="quota-badge">
+            <div>Claim your 🎁</div>
+            <div style="margin-top: 4px;">
+                <span>10 free models per week</span>
+            </div>
+        </div>
+
+        <div class="features">
+            <div class="feature">
+                <div class="feature-icon">⚡</div>
+                <div class="feature-text">
+                    <h3>Lightning Fast</h3>
+                    <p>Generate 3D models in 3 minutes with TripoSR</p>
+                </div>
+            </div>
+            <div class="feature">
+                <div class="feature-icon">🎯</div>
+                <div class="feature-text">
+                    <h3>Professional Quality</h3>
+                    <p>200K+ vertices with 2K texture maps</p>
+                </div>
+            </div>
+            <div class="feature">
+                <div class="feature-icon">🎁</div>
+                <div class="feature-text">
+                    <h3>Free Weekly Quota</h3>
+                    <p>10 free model generations per week</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Badge System -->
+        <div class="badge-section">
+            <h3>🏆 Earn Badges as You Create</h3>
+            <p style="text-align: center; font-size: 13px; color: var(--text-sub); margin-bottom: 16px;">Level up with every model you generate and unlock rewards!</p>
+            <div class="badge-grid">
+                <div class="badge-item">
+                    <div class="badge-icon" style="color: #94a3b8;">🔰</div>
+                    <div class="badge-name" style="color: #94a3b8;">Newcomer</div>
+                    <div class="badge-req">0-9 models</div>
+                </div>
+                <div class="badge-item">
+                    <div class="badge-icon" style="color: #3b82f6;">⭐</div>
+                    <div class="badge-name" style="color: #3b82f6;">Creator</div>
+                    <div class="badge-req">10-49 models</div>
+                </div>
+                <div class="badge-item">
+                    <div class="badge-icon" style="color: #8b5cf6;">✨</div>
+                    <div class="badge-name" style="color: #8b5cf6;">Artist</div>
+                    <div class="badge-req">50-199 models</div>
+                </div>
+                <div class="badge-item">
+                    <div class="badge-icon" style="color: #f59e0b;">👑</div>
+                    <div class="badge-name" style="color: #f59e0b;">Master</div>
+                    <div class="badge-req">200-499 models</div>
+                </div>
+                <div class="badge-item">
+                    <div class="badge-icon" style="color: #ef4444;">🔥</div>
+                    <div class="badge-name" style="color: #ef4444;">Legend</div>
+                    <div class="badge-req">500+ models</div>
+                </div>
+                <div class="badge-item" style="opacity: 0.6; cursor: help;" title="Secret badge - how do you unlock this?">
+                    <div class="badge-icon" style="color: #a855f7;">❓</div>
+                    <div class="badge-name" style="color: #a855f7;">???</div>
+                    <div class="badge-req">Mystery</div>
+                </div>
+            </div>
+            <p style="text-align: center; font-size: 12px; color: var(--accent-1); margin-top: 16px;">✨ Get quota reset rewards when you reach each level!</p>
+        </div>
+
+        <!-- Pricing Preview -->
+        <div class="pricing-preview">
+            <h3>💎 Flexible Pricing Plans</h3>
+            <div class="pricing-grid">
+                <div class="pricing-tier">
+                    <div class="tier-name">Free</div>
+                    <div class="tier-price">$0 USD/week</div>
+                    <div class="tier-quota">10 models/week</div>
+                </div>
+                <div class="pricing-tier" style="border: 2px solid var(--accent-1);">
+                    <div class="tier-name">Standard</div>
+                    <div class="tier-price">$3.47 USD<span style="font-size: 14px;">/week</span></div>
+                    <div class="tier-quota">40 models/week</div>
+                    <div style="font-size: 11px; color: #22c55e; margin-top: 4px;">
+                        💰 <span style="text-decoration: line-through; opacity: 0.6;">$180</span> $72 USD/year (save 60%)
+                    </div>
+                </div>
+                <div class="pricing-tier">
+                    <div class="tier-name">Pro</div>
+                    <div class="tier-price">$7.89 USD<span style="font-size: 14px;">/week</span></div>
+                    <div class="tier-quota">120 models/week</div>
+                    <div style="font-size: 11px; color: #22c55e; margin-top: 4px;">
+                        💰 <span style="text-decoration: line-through; opacity: 0.6;">$410</span> $164 USD/year (save 60%)
+                    </div>
+                </div>
+                <div class="pricing-tier" style="background: linear-gradient(135deg, rgba(59, 130, 246, 0.1), rgba(139, 92, 246, 0.1)); border: 1px solid rgba(59, 130, 246, 0.3);">
+                    <div class="tier-name">⚡ Quick Refill</div>
+                    <div class="tier-price">$1.00 USD</div>
+                    <div class="tier-quota">+10 models instantly</div>
+                </div>
+            </div>
+            <p style="text-align: center; font-size: 12px; color: var(--text-sub); margin-top: 16px;">
+                💳 Pay with Credit Card or 🪙 Crypto (BTC/ETH) • 
+                <a href="https://github.com/GareBear99/SlushAI/tree/main/docs" style="color: var(--accent-1); text-decoration: none;">View documentation →</a>
+            </p>
+        </div>
+
+        <div class="footer">
+            SlushAI is open source (MIT). <a href="https://github.com/GareBear99/SlushAI" style="color: var(--accent-1); text-decoration: none;">View the source on GitHub</a> — self-host it and generate 3D models on your own hardware.
+        </div>
+    </div>
+
+    <!-- Support — static site: point to GitHub Issues -->
+    <a href="https://github.com/GareBear99/SlushAI/issues" class="support-floating-btn" style="text-decoration: none; display: flex; align-items: center; justify-content: center;" title="Need help? Open an issue on GitHub">💬</a>
+
+    <script src="themeSwitcher.js"></script>
+</body>
+</html>

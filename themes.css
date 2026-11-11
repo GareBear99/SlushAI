@@ -1,0 +1,201 @@
+
+/* Base background so there is *something* before theme classes apply */
+body { background-color: #030014; }
+
+/* Base tokens */
+:root {
+  --bg: #030014;
+  --bg-soft: #050018;
+  --card: #050018;
+  --card-alt: #000000;
+  --border-soft: rgba(88, 28, 135, 0.7);
+  --border-strong: rgba(30, 64, 175, 0.9);
+  --accent-1: #a855f7;
+  --accent-2: #f97316;
+  --accent-3: #22c55e;
+  --accent-soft: rgba(147, 51, 234, 0.5);
+  --text-main: #f9fafb;
+  --text-sub: #d1d5db;
+}
+
+/* THEME 1 – Default: Dark purple / orange (your new one) */
+body.theme-1 {
+  --bg: #030014;
+  --bg-soft: #050018;
+  --card: #050018;
+  --card-alt: #000000;
+  --border-soft: rgba(88, 28, 135, 0.7);
+  --border-strong: rgba(168, 85, 247, 0.9);
+  --accent-1: #a855f7;
+  --accent-2: #f97316;
+  --accent-3: #22c55e;
+  --accent-soft: rgba(147, 51, 234, 0.7);
+  --text-main: #f9fafb;
+  --text-sub: #d1d5db;
+}
+
+/* THEME 2 – Blue / cyan (first screenshot) */
+body.theme-2 {
+  --bg: #020617;
+  --bg-soft: #020617;
+  --card: #020617;
+  --card-alt: #020617;
+  --border-soft: rgba(15, 118, 110, 0.7);
+  --border-strong: rgba(37, 99, 235, 0.9);
+  --accent-1: #22d3ee;
+  --accent-2: #6366f1;
+  --accent-3: #22c55e;
+  --accent-soft: rgba(56, 189, 248, 0.7);
+  --text-main: #f9fafb;
+  --text-sub: #d1d5db;
+}
+
+/* THEME 3 – Desaturated grey / studio UI */
+body.theme-3 {
+  --bg: #020617;
+  --bg-soft: #020617;
+  --card: #020617;
+  --card-alt: #020617;
+  --border-soft: rgba(75, 85, 99, 0.8);
+  --border-strong: rgba(148, 163, 184, 0.9);
+  --accent-1: #e5e7eb;
+  --accent-2: #9ca3af;
+  --accent-3: #22c55e;
+  --accent-soft: rgba(148, 163, 184, 0.6);
+  --text-main: #f9fafb;
+  --text-sub: #d1d5db;
+}
+
+/* THEME 4 – Infernal red / black */
+body.theme-4 {
+  --bg: #02010a;
+  --bg-soft: #05010f;
+  --card: #05010f;
+  --card-alt: #000000;
+  --border-soft: rgba(220, 38, 38, 0.7);
+  --border-strong: rgba(248, 113, 113, 0.9);
+  --accent-1: #f97373;
+  --accent-2: #f97316;
+  --accent-3: #22c55e;
+  --accent-soft: rgba(127, 29, 29, 0.7);
+  --text-main: #fee2e2;
+  --text-sub: #fecaca;
+}
+
+/* THEME 5 – Turquoise / teal vaporwave */
+body.theme-5 {
+  --bg: #02151a;
+  --bg-soft: #031b22;
+  --card: #031b22;
+  --card-alt: #020617;
+  --border-soft: rgba(20, 184, 166, 0.7);
+  --border-strong: rgba(45, 212, 191, 0.9);
+  --accent-1: #22d3ee;
+  --accent-2: #14b8a6;
+  --accent-3: #e879f9;
+  --accent-soft: rgba(45, 212, 191, 0.7);
+  --text-main: #ecfeff;
+  --text-sub: #bae6fd;
+}
+
+/* THEME 6 – Meshy green to pink */
+body.theme-6 {
+  --bg: #020a06;
+  --bg-soft: #031508;
+  --card: #031508;
+  --card-alt: #000000;
+  --border-soft: rgba(34, 197, 94, 0.7);
+  --border-strong: rgba(34, 197, 94, 0.9);
+  --accent-1: #22c55e;
+  --accent-2: #ec4899;
+  --accent-3: #f472b6;
+  --accent-soft: rgba(34, 197, 94, 0.7);
+  --text-main: #f0fdf4;
+  --text-sub: #bbf7d0;
+}
+
+/* Utility classes driven by variables */
+.app-bg { background-color: var(--bg); }
+.app-bg-soft { background-color: var(--bg-soft); }
+.card-bg { background-color: var(--card); }
+.card-alt-bg { background-color: var(--card-alt); }
+.border-soft { border-color: var(--border-soft); }
+.border-strong { border-color: var(--border-strong); }
+.text-main { color: var(--text-main); }
+.text-sub { color: var(--text-sub); }
+
+.accent-pill {
+  background-image: linear-gradient(90deg, var(--accent-1), var(--accent-2));
+}
+.accent-pill-soft {
+  background-image: linear-gradient(90deg, var(--accent-2), var(--accent-1));
+}
+.hero-glow {
+  box-shadow: 0 0 40px var(--accent-soft);
+}
+.gate-glow {
+  box-shadow: 0 0 32px var(--accent-soft);
+}
+.stat-glow {
+  box-shadow: 0 0 16px rgba(0,0,0,0.4);
+}
+
+.hero-art-bg {
+  background-image:
+    radial-gradient(circle at top, rgba(244, 63, 94, 0.7) 0, transparent 55%),
+    radial-gradient(circle at bottom, rgba(249, 115, 22, 0.8) 0, transparent 55%);
+}
+body.theme-2 .hero-art-bg {
+  background-image:
+    radial-gradient(circle at top, rgba(56, 189, 248, 0.8) 0, transparent 55%),
+    radial-gradient(circle at bottom, rgba(96, 165, 250, 0.8) 0, transparent 55%);
+}
+body.theme-3 .hero-art-bg {
+  background-image:
+    radial-gradient(circle at top, rgba(148, 163, 184, 0.7) 0, transparent 55%),
+    radial-gradient(circle at bottom, rgba(75, 85, 99, 0.9) 0, transparent 55%);
+}
+body.theme-4 .hero-art-bg {
+  background-image:
+    radial-gradient(circle at top, rgba(248, 113, 113, 0.9) 0, transparent 55%),
+    radial-gradient(circle at bottom, rgba(220, 38, 38, 0.9) 0, transparent 55%);
+}
+body.theme-5 .hero-art-bg {
+  background-image:
+    radial-gradient(circle at top, rgba(56, 189, 248, 0.9) 0, transparent 55%),
+    radial-gradient(circle at bottom, rgba(45, 212, 191, 0.9) 0, transparent 55%);
+}
+body.theme-6 .hero-art-bg {
+  background-image:
+    radial-gradient(circle at top, rgba(34, 197, 94, 0.9) 0, transparent 55%),
+    radial-gradient(circle at bottom, rgba(236, 72, 153, 0.9) 0, transparent 55%);
+}
+
+.headphone-ring {
+  box-shadow: 0 0 18px var(--accent-2);
+}
+
+.theme-dot {
+  border-radius: 9999px;
+  height: 1rem;
+  width: 1.5rem;
+  cursor: pointer;
+  border: 1px solid rgba(148,163,184,0.4);
+  opacity: 0.65;
+  transition:
+    transform 0.12s ease-out,
+    box-shadow 0.12s ease-out,
+    opacity 0.12s ease-out;
+}
+.theme-dot[data-active="true"] {
+  opacity: 1;
+  box-shadow: 0 0 12px rgba(248,250,252,0.5);
+  transform: translateY(-1px);
+}
+
+.theme-dot.theme-1 { background: linear-gradient(90deg, #a855f7, #f97316); }
+.theme-dot.theme-2 { background: linear-gradient(90deg, #22d3ee, #6366f1); }
+.theme-dot.theme-3 { background: linear-gradient(90deg, #9ca3af, #e5e7eb); }
+.theme-dot.theme-4 { background: linear-gradient(90deg, #f97373, #b91c1c); }
+.theme-dot.theme-5 { background: linear-gradient(90deg, #14b8a6, #22d3ee); }
+.theme-dot.theme-6 { background: linear-gradient(90deg, #22c55e, #ec4899); }
