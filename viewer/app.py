@@ -3,6 +3,7 @@
 import os
 import sys
 import secrets
+import hashlib
 import logging
 import json
 import time
@@ -41,6 +42,16 @@ from src.ai3d.utils.stripe_payment_manager import (
 from src.ai3d.utils.issue_manager import IssueManager
 from src.ai3d.utils.security import SecurityManager, create_security_headers
 from src.ai3d.utils.favorites_manager import FavoritesManager
+from src.ai3d.utils.mesh_stats import count_obj_vertices_faces
+from src.ai3d.utils.remesh import remesh_obj
+from src.ai3d.utils.export_glb import (
+    export_glbs_for_generation,
+    parse_export_flag,
+)
+from src.ai3d.utils.pbr_textures import (
+    apply_pbr_for_generation,
+    parse_pbr_flag,
+)
 from src.ai3d.utils.activity_logger import ActivityLogger
 from src.ai3d.utils.email_manager import EmailManager
 
@@ -698,6 +709,10 @@ def load_user(user_id):
     try:
         user_data = user_manager.get_user_by_id(user_id)
         if user_data:
+            # Discarded temps stop loading: an existing Flask-Login
+            # session for a discarded temp no longer authenticates.
+            if user_data.get('is_temp') and user_data.get('temp_discarded_at'):
+                return None
             return User(
                 user_id=user_data.get('user_id', user_id),  # Fallback to provided user_id
                 google_id=user_data.get('google_id'),
@@ -855,6 +870,61 @@ def execute_generation_task(task):
         'filename': filename,
         'output': found.name
     })
+
+    # Vertex/face counts on the task result (Meshy surfaces these on
+    # every task object; SlushAI only had them on /api/models). Counted
+    # from this task's own output file, same helper as /api/models.
+    vertices, faces = count_obj_vertices_faces(found)
+
+    # Optional local remesh to a target face budget (Meshy Remesh,
+    # local + free): the remeshed file sits next to the original
+    # (<stem>_remeshed.obj) and the result carries the remeshed
+    # counts alongside the original ones. A remesh failure never
+    # fails the generation -- it logs and leaves the original mesh
+    # and counts in place.
+    remesh_result = None
+    _remesh_target = params.get('remesh_target_faces')
+    if _remesh_target:
+        try:
+            _remeshed_path = found.with_name(f"{found.stem}_remeshed.obj")
+            remesh_result = remesh_obj(
+                str(found), str(_remeshed_path),
+                target_faces=int(_remesh_target),
+                topology=params.get('remesh_topology', 'triangle'),
+            )
+        except Exception as _e:
+            session_logger.logger.warning(
+                f"Remesh failed for task {task.task_id}: {_e}")
+            remesh_result = None
+
+    # Optional local GLB export (Meshy export, local + free): the
+    # generated mesh -- and the remeshed variant when one ran -- as
+    # .glb next to the OBJ. An export failure never fails the
+    # generation -- it logs and leaves the OBJ and counts in place,
+    # the same guarantee the remesh step carries.
+    _glb = export_glbs_for_generation(
+        found,
+        found.with_name(f"{found.stem}_remeshed.obj") if remesh_result else None,
+        params.get('export_glb'),
+        session_logger.logger.warning,
+    )
+
+    # Optional local PBR textures (Meshy PBR texture, local +
+    # free): a textured OBJ (<stem>_textured.obj) with planar UVs
+    # plus base-colour and metallic-roughness PNGs next to it, and
+    # -- when a GLB was exported -- the textures embedded into
+    # that GLB. A texturing failure never fails the generation --
+    # it logs and leaves the untextured mesh and GLB in place,
+    # the same guarantee the remesh and GLB steps carry.
+    _pbr = apply_pbr_for_generation(
+        found,
+        found.with_name(f"{found.stem}_remeshed.obj") if remesh_result else None,
+        _glb,
+        params.get('pbr_textures'),
+        session_logger.logger.warning,
+    )
+    _pbr_path = _pbr['textured_path']
+    _pbr_remeshed_path = _pbr['remeshed_textured_path']
     
     # Register model with favorites manager for tracking
     if 'user_id' in params:
@@ -878,6 +948,32 @@ def execute_generation_task(task):
         'backend_requested': backend,
         'backend_used': backend_used,
         'note': result_note,
+        'vertices': vertices,
+        'faces': faces,
+        'remeshed_vertices': remesh_result['output_vertices'] if remesh_result else None,
+        'remeshed_faces': remesh_result['output_faces'] if remesh_result else None,
+        'remesh_target_faces': remesh_result['target_faces'] if remesh_result else None,
+        'remesh_topology': remesh_result['topology'] if remesh_result else None,
+        'remeshed_path': str(_remeshed_path.relative_to(PROJECT_ROOT)) if remesh_result else None,
+        'glb_path': str(_glb['glb_path'].relative_to(PROJECT_ROOT)) if _glb['glb_path'] else None,
+        'glb_bytes': _glb['glb_bytes'],
+        'remeshed_glb_path': str(_glb['remeshed_glb_path'].relative_to(PROJECT_ROOT)) if _glb['remeshed_glb_path'] else None,
+        'remeshed_glb_bytes': _glb['remeshed_glb_bytes'],
+        'pbr_textures': bool(_pbr['textured_path']),
+        'textured_path': str(_pbr_path.relative_to(PROJECT_ROOT)) if _pbr_path else None,
+        'pbr_basecolor_path': str(_pbr['basecolor_path'].relative_to(PROJECT_ROOT)) if _pbr['basecolor_path'] else None,
+        'pbr_basecolor_bytes': _pbr['basecolor_bytes'],
+        'pbr_metallic_roughness_path': str(_pbr['metallic_roughness_path'].relative_to(PROJECT_ROOT)) if _pbr['metallic_roughness_path'] else None,
+        'pbr_metallic_roughness_bytes': _pbr['metallic_roughness_bytes'],
+        'pbr_uv_count': _pbr['uv_count'],
+        'remeshed_textured_path': str(_pbr_remeshed_path.relative_to(PROJECT_ROOT)) if _pbr_remeshed_path else None,
+        'remeshed_pbr_basecolor_path': str(_pbr['remeshed_basecolor_path'].relative_to(PROJECT_ROOT)) if _pbr['remeshed_basecolor_path'] else None,
+        'remeshed_pbr_basecolor_bytes': _pbr['remeshed_basecolor_bytes'],
+        'remeshed_pbr_metallic_roughness_path': str(_pbr['remeshed_metallic_roughness_path'].relative_to(PROJECT_ROOT)) if _pbr['remeshed_metallic_roughness_path'] else None,
+        'remeshed_pbr_metallic_roughness_bytes': _pbr['remeshed_metallic_roughness_bytes'],
+        'remeshed_pbr_uv_count': _pbr['remeshed_uv_count'],
+        'glb_pbr_embedded': _pbr['glb_pbr_embedded'],
+        'remeshed_glb_pbr_embedded': _pbr['remeshed_glb_pbr_embedded'],
     }
 
 # Wire up the executor
@@ -1324,25 +1420,21 @@ def auth_callback():
         name = user_info.get('name') or (email.split('@')[0] if email else 'User')
         picture = user_info.get('picture', '')
         
-        # Get or create user in database
-        user_data = user_manager.get_user_by_google_id(google_id)
-        
-        if user_data:
-            # Update existing user
-            user_manager.update_user(user_data['user_id'], {
-                'email': email,
-                'name': name,
-                'picture': picture
-            })
-            user_id = user_data['user_id']
-        else:
-            # Create new user
-            user_id = user_manager.create_user(
-                google_id=google_id,
-                email=email,
-                name=name,
-                picture=picture
-            )
+        # Get or create user in database. get_or_create_user — NOT the
+        # get-by-google_id + create_user pair — is the only safe shape:
+        # create_user does a bare INSERT, so a Google sign-in for an
+        # email that already has a row (email signup, or a temp) raised
+        # UNIQUE constraint failed: users.email and bounced the user to
+        # the landing page (seen 2026-11-11). get_or_create_user links
+        # the email_* row onto the Google identity instead, and refuses
+        # to clobber a row owned by a different Google sub. The DB row
+        # is authoritative for the session identity from here on.
+        user_data = user_manager.get_or_create_user(
+            google_id, email, name, picture)
+        user_id = user_data['user_id']
+        email = user_data.get('email', email)
+        name = user_data.get('name', name)
+        picture = user_data.get('picture', picture)
         
         # Create User object for Flask-Login
         user = User(
@@ -1394,25 +1486,17 @@ def auth_facebook_callback():
         name = user_info.get('name', email.split('@')[0] if email else f'User_{facebook_id}')
         picture = user_info.get('picture', {}).get('data', {}).get('url', '')
         
-        # Get or create user in database (use facebook_id as google_id for now)
-        user_data = user_manager.get_user_by_google_id(f'fb_{facebook_id}')
-        
-        if user_data:
-            # Update existing user
-            user_manager.update_user(user_data['user_id'], {
-                'email': email or user_data['email'],
-                'name': name,
-                'picture': picture
-            })
-            user_id = user_data['user_id']
-        else:
-            # Create new user
-            user_id = user_manager.create_user(
-                google_id=f'fb_{facebook_id}',  # Prefix to distinguish from Google
-                email=email or f'fb_{facebook_id}@facebook.user',
-                name=name,
-                picture=picture
-            )
+        # Get or create user in database (use facebook_id as google_id for now).
+        # Same shape as the Google callback: get_or_create_user links an
+        # existing email_* row instead of raising UNIQUE users.email.
+        fb_google_id = f'fb_{facebook_id}'  # Prefix to distinguish from Google
+        fb_email = email or f'{fb_google_id}@facebook.user'
+        user_data = user_manager.get_or_create_user(
+            fb_google_id, fb_email, name, picture)
+        user_id = user_data['user_id']
+        email = user_data.get('email', fb_email)
+        name = user_data.get('name', name)
+        picture = user_data.get('picture', picture)
         
         # Create User object for Flask-Login
         user = User(
@@ -1456,8 +1540,9 @@ def auth_logout():
     
     # Remove from active users
     active_users.discard(user_id)
-    
+
     logout_user()
+    session.pop('is_temp', None)
     return redirect(url_for('landing'))
 
 @app.route('/api/check-username', methods=['POST'])
@@ -1612,6 +1697,15 @@ def auth_email_login():
         # Map 'id' to 'user_id' for consistency
         user_id = user_data.get('id') or user_data.get('user_id')
         
+        # Discarded temps cannot sign in (temp system): the temp's login
+        # is revoked on discard; the user continues via Google sign-in.
+        if user_data.get('is_temp') and user_data.get('temp_discarded_at'):
+            return jsonify({
+                'error': 'This temp account has been discarded. Sign in with Google to continue as a full user.',
+                'user_id': user_id,
+                'email_verified': False
+            }), 403
+
         # Check if email is verified
         if not user_data.get('email_verified', False):
             return jsonify({
@@ -1674,10 +1768,11 @@ def auth_email_login():
         # Log user in with remember_me flag
         login_user(user, remember=remember_me)
         session.permanent = remember_me
-        
+        session.pop('is_temp', None)  # a normal login is not a temp session
+
         # Track active user
         active_users.add(user_id)
-        
+
         session_logger.log_action('email_login', {
             'user_id': user_id,
             'email': email,
@@ -1865,6 +1960,347 @@ def auth_email_resend_code():
     except Exception as e:
         session_logger.logger.error(f"Resend code error: {e}")
         return jsonify({'error': 'Server error during resend'}), 500
+
+# ----------------------------------------------------------------------
+# Temp accounts (SlushAI temp system — HUB pattern)
+#
+# Pattern (Gary, 2026-11-11): the temp system follows TizWildin's auth
+# — worker-issued session tokens, email-based, Google optional not
+# required — so the system does NOT depend on Google. The per-temp API
+# token (x-slushai-temp-token) is the grant, issued once at creation;
+# the temp verifies by email (the 6-digit code flow); the daily scrape
+# marks it verified and discards it; the user continues as a full user
+# via Google sign-in. Q3 default: discard is non-destructive (data
+# preserved). Q5 default: temp creation is admin-only (not the public
+# signup route, so the 3-per-IP cap does not apply).
+#
+# Endpoints (all JSON in, JSON out):
+#   POST /api/temp/create   (admin)  create a temp; token returned once
+#   POST /api/temp/login             temp sign-in; temp bypass for the
+#                                    email_verified gate; rotates the token
+#   GET  /api/temp/status            own verification status (any temp)
+#   GET  /api/temp/avatar            own avatar artifact (file + SHA-256)
+#   POST /api/temp/discard  (admin)  discard a verified temp
+#   POST /api/temp/scrape            daily scrape hook (staff session OR
+#                                    x-slushai-scrape-token header)
+#
+# The avatar FILE itself is fetched from the existing /outputs/<file>
+# route with the temp's Flask-Login session (serve_output enforces
+# ownership); this endpoint returns the metadata + SHA-256, and the
+# caller verifies the hash BEFORE use (the snapshot rule: the hash IS
+# the identity; mismatch -> discard + re-fetch).
+# ----------------------------------------------------------------------
+
+def _temp_token_user():
+    """The temp for a valid x-slushai-temp-token header, or None.
+    The token is the auth; it is scoped to its own temp and revoked on
+    discard (checked on every call by verify_temp_token)."""
+    _tok = request.headers.get(user_manager.TEMP_TOKEN_HEADER, '')
+    if not _tok:
+        return None
+    try:
+        return user_manager.verify_temp_token(_tok)
+    except Exception:
+        return None
+
+
+def _temp_caller():
+    """The calling temp: by API token header, else by the logged-in
+    session (the temp's own session). Returns the temp's user dict, or
+    None. A discarded temp authenticates neither way."""
+    _u = _temp_token_user()
+    if _u:
+        return _u
+    if current_user.is_authenticated:
+        try:
+            _ud = user_manager.get_user_by_id(current_user.user_id)
+        except Exception:
+            _ud = None
+        if _ud and _ud.get('is_temp') and not _ud.get('temp_discarded_at'):
+            return _ud
+    return None
+
+
+def _temp_avatar_artifact(temp_id):
+    """The temp's avatar artifact: its latest owned generated model
+    (OBJ + texture — what TripoSR makes; no GLB yet). Returns the
+    artifact dict, or None if the temp has generated nothing yet.
+    Same scan as /api/models (owned .obj files, newest first; vertex /
+    face counts read from the file); the SHA-256 is streamed so a large
+    model never loads into RAM."""
+    try:
+        _owned = {str(Path(p).resolve()) for p in
+                  favorites_manager.get_user_model_paths(temp_id)}
+    except Exception:
+        _owned = set()
+    _best = None
+    if not OUTPUTS_DIR.exists():
+        return None
+    for _obj in OUTPUTS_DIR.rglob('*.obj'):
+        if str(_obj.resolve()) not in _owned:
+            continue
+        if '_refined' in _obj.stem:
+            continue
+        _mtime = _obj.stat().st_mtime
+        if _best is None or _mtime > _best[0]:
+            _best = (_mtime, _obj)
+    if _best is None:
+        return None
+    _mtime, _obj = _best
+    _vertices, _faces = count_obj_vertices_faces(_obj)
+    _sha = hashlib.sha256()
+    try:
+        with open(_obj, 'rb') as _f:
+            for _chunk in iter(lambda: _f.read(1024 * 1024), b''):
+                _sha.update(_chunk)
+    except Exception:
+        return None
+    _rel = _obj.relative_to(PROJECT_ROOT)
+    _refined = _obj.parent / f"{_obj.stem.replace('_preview', '')}_refined.obj"
+    return {
+        'temp_id': temp_id,
+        'file_url': f"/outputs/{_obj.relative_to(OUTPUTS_DIR)}",
+        'path': str(_rel),
+        'sha256': _sha.hexdigest(),
+        'format': 'obj',
+        'vertices': _vertices,
+        'faces': _faces,
+        'size': _obj.stat().st_size,
+        'has_texture': _refined.exists(),
+        'created_at': datetime.fromtimestamp(_mtime).isoformat(),
+    }
+
+
+@app.route('/api/temp/create', methods=['POST'])
+@login_required
+@limiter.limit("10 per minute", key_func=get_limiter_key)
+def temp_create():
+    """Create a temp account (admin-only). Returns the temp id + the API
+    token ONCE — pass it to the temp user now; it cannot be retrieved
+    again (only its hash is stored)."""
+    if not _is_staff(current_user.user_id):
+        return jsonify({'error': 'Admin only'}), 403
+    data = request.get_json(silent=True) or {}
+    email = (data.get('email') or '').strip()
+    password = data.get('password') or ''
+    name = (data.get('name') or '').strip()
+    username = (data.get('username') or '').strip()
+    if not all([email, password, name, username]):
+        return jsonify({'error': 'All fields are required'}), 400
+    success, message, user_id, token = user_manager.create_temp_user(
+        email, password, name, username,
+        created_by_admin_id=current_user.user_id)
+    if not success:
+        # create_temp_user can return a user_id even on token-issue
+        # failure (the account exists); surface it so the admin can act.
+        _body = {'error': message}
+        if user_id:
+            _body['user_id'] = user_id
+            _body['temp_id'] = user_id
+        return jsonify(_body), 400
+    # Never log the token.
+    session_logger.log_action('temp_created', {
+        'user_id': user_id,
+        'email': email,
+        'created_by': current_user.user_id
+    })
+    return jsonify({
+        'success': True,
+        'temp_id': user_id,
+        'user_id': user_id,
+        'email': email,
+        'is_temp': True,
+        'state': 'temp',
+        'api_token': token,
+        'message': 'Temp account created. The API token is shown once — pass it to the temp user now; it cannot be retrieved again.'
+    }), 201
+
+
+@app.route('/api/temp/login', methods=['POST'])
+@limiter.limit("10 per minute", key_func=get_limiter_key)
+def temp_login():
+    """Temp sign-in (email/password). Bypasses the email_verified gate
+    for temps only; rotates the temp API token and returns it once.
+    The session is marked as a temp session."""
+    try:
+        data = request.get_json(silent=True) or {}
+        email = (data.get('email') or '').strip()
+        password = data.get('password') or ''
+        remember_me = data.get('remember_me', True)
+
+        if not all([email, password]):
+            return jsonify({'error': 'Email and password required'}), 400
+
+        success, user_data = user_manager.verify_email_password(email, password)
+        if not success or not user_data:
+            session_logger.logger.warning(f"Failed temp login attempt for: {email}")
+            return jsonify({'error': 'Invalid email or password'}), 401
+
+        if not user_data.get('is_temp'):
+            return jsonify({'error': 'Not a temp account. Use the normal sign-in.'}), 403
+
+        user_id = user_data.get('id') or user_data.get('user_id')
+
+        if user_data.get('temp_discarded_at'):
+            return jsonify({
+                'error': 'This temp account has been discarded. Sign in with Google to continue as a full user.',
+                'user_id': user_id
+            }), 403
+
+        # Rotate the API token (old token revoked, new one returned once).
+        token = user_manager._issue_temp_token(user_id)
+
+        user = User(
+            user_id=user_id,
+            google_id=user_data.get('google_id'),
+            email=user_data['email'],
+            name=user_data.get('name'),
+            picture=user_data.get('avatar_url', ''),
+            email_verified=user_data.get('email_verified', False)
+        )
+        login_user(user, remember=remember_me)
+        session.permanent = remember_me
+        session['is_temp'] = True
+        active_users.add(user_id)
+
+        session_logger.log_action('temp_login', {
+            'user_id': user_id,
+            'email': email,
+            'remember_me': remember_me,
+            'ip': g.visitor_ip
+        })
+
+        return jsonify({
+            'success': True,
+            'message': 'Signed in as temp',
+            'user_id': user_id,
+            'temp_id': user_id,
+            'is_temp': True,
+            'state': user_manager.temp_state(user_data),
+            'email_verified': bool(user_data.get('email_verified')),
+            'api_token': token
+        }), 200
+
+    except Exception as e:
+        session_logger.logger.error(f"Temp login error: {e}")
+        import traceback
+        session_logger.logger.error(traceback.format_exc())
+        return jsonify({'error': 'Server error during temp login'}), 500
+
+
+@app.route('/api/temp/status', methods=['GET'])
+def temp_status():
+    """Verification status lookup. Any temp can check its own status
+    (the Lucid design rule: a status lookup, not a hidden gate)."""
+    caller = _temp_caller()
+    if not caller:
+        return jsonify({'error': 'Temp authentication required'}), 401
+    status = user_manager.get_temp_status(
+        caller.get('id') or caller.get('user_id'))
+    if not status:
+        return jsonify({'error': 'Not a temp account'}), 403
+    return jsonify(status), 200
+
+
+@app.route('/api/temp/avatar', methods=['GET'])
+def temp_avatar():
+    """The temp's avatar artifact for Lucid: the temp's latest generated
+    model (OBJ + texture; no GLB yet) as file + SHA-256. Lucid verifies
+    the hash BEFORE use; mismatch -> discard + re-fetch. The file itself
+    is fetched from /outputs/<file> with the temp's session.
+    Staff (logged in) may fetch any temp's avatar with ?temp_id= (the
+    data is preserved after discard, so a discarded temp's avatar is
+    still reachable to staff)."""
+    # Staff session + ?temp_id= : admin fetch of any temp (incl. discarded).
+    if current_user.is_authenticated:
+        try:
+            if _is_staff(current_user.user_id):
+                _tid = request.args.get('temp_id')
+                if _tid:
+                    _t = user_manager.get_user_by_id(int(_tid))
+                    if _t and _t.get('is_temp'):
+                        _art = _temp_avatar_artifact(int(_tid))
+                        if not _art:
+                            return jsonify({
+                                'error': 'No avatar yet — generate a model first',
+                                'temp_id': int(_tid)
+                            }), 404
+                        return jsonify(_art), 200
+                    return jsonify({'error': 'Temp not found'}), 404
+        except (TypeError, ValueError):
+            return jsonify({'error': 'temp_id must be an integer'}), 400
+        except Exception:
+            pass
+    caller = _temp_caller()
+    if not caller:
+        return jsonify({'error': 'Temp authentication required'}), 401
+    temp_id = caller.get('id') or caller.get('user_id')
+    artifact = _temp_avatar_artifact(temp_id)
+    if not artifact:
+        return jsonify({
+            'error': 'No avatar yet — generate a model first',
+            'temp_id': temp_id
+        }), 404
+    return jsonify(artifact), 200
+
+
+@app.route('/api/temp/discard', methods=['POST'])
+@login_required
+@limiter.limit("10 per minute", key_func=get_limiter_key)
+def temp_discard():
+    """Discard a temp (admin). Non-destructive (Q3 default): marks the
+    temp discarded, revokes the API token, records the audit; the
+    temp's models/outputs are PRESERVED (nothing is deleted)."""
+    if not _is_staff(current_user.user_id):
+        return jsonify({'error': 'Admin only'}), 403
+    data = request.get_json(silent=True) or {}
+    temp_id = data.get('temp_id') or data.get('user_id')
+    if not temp_id:
+        return jsonify({'error': 'temp_id required'}), 400
+    try:
+        temp_id = int(temp_id)
+    except (TypeError, ValueError):
+        return jsonify({'error': 'temp_id must be an integer'}), 400
+    ok, message = user_manager.discard_temp(
+        temp_id, reason=f'admin:{current_user.user_id}')
+    if not ok:
+        return jsonify({'error': message}), 400
+    session_logger.log_action('temp_discarded', {
+        'user_id': temp_id,
+        'by': current_user.user_id
+    })
+    return jsonify({
+        'success': True,
+        'temp_id': temp_id,
+        'state': 'discarded',
+        'message': message
+    }), 200
+
+
+@app.route('/api/temp/scrape', methods=['POST'])
+def temp_scrape():
+    """Daily scrape hook (Q2: checks email confirmation via the 6-digit
+    code flow). Runs run_temp_scrape(): marks temps verified where the
+    email is confirmed, then discards verified temps. Auth: a staff
+    session, OR the x-slushai-scrape-token header matching
+    TEMP_SCRAPE_TOKEN from the environment. Fails closed when the token
+    is not configured (the header path is then disabled)."""
+    _authorized = False
+    _tok = request.headers.get(user_manager.TEMP_SCRAPE_HEADER, '')
+    _expected = os.environ.get('TEMP_SCRAPE_TOKEN', '')
+    if _tok and _expected and secrets.compare_digest(_tok, _expected):
+        _authorized = True
+    elif current_user.is_authenticated:
+        try:
+            _authorized = _is_staff(current_user.user_id)
+        except Exception:
+            _authorized = False
+    if not _authorized:
+        return jsonify({'error': 'Unauthorized'}), 401
+    summary = user_manager.run_temp_scrape()
+    session_logger.log_action('temp_scrape', summary)
+    return jsonify({'success': True, **summary}), 200
+
 
 @app.route('/auth/password-reset/request', methods=['POST'])
 @limiter.limit("3 per hour", key_func=get_limiter_key)
@@ -2298,7 +2734,7 @@ def _user_can_access_output(user_id, resolved_path):
     # any file whose base stem matches an owned model's base stem.
     owned_stems = {Path(p).stem for p in owned_set}
     owned_stems |= {s.replace('_preview', '').replace('_refined', '') for s in owned_stems}
-    base = target_stem.replace('_preview', '').replace('_refined', '')
+    base = Path(target).stem.replace('_preview', '').replace('_refined', '')
     return base in owned_stems
 
 @app.route('/api/models')
@@ -2337,18 +2773,8 @@ def list_models():
             
         relative_path = obj_file.relative_to(PROJECT_ROOT)
         
-        # Try to get vertex/face count from file
-        vertices = 0
-        faces = 0
-        try:
-            with open(obj_file, 'r') as f:
-                for line in f:
-                    if line.startswith('v '):
-                        vertices += 1
-                    elif line.startswith('f '):
-                        faces += 1
-        except:
-            pass
+        # Vertex/face count from file (same helper as the task result).
+        vertices, faces = count_obj_vertices_faces(obj_file)
         
         # Check if there's a refined version
         refined_path = obj_file.parent / f"{obj_file.stem.replace('_preview', '')}_refined.obj"
@@ -2451,6 +2877,13 @@ def _ensure_png(src_path: Path) -> Path:
 
 GENERATION_BACKENDS = ('triposr', 'native')
 GENERATION_TEXTURES = ('native', 'none')
+# Local remesh (Meshy Remesh equivalent): target face budget and
+# output topology. The budget is triangle-equivalent faces, Meshy's
+# target_polycount range 100-300,000. Both params are optional --
+# a generation without them behaves exactly as before.
+REMESH_TOPOLOGIES = ('triangle', 'quad')
+REMESH_MIN_TARGET_FACES = 100
+REMESH_MAX_TARGET_FACES = 300000
 
 def _run_pipeline(temp_path, backend, filename, texture='native'):
     import subprocess
@@ -2520,6 +2953,43 @@ def generate_model():
     if texture not in GENERATION_TEXTURES:
         return jsonify({'error': f"Unsupported texture mode: {texture!r} (allowed: native, none)"}), 400
 
+    # Optional local remesh to a target face budget (Meshy Remesh,
+    # local + free). Absent means no remesh -- the generation path
+    # is exactly as before. Present but invalid is a 400, so a
+    # typo'd budget fails fast instead of silently generating
+    # un-remeshed.
+    remesh_target_faces = None
+    remesh_topology = 'triangle'
+    _raw_target = request.form.get('remesh_target_faces')
+    if _raw_target:
+        try:
+            remesh_target_faces = int(_raw_target)
+        except (TypeError, ValueError):
+            return jsonify({'error': 'remesh_target_faces must be an integer'}), 400
+        if remesh_target_faces < REMESH_MIN_TARGET_FACES or remesh_target_faces > REMESH_MAX_TARGET_FACES:
+            return jsonify({'error': f'remesh_target_faces must be between {REMESH_MIN_TARGET_FACES} and {REMESH_MAX_TARGET_FACES}'}), 400
+        remesh_topology = request.form.get('remesh_topology', 'triangle')
+        if remesh_topology not in REMESH_TOPOLOGIES:
+            return jsonify({'error': f"Unsupported remesh topology: {remesh_topology!r} (allowed: triangle, quad)"}), 400
+
+    # Optional local GLB export (Meshy export, local + free). Absent
+    # means no GLB -- the generation path is exactly as before.
+    # Present but invalid is a 400, so a typo'd flag fails fast
+    # instead of silently generating without a GLB.
+    try:
+        export_glb_flag = parse_export_flag(request.form.get('export_glb'))
+    except ValueError as e:
+        return jsonify({'error': str(e)}), 400
+
+    # Optional local PBR textures (Meshy PBR texture, local +
+    # free). Absent means no textures -- the generation path is
+    # exactly as before. Present but invalid is a 400, so a typo'd
+    # flag fails fast instead of silently generating untextured.
+    try:
+        pbr_textures_flag = parse_pbr_flag(request.form.get('pbr_textures'))
+    except ValueError as e:
+        return jsonify({'error': str(e)}), 400
+
     session_logger.logger.info(f"Image received: {file.filename}, size: {getattr(file, 'content_length', None)} bytes")
     session_logger.logger.info(f"Backend: {backend}")
     session_logger.logger.info(f"Texture: {texture}")
@@ -2564,7 +3034,11 @@ def generate_model():
             'temp_path': str(temp_path),
             'backend': backend,
             'texture': texture,
-            'filename': filename
+            'filename': filename,
+            'remesh_target_faces': remesh_target_faces,
+            'remesh_topology': remesh_topology,
+            'export_glb': export_glb_flag,
+            'pbr_textures': pbr_textures_flag,
         },
         callback=task_callback
     )
@@ -2622,7 +3096,7 @@ def task_status(task_id):
     if _task is not None:
         _owner = (_task.params or {}).get('user_id')
         if _owner is not None and int(_owner) != int(current_user.user_id) and not _is_staff(current_user.user_id):
-            return jsonify({'error': 'Task not found'}), 404
+            return jsonify({'error': 'Access denied'}), 403
     status = task_queue.get_task_status(task_id)
     if not status:
         return jsonify({'error': 'Task not found'}), 404
@@ -2654,7 +3128,9 @@ def get_thumbnail():
         try:
             _mp = (PROJECT_ROOT / model_path).resolve() if not Path(model_path).is_absolute() else Path(model_path).resolve()
             _mp.relative_to(PROJECT_ROOT.resolve())
-            if _mp.suffix.lower() == '.obj' and _mp.exists() and _user_can_access_output(current_user.user_id, _mp):
+            if _mp.suffix.lower() == '.obj' and _mp.exists():
+                if not _user_can_access_output(current_user.user_id, _mp):
+                    return jsonify({'error': 'Access denied'}), 403
                 for _cand in (_mp.with_suffix('.png'),
                               _mp.parent / (_mp.stem + '_albedo.png'),
                               _mp.parent / (_mp.stem.replace('_preview', '') + '_refined_albedo.png'),

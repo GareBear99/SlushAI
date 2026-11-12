@@ -210,7 +210,10 @@ class UserManager:
                 last_login TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                 subscription_tier TEXT DEFAULT 'free',
                 badge_level INTEGER DEFAULT 0,
-                lifetime_completions INTEGER DEFAULT 0
+                lifetime_completions INTEGER DEFAULT 0,
+                is_temp BOOLEAN DEFAULT 0,
+                temp_verified_at TIMESTAMP,
+                temp_discarded_at TIMESTAMP
             )
         ''')
         
@@ -230,6 +233,12 @@ class UserManager:
             cursor.execute('ALTER TABLE users ADD COLUMN newsletter_subscribed BOOLEAN DEFAULT 1')
         if 'last_code_sent_at' not in columns:
             cursor.execute('ALTER TABLE users ADD COLUMN last_code_sent_at TIMESTAMP')
+        if 'is_temp' not in columns:
+            cursor.execute('ALTER TABLE users ADD COLUMN is_temp BOOLEAN DEFAULT 0')
+        if 'temp_verified_at' not in columns:
+            cursor.execute('ALTER TABLE users ADD COLUMN temp_verified_at TIMESTAMP')
+        if 'temp_discarded_at' not in columns:
+            cursor.execute('ALTER TABLE users ADD COLUMN temp_discarded_at TIMESTAMP')
         if 'signup_ip' not in columns:
             # Used by create_email_user for the 3-accounts-per-IP signup cap;
             # previously only added ad hoc by the signup route.
@@ -270,6 +279,29 @@ class UserManager:
             except:
                 pass  # Index might already exist
         
+        # Temp accounts (SlushAI temp system): per-temp API tokens + audit.
+        # Tokens are stored as SHA-256 hashes only; the plaintext token is
+        # returned once at issue and never stored, logged, or printed.
+        cursor.execute('''
+            CREATE TABLE IF NOT EXISTS temp_api_tokens (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                user_id INTEGER NOT NULL,
+                token_hash TEXT NOT NULL,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                revoked_at TIMESTAMP,
+                last_used_at TIMESTAMP
+            )
+        ''')
+        cursor.execute('''
+            CREATE TABLE IF NOT EXISTS temp_audit (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                user_id INTEGER NOT NULL,
+                action TEXT NOT NULL,
+                detail TEXT,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            )
+        ''')
+
         # Usage tracking table
         cursor.execute('''
             CREATE TABLE IF NOT EXISTS usage_log (
@@ -479,47 +511,83 @@ class UserManager:
         conn = sqlite3.connect(self.db_path)
         conn.row_factory = sqlite3.Row  # Dict-like access by column name
         cursor = conn.cursor()
-        
-        # Try to get existing user
-        cursor.execute('SELECT * FROM users WHERE google_id = ?', (google_id,))
-        row = cursor.fetchone()
-        
-        if row:
-            # Update last login and info
-            cursor.execute('''
-                UPDATE users 
-                SET last_login = CURRENT_TIMESTAMP, name = ?, avatar_url = ?
-                WHERE google_id = ?
-            ''', (name, avatar_url, google_id))
-            conn.commit()
-            
-            # Fetch updated user
-            cursor.execute('SELECT * FROM users WHERE google_id = ?', (google_id,))
-            row = cursor.fetchone()
-        else:
-            # Create new user - generate username from email
-            base_username = email.split('@')[0].replace('.', '').replace('-', '').replace('+', '')[:15].lower()
-            username = base_username
-            counter = 1
-            # Ensure username uniqueness
-            while True:
-                cursor.execute('SELECT id FROM users WHERE LOWER(username) = LOWER(?)', (username,))
-                if not cursor.fetchone():
-                    break
-                username = f"{base_username}{counter}"
-                counter += 1
-            
-            cursor.execute('''
-                INSERT INTO users (google_id, email, name, username, avatar_url)
-                VALUES (?, ?, ?, ?, ?)
-            ''', (google_id, email, name, username, avatar_url))
-            conn.commit()
-            
+        try:
+            # Try to get existing user
             cursor.execute('SELECT * FROM users WHERE google_id = ?', (google_id,))
             row = cursor.fetchone()
         
-        conn.close()
-        
+            if row:
+                # Update last login and info. email_verified=1: Google
+                # attested this email, by definition — a Google sign-in is
+                # a verified-email sign-in (matches create_user, which
+                # inserts email_verified=1). This also self-heals rows the
+                # old create branch made with the DEFAULT 0.
+                cursor.execute('''
+                    UPDATE users 
+                    SET last_login = CURRENT_TIMESTAMP, name = ?, avatar_url = ?,
+                        email_verified = 1
+                    WHERE google_id = ?
+                ''', (name, avatar_url, google_id))
+                conn.commit()
+            
+                # Fetch updated user
+                cursor.execute('SELECT * FROM users WHERE google_id = ?', (google_id,))
+                row = cursor.fetchone()
+            else:
+                # Link an existing email/password account (e.g. a temp) instead
+                # of failing on the UNIQUE email constraint: if a row already
+                # exists for this email whose google_id is the email_* form
+                # (never a real Google sub — that would be a different person),
+                # adopt it as the Google account: set the real google_id, mark
+                # the email verified, and clear the temp markers, so the temp
+                # continues as a full user. Without this, a temp that later
+                # signs in with Google hits UNIQUE constraint failed:
+                # users.email on the callback (seen 2026-11-11).
+                cursor.execute('SELECT * FROM users WHERE email = ?', (email,))
+                _email_row = cursor.fetchone()
+                if _email_row and str(_email_row['google_id'] or '').startswith('email_'):
+                    _linked_id = _email_row['id']
+                    cursor.execute('''
+                        UPDATE users
+                        SET google_id = ?, email_verified = 1,
+                            last_login = CURRENT_TIMESTAMP, name = ?, avatar_url = ?,
+                            is_temp = 0, temp_verified_at = NULL, temp_discarded_at = NULL
+                        WHERE id = ?
+                    ''', (google_id, name, avatar_url, _linked_id))
+                    conn.commit()
+                    self.revoke_temp_tokens(_linked_id)
+                    self._temp_audit(_linked_id, 'linked_to_google')
+                    cursor.execute('SELECT * FROM users WHERE google_id = ?', (google_id,))
+                    row = cursor.fetchone()
+                else:
+                    # Create new user - generate username from email.
+                    # email_verified=1: Google attested this email. Without
+                    # it a fresh Google user lands unverified (DEFAULT 0)
+                    # even though the old callback's create_user set 1 —
+                    # switching callbacks to this method must not regress that.
+                    base_username = email.split('@')[0].replace('.', '').replace('-', '').replace('+', '')[:15].lower()
+                    username = base_username
+                    counter = 1
+                    # Ensure username uniqueness
+                    while True:
+                        cursor.execute('SELECT id FROM users WHERE LOWER(username) = LOWER(?)', (username,))
+                        if not cursor.fetchone():
+                            break
+                        username = f"{base_username}{counter}"
+                        counter += 1
+
+                    cursor.execute('''
+                        INSERT INTO users (google_id, email, name, username, avatar_url,
+                                           email_verified)
+                        VALUES (?, ?, ?, ?, ?, 1)
+                    ''', (google_id, email, name, username, avatar_url))
+                    conn.commit()
+
+                    cursor.execute('SELECT * FROM users WHERE google_id = ?', (google_id,))
+                    row = cursor.fetchone()
+        finally:
+            conn.close()
+
         # Map by column name, never by position (see _canonical_user_dict).
         return self._canonical_user_dict(dict(row))
     
@@ -1387,7 +1455,274 @@ class UserManager:
         # Get full user data
         user_data = self.get_user_by_id(user_id)
         return True, user_data
-    
+
+    # ------------------------------------------------------------------
+    # Temp accounts (SlushAI temp system — HUB pattern)
+    #
+    # Pattern (Gary, 2026-11-11): the temp system follows TizWildin's
+    # auth — worker-issued session tokens, email-based, Google optional
+    # not required — so the system does NOT depend on Google. The
+    # SlushAI Google sign-in stays the verified Google path, but a temp
+    # never needs Google to work. In this deployment the issuing worker
+    # is the SlushAI server itself: it issues the per-temp API token at
+    # creation, the temp verifies by email (the 6-digit code flow), and
+    # the token is the grant (Reading A authority shape) on a
+    # provisional account (Reading B account mechanics).
+    #
+    # Lifecycle: create (is_temp, admin-only) -> sign in (temp bypass
+    # for the email_verified gate) -> verify (daily scrape notices the
+    # confirmed email) -> discard (login + token revoked, data
+    # preserved — Q3 non-destructive default) -> continue as full user
+    # via Google sign-in (get_or_create_user links the email_* row).
+    # ------------------------------------------------------------------
+
+    TEMP_TOKEN_PREFIX = 'slush_temp_'
+    TEMP_TOKEN_HEADER = 'x-slushai-temp-token'
+    TEMP_SCRAPE_HEADER = 'x-slushai-scrape-token'
+
+    @staticmethod
+    def temp_state(user_row: Dict) -> str:
+        """Derived temp state from the row's timestamps (single source of
+        truth; no separate state column to drift). 'temp' | 'verified' |
+        'discarded'. Only meaningful for is_temp rows."""
+        if not user_row or not user_row.get('is_temp'):
+            return 'temp'
+        if user_row.get('temp_discarded_at'):
+            return 'discarded'
+        if user_row.get('temp_verified_at'):
+            return 'verified'
+        return 'temp'
+
+    def _temp_audit(self, user_id: int, action: str, detail: str = '') -> None:
+        """Append a temp audit record (best-effort; never raises)."""
+        try:
+            conn = sqlite3.connect(self.db_path)
+            cursor = conn.cursor()
+            cursor.execute(
+                'INSERT INTO temp_audit (user_id, action, detail) VALUES (?, ?, ?)',
+                (user_id, action, detail or ''))
+            conn.commit()
+            conn.close()
+        except Exception:
+            pass
+
+    def _temp_token_hash(self, token: str) -> str:
+        return hashlib.sha256(token.encode('utf-8')).hexdigest()
+
+    def _issue_temp_token(self, user_id: int) -> Optional[str]:
+        """Issue (rotate) a temp's API token. Revokes any active token for
+        the temp, stores only the SHA-256 hash, returns the plaintext
+        token ONCE (it cannot be retrieved again). Returns None if the
+        user is not a temp or is discarded."""
+        row = self.get_user_by_id(user_id)
+        if not row or not row.get('is_temp') or row.get('temp_discarded_at'):
+            return None
+        token = self.TEMP_TOKEN_PREFIX + secrets.token_hex(32)
+        conn = sqlite3.connect(self.db_path)
+        cursor = conn.cursor()
+        try:
+            cursor.execute(
+                'UPDATE temp_api_tokens SET revoked_at = CURRENT_TIMESTAMP '
+                'WHERE user_id = ? AND revoked_at IS NULL', (user_id,))
+            cursor.execute(
+                'INSERT INTO temp_api_tokens (user_id, token_hash) VALUES (?, ?)',
+                (user_id, self._temp_token_hash(token)))
+            conn.commit()
+        except Exception:
+            conn.rollback()
+            conn.close()
+            return None
+        conn.close()
+        self._temp_audit(user_id, 'token_issued')
+        return token
+
+    def verify_temp_token(self, token: str) -> Optional[Dict]:
+        """Verify a temp API token. Returns the temp's user dict, or None.
+        The token is scoped to its own temp, is revoked on discard, and
+        is checked on every call. Updates last_used_at on success."""
+        if not token or not token.startswith(self.TEMP_TOKEN_PREFIX):
+            return None
+        conn = sqlite3.connect(self.db_path)
+        conn.row_factory = sqlite3.Row
+        cursor = conn.cursor()
+        cursor.execute(
+            '''SELECT t.user_id FROM temp_api_tokens t
+               JOIN users u ON u.id = t.user_id
+               WHERE t.token_hash = ? AND t.revoked_at IS NULL
+                 AND u.is_temp = 1 AND u.temp_discarded_at IS NULL''',
+            (self._temp_token_hash(token),))
+        row = cursor.fetchone()
+        if not row:
+            conn.close()
+            return None
+        user_id = row[0]
+        cursor.execute(
+            'UPDATE temp_api_tokens SET last_used_at = CURRENT_TIMESTAMP '
+            'WHERE token_hash = ? AND revoked_at IS NULL',
+            (self._temp_token_hash(token),))
+        conn.commit()
+        conn.close()
+        return self.get_user_by_id(user_id)
+
+    def revoke_temp_tokens(self, user_id: int) -> int:
+        """Revoke all active API tokens for a temp. Returns count revoked."""
+        conn = sqlite3.connect(self.db_path)
+        cursor = conn.cursor()
+        cursor.execute(
+            'UPDATE temp_api_tokens SET revoked_at = CURRENT_TIMESTAMP '
+            'WHERE user_id = ? AND revoked_at IS NULL', (user_id,))
+        count = cursor.rowcount
+        conn.commit()
+        conn.close()
+        if count:
+            self._temp_audit(user_id, 'token_revoked', f'revoked={count}')
+        return count
+
+    def create_temp_user(self, email: str, password: str, name: str,
+                         username: str,
+                         created_by_admin_id: int = None
+                         ) -> Tuple[bool, str, Optional[int], Optional[str]]:
+        """Create a temp account (ADMIN-ONLY act, not the public signup
+        route — the 3-per-IP cap does not apply). The temp is an
+        email/password account (bcrypt, existing path) plus the is_temp
+        marker, Free tier, and a per-temp API token issued at creation
+        and returned ONCE. No plaintext password is stored, logged, or
+        printed. Returns (ok, message, user_id, api_token-or-None)."""
+        success, message, user_id = self.create_email_user(
+            email, password, name, username, newsletter_subscribed=False)
+        if not success:
+            return False, message, None, None
+        conn = sqlite3.connect(self.db_path)
+        cursor = conn.cursor()
+        cursor.execute(
+            "UPDATE users SET is_temp = 1, subscription_tier = 'free' WHERE id = ?",
+            (user_id,))
+        conn.commit()
+        conn.close()
+        token = self._issue_temp_token(user_id)
+        if token is None:
+            return False, ('Temp account created but the API token could not '
+                           'be issued — sign in as the temp to rotate one'), user_id, None
+        self._temp_audit(user_id, 'created',
+                         f'created_by_admin={created_by_admin_id}')
+        return True, 'Temp account created', user_id, token
+
+    def get_temp_status(self, user_id: int) -> Optional[Dict]:
+        """Verification status lookup for a temp. Any temp can check its
+        own status (the Lucid design rule: a status lookup, not a hidden
+        gate). Returns None for non-temp accounts."""
+        row = self.get_user_by_id(user_id)
+        if not row or not row.get('is_temp'):
+            return None
+        return {
+            'temp_id': row.get('id'),
+            'user_id': row.get('id'),
+            'email': row.get('email'),
+            'is_temp': True,
+            'state': self.temp_state(row),
+            'email_verified': bool(row.get('email_verified')),
+            'verified_at': row.get('temp_verified_at'),
+            'discarded_at': row.get('temp_discarded_at'),
+            'created_at': row.get('created_at'),
+        }
+
+    def mark_temp_verified(self, user_id: int) -> Tuple[bool, str]:
+        """Mark a temp verified (sets temp_verified_at). Only for temps
+        that are not discarded. Idempotent: already-verified is success."""
+        row = self.get_user_by_id(user_id)
+        if not row or not row.get('is_temp'):
+            return False, 'Not a temp account'
+        if row.get('temp_discarded_at'):
+            return False, 'Temp already discarded'
+        if row.get('temp_verified_at'):
+            return True, 'Temp already verified'
+        conn = sqlite3.connect(self.db_path)
+        cursor = conn.cursor()
+        cursor.execute(
+            'UPDATE users SET temp_verified_at = CURRENT_TIMESTAMP WHERE id = ?',
+            (user_id,))
+        conn.commit()
+        conn.close()
+        self._temp_audit(user_id, 'verified')
+        return True, 'Temp marked verified'
+
+    def discard_temp(self, user_id: int, reason: str = '') -> Tuple[bool, str]:
+        """Discard a temp (Q3 non-destructive default): marks
+        temp_discarded_at, revokes the API token, records the audit.
+        The temp's models/gallery/outputs are PRESERVED — nothing is
+        deleted. Login is refused afterwards (the routes + load_user
+        enforce it). Idempotent: already-discarded is success."""
+        row = self.get_user_by_id(user_id)
+        if not row or not row.get('is_temp'):
+            return False, 'Not a temp account'
+        if row.get('temp_discarded_at'):
+            return True, 'Temp already discarded'
+        conn = sqlite3.connect(self.db_path)
+        cursor = conn.cursor()
+        cursor.execute(
+            'UPDATE users SET temp_discarded_at = CURRENT_TIMESTAMP WHERE id = ?',
+            (user_id,))
+        conn.commit()
+        conn.close()
+        self.revoke_temp_tokens(user_id)
+        self._temp_audit(user_id, 'discarded', reason or '')
+        return True, 'Temp discarded (data preserved)'
+
+    def run_temp_scrape(self) -> Dict:
+        """Daily scrape (Q2: checks email confirmation via the existing
+        6-digit code flow). For each temp not yet discarded:
+          1. if the email is confirmed (email_verified = 1) and the temp
+             is not yet verified -> mark verified;
+          2. if verified and not yet discarded -> discard.
+        The scrape is the job that notices the confirmation and marks
+        the temp verified; discard happens at the scrape run that first
+        finds the temp verified. Returns a summary dict."""
+        conn = sqlite3.connect(self.db_path)
+        conn.row_factory = sqlite3.Row
+        cursor = conn.cursor()
+        cursor.execute(
+            'SELECT id, email_verified, temp_verified_at FROM users '
+            'WHERE is_temp = 1 AND temp_discarded_at IS NULL')
+        temps = [dict(r) for r in cursor.fetchall()]
+        conn.close()
+        summary = {'checked': len(temps), 'newly_verified': 0,
+                   'discarded': 0, 'already_verified': 0, 'errors': []}
+        for t in temps:
+            user_id = t['id']
+            try:
+                if t.get('temp_verified_at'):
+                    summary['already_verified'] += 1
+                elif t.get('email_verified'):
+                    ok, _msg = self.mark_temp_verified(user_id)
+                    if ok:
+                        summary['newly_verified'] += 1
+                    else:
+                        summary['errors'].append(f'{user_id}: verify failed')
+                        continue
+                else:
+                    continue  # not verified yet; leave as temp
+                ok, _msg = self.discard_temp(user_id, reason='daily_scrape')
+                if ok:
+                    summary['discarded'] += 1
+                else:
+                    summary['errors'].append(f'{user_id}: discard failed')
+            except Exception as e:
+                summary['errors'].append(f'{user_id}: {e}')
+        return summary
+
+    def list_temps(self) -> List[Dict]:
+        """All temp accounts with derived state (admin visibility)."""
+        conn = sqlite3.connect(self.db_path)
+        conn.row_factory = sqlite3.Row
+        cursor = conn.cursor()
+        cursor.execute(
+            'SELECT * FROM users WHERE is_temp = 1 ORDER BY created_at DESC')
+        rows = [self._canonical_user_dict(dict(r)) for r in cursor.fetchall()]
+        conn.close()
+        for r in rows:
+            r['temp_state'] = self.temp_state(r)
+        return rows
+
     def generate_verification_code(self, user_id: int) -> Optional[str]:
         """Generate a 6-digit verification code that expires in 10 minutes.
         
@@ -1720,20 +2055,27 @@ The SlushAI Team
         return self._canonical_user_dict(dict(row))
     
     def create_user(self, google_id: str, email: str, name: str, picture: str = '') -> int:
-        """Create a new OAuth user."""
+        """Create a new OAuth user.
+
+        The connection is closed in a finally: on a failed INSERT
+        (e.g. UNIQUE users.email) the old code leaked the connection,
+        and the leaked write lock made the next write on the database
+        fail with "database is locked".
+        """
         conn = sqlite3.connect(self.db_path)
-        cursor = conn.cursor()
-        
-        cursor.execute('''
-            INSERT INTO users (google_id, email, name, avatar_url, email_verified)
-            VALUES (?, ?, ?, ?, 1)
-        ''', (google_id, email, name, picture))
-        
-        user_id = cursor.lastrowid
-        conn.commit()
-        conn.close()
-        
-        return user_id
+        try:
+            cursor = conn.cursor()
+
+            cursor.execute('''
+                INSERT INTO users (google_id, email, name, avatar_url, email_verified)
+                VALUES (?, ?, ?, ?, 1)
+            ''', (google_id, email, name, picture))
+
+            user_id = cursor.lastrowid
+            conn.commit()
+            return user_id
+        finally:
+            conn.close()
     
     def update_user(self, user_id: int, updates: Dict) -> bool:
         """Update user information."""
