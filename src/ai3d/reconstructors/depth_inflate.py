@@ -31,11 +31,68 @@ def _otsu_threshold(img: np.ndarray) -> float:
     return float(threshold)
 
 
+def _otsu_subject_mask(gray: np.ndarray, thr: float) -> Tuple[np.ndarray, np.ndarray]:
+    """Split an opaque image into SUBJECT (mask 1) and BACKGROUND (mask 0).
+
+    The background is the side of the Otsu split that contains the image
+    border: the border is background unless the subject touches the frame.
+    Height is the distance from the BACKGROUND level, in the subject
+    direction, normalised over subject pixels: 0 at the background
+    level, 1 at the most subject-like pixel. (Anchoring at the
+    background level, not at the split, matters: Otsu lands the split
+    ON a flat subject's own grey level, which would flatten the whole
+    relief to zero.)
+
+    This works for BOTH polarities, because the polarity is derived from
+    the image itself, not assumed:
+      - dark subject on a light background: subject = dark side, height
+        grows as luminance drops below the background level;
+      - light subject on a dark background: subject = bright side, height
+        grows as luminance rises above the background level.
+
+    The old code assumed bright = keep/high, which kept the background
+    and deleted the subject whenever the subject was the darker side
+    (Gary, 2026-11-12: "clearly youv got something inverted and wrong").
+
+    Returns (mask uint8, height01 float32 in [0, 1]).
+    """
+    bright = gray > thr
+    border = np.concatenate([gray[0, :], gray[-1, :], gray[:, 0], gray[:, -1]])
+    border_bright_frac = float((border > thr).mean())
+    if border_bright_frac > 0.75:
+        bg_is_bright = True  # border is (almost) all bright -> background is bright
+        bg_level = float(np.median(border))
+    elif border_bright_frac < 0.25:
+        bg_is_bright = False  # border is (almost) all dark -> background is dark
+        bg_level = float(np.median(border))
+    else:
+        # Subject touches the frame (or no clear border): the background
+        # is the larger Otsu class, and its level is that class's mean.
+        bg_is_bright = bool(bright.mean() > 0.5)
+        bg_level = float(gray[bright].mean()) if bg_is_bright else float(gray[~bright].mean())
+    if bg_is_bright:
+        mask = (~bright).astype(np.uint8)  # subject = dark side
+        dist = np.clip(bg_level - gray, 0, None)  # distance from background
+    else:
+        mask = bright.astype(np.uint8)  # subject = bright side
+        dist = np.clip(gray - bg_level, 0, None)
+    if (mask > 0).any():
+        peak = float(dist[mask > 0].max())
+    else:
+        peak = 0.0
+    height01 = dist / peak if peak > 1e-6 else np.zeros_like(dist)
+    return mask, height01.astype(np.float32)
+
+
 class DepthInflationRunner:
     """
     Native, original preview reconstructor.
     Builds a mesh by treating image intensity as height (depth) and triangulating a grid.
     This is a simple, explainable baseline you own entirely.
+
+    The mesh is a raised relief OF THE SUBJECT: the subject region is kept
+    and lifted, the background region is dropped. Polarity (which side is
+    the subject) is derived from the image border, never assumed.
     """
 
     def run(self, image_path: str, out_obj: str, grid_step: int = 4, z_scale: float = 0.3) -> Tuple[bool, str]:
@@ -53,19 +110,35 @@ class DepthInflationRunner:
             # Height from luminance
             gray = ImageOps.grayscale(im)
             gray = gray.filter(ImageFilter.GaussianBlur(radius=1.0))
-            h = np.array(gray, dtype=np.float32)
+            g = np.array(gray, dtype=np.float32)
 
-            # Normalize heights to [-0.5, 0.5]
-            h = (h - h.min()) / max(1e-6, (h.max() - h.min()))
-            h = (h - 0.5) * (2 * z_scale)
-
-            # Optional mask from alpha or Otsu
+            # Subject mask + height, polarity derived from the image.
             alpha = np.array(im.split()[-1])
-            if alpha.std() < 1e-3:  # no alpha, compute simple Otsu
-                thr = _otsu_threshold(np.array(gray))
-                mask = (np.array(gray) > thr).astype(np.uint8)
+            if alpha.std() < 1e-3:  # no alpha: Otsu split, background anchored to the border
+                thr = _otsu_threshold(g)
+                mask, height01 = _otsu_subject_mask(g, thr)
+                if mask.mean() < 0.01:
+                    # No detectable subject (solid / gradient image): fall
+                    # back to the whole image as the subject, as before.
+                    mask = np.ones_like(mask)
+                    lo = g.min()
+                    hi = g.max()
+                    height01 = (g - lo) / max(1e-6, hi - lo)
             else:
+                # Transparency defines the subject directly.
                 mask = (alpha > 8).astype(np.uint8)
+                opaque = mask > 0
+                height01 = np.zeros_like(g)
+                if opaque.any():
+                    # Normalise within the opaque region only, so the
+                    # transparent (black) pixels cannot skew the relief.
+                    lo = g[opaque].min()
+                    hi = g[opaque].max()
+                    height01[opaque] = (g[opaque] - lo) / max(1e-6, hi - lo)
+
+            # Heights in [-z_scale, +z_scale]: background at the base plane,
+            # most subject-like pixel at the top of the relief.
+            h = (height01 - 0.5) * (2 * z_scale)
 
             H, W = h.shape
             xs = np.arange(0, W, grid_step, dtype=np.int32)
