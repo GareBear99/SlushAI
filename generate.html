@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SlushAI — Generate a 3D mesh in your browser (no server)</title>
+<style>
+  body { background: #0b0b10; color: #e8e8ef; font-family: system-ui, sans-serif; margin: 0; padding: 24px; }
+  h1 { font-size: 22px; margin: 0 0 4px; }
+  p.sub { color: #9a9ab0; margin: 0 0 18px; max-width: 720px; }
+  .row { display: flex; gap: 12px; flex-wrap: wrap; align-items: center; margin: 12px 0; }
+  button { background: #2a2a3a; color: #fff; border: 1px solid #55556a; border-radius: 8px; padding: 10px 16px; font-size: 15px; cursor: pointer; }
+  button:disabled { opacity: 0.45; cursor: default; }
+  button.primary { background: #5b4bc4; border-color: #7a6ae0; }
+  #bar-wrap { background: #1c1c28; border-radius: 6px; height: 10px; overflow: hidden; max-width: 720px; }
+  #bar { height: 100%; width: 0%; background: #5b4bc4; transition: width .2s; }
+  #stage { color: #c9c9de; margin: 8px 0; min-height: 20px; }
+  #log { background: #101018; border: 1px solid #26263a; border-radius: 8px; padding: 12px; height: 180px; overflow: auto; white-space: pre-wrap; font-family: monospace; font-size: 12px; max-width: 720px; }
+  #preview { border: 1px solid #26263a; border-radius: 8px; background: #0b0b10; cursor: grab; }
+  .note { color: #9a9ab0; font-size: 13px; max-width: 720px; }
+  #thumb { max-height: 120px; border-radius: 8px; border: 1px solid #26263a; }
+</style>
+</head>
+<body>
+<h1>SlushAI — generate a 3D mesh in your browser</h1>
+<p class="sub">TripoSR image-to-3D, running entirely on your device with ONNX Runtime Web.
+No server, no upload, no account. The model weights (~690 MB) download once and are
+cached by your browser. Generation takes about 2–4 minutes on a desktop CPU.</p>
+
+<div class="row">
+  <input type="file" id="file" accept="image/*">
+  <button id="example">Use the example chair</button>
+  <img id="thumb" alt="" style="display:none">
+</div>
+<div class="row">
+  <button id="load" class="primary">1. Load models (~690 MB)</button>
+  <button id="go" class="primary" disabled>2. Generate mesh</button>
+  <button id="dl-glb" disabled>Download GLB</button>
+  <button id="dl-obj" disabled>Download OBJ</button>
+</div>
+<div id="bar-wrap"><div id="bar"></div></div>
+<div id="stage">Models not loaded yet.</div>
+<pre id="log"></pre>
+<div class="row"><canvas id="preview" width="640" height="480"></canvas></div>
+<p class="note">Draft quality: TripoSR is a working generator with a real back (a closed mesh),
+not the immaculate one — topology can be chaotic and details blurred. The upgrade path is
+SF3D, then TripoSG. Background removal is not in this page yet: use an image with a clean
+background (a transparent PNG works best; its stored RGB is used, alpha ignored). Drag the
+preview to rotate. The mesh is yours to keep — feed the GLB back into SlushAI for remesh
+and PBR texturing.</p>
+
+<script src="triposr/ort/ort.all.min.js"></script>
+<script src="triposr/mc.js"></script>
+<script src="triposr/triposr.js"></script>
+<script>
+(function () {
+  var T = window.SlushAITripoSR;
+  var logEl = document.getElementById('log');
+  var barEl = document.getElementById('bar');
+  var stageEl = document.getElementById('stage');
+  T.bindLog(logEl, barEl, stageEl);
+  var fileInput = document.getElementById('file');
+  var thumb = document.getElementById('thumb');
+  var currentImage = null;
+  var modelsLoaded = false;
+
+  function setImage(img) {
+    currentImage = img;
+    thumb.src = img.src;
+    thumb.style.display = '';
+    document.getElementById('go').disabled = !modelsLoaded;
+  }
+  fileInput.addEventListener('change', function () {
+    var f = fileInput.files[0];
+    if (!f) return;
+    var img = new Image();
+    img.onload = function () { setImage(img); };
+    img.src = URL.createObjectURL(f);
+  });
+  document.getElementById('example').addEventListener('click', function () {
+    var img = new Image();
+    img.onload = function () { setImage(img); };
+    img.src = 'triposr/example-chair.png';
+  });
+
+  document.getElementById('load').addEventListener('click', function () {
+    var btn = document.getElementById('load');
+    btn.disabled = true;
+    stageEl.textContent = 'Loading models…';
+    T.loadSessions().then(function () {
+      modelsLoaded = true;
+      stageEl.textContent = 'Models loaded. Pick an image and generate.';
+      document.getElementById('go').disabled = !currentImage;
+    }).catch(function (e) {
+      stageEl.textContent = 'Model load failed: ' + e.message;
+      btn.disabled = false;
+      console.error(e);
+    });
+  });
+
+  document.getElementById('go').addEventListener('click', function () {
+    if (!currentImage) return;
+    var btn = document.getElementById('go');
+    btn.disabled = true;
+    document.getElementById('dl-glb').disabled = true;
+    document.getElementById('dl-obj').disabled = true;
+    T.generate(currentImage).then(function () {
+      T.drawPreview(document.getElementById('preview'));
+      document.getElementById('dl-glb').disabled = false;
+      document.getElementById('dl-obj').disabled = false;
+      btn.disabled = false;
+    }).catch(function (e) {
+      stageEl.textContent = 'Generation failed: ' + e.message;
+      btn.disabled = false;
+      console.error(e);
+    });
+  });
+
+  function download(blob, name) {
+    var a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = name;
+    a.click();
+    setTimeout(function () { URL.revokeObjectURL(a.href); }, 5000);
+  }
+  document.getElementById('dl-glb').addEventListener('click', function () {
+    download(T.exportGLB(T.lastMesh), 'slushai-triposr.glb');
+  });
+  document.getElementById('dl-obj').addEventListener('click', function () {
+    download(T.exportOBJ(T.lastMesh), 'slushai-triposr.obj');
+  });
+
+  // Drag to rotate the preview.
+  var canvas = document.getElementById('preview');
+  var dragging = false, lx = 0, ly = 0;
+  canvas.addEventListener('pointerdown', function (e) { dragging = true; lx = e.clientX; ly = e.clientY; canvas.setPointerCapture(e.pointerId); });
+  canvas.addEventListener('pointermove', function (e) {
+    if (!dragging) return;
+    T.preview.rotY += (e.clientX - lx) * 0.01;
+    T.preview.rotX += (e.clientY - ly) * 0.01;
+    lx = e.clientX; ly = e.clientY;
+    T.drawPreview(canvas);
+  });
+  canvas.addEventListener('pointerup', function () { dragging = false; });
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,101 @@
+{
+  "chunk_bytes": 50331648,
+  "models": {
+    "dino": {
+      "file": "triposr_dino.onnx",
+      "bytes": 343527056,
+      "sha256": "7c49114643acd48b7c91b3646870c02850e5ffe3e4f85ea0aece709c44b9d35b",
+      "chunks": [
+        {
+          "file": "chunk-0000.bin",
+          "bytes": 50331648,
+          "sha256": "7c6b0b961381e55da359f03f2c1d651f7c50f2fadb68df6959242a79d6255e61"
+        },
+        {
+          "file": "chunk-0001.bin",
+          "bytes": 50331648,
+          "sha256": "68c46b74162ba39d2bd7c3440e1f66fb1a8512669bfb01e66e9744cd86017615"
+        },
+        {
+          "file": "chunk-0002.bin",
+          "bytes": 50331648,
+          "sha256": "19494df5e745965cde230c6f35f11d8a7c30d91e40f7f0a62e51ce60288889dd"
+        },
+        {
+          "file": "chunk-0003.bin",
+          "bytes": 50331648,
+          "sha256": "8a82c7e1b0b368159f9b300faee26d3c4ed22c1cc6e90be4dc847acbbd0e5d2b"
+        },
+        {
+          "file": "chunk-0004.bin",
+          "bytes": 50331648,
+          "sha256": "740833996e4b707408a6ec6b0c53eb829ade6fa41c0c02a07ea3464f03433eed"
+        },
+        {
+          "file": "chunk-0005.bin",
+          "bytes": 50331648,
+          "sha256": "7fbce996b0294564f71d4fe6bdcef507e9973f776b2ce2c079bb93627172d2f7"
+        },
+        {
+          "file": "chunk-0006.bin",
+          "bytes": 41537168,
+          "sha256": "6a85a48fa6130e9c49c2088acb46ffbbbf8e876e9e91df079f21413d3cd1c326"
+        }
+      ]
+    },
+    "triplane": {
+      "file": "triposr_triplane_pc.onnx",
+      "bytes": 349305940,
+      "sha256": "31fc2044b43eba9a08adf663973d4b132bd6d70db2b04e8c43db7ebf5e4632c8",
+      "chunks": [
+        {
+          "file": "chunk-0000.bin",
+          "bytes": 50331648,
+          "sha256": "0cfa6580d5bbccf4f85d57f097d1526746de16976ace45cea72da0f190e9162b"
+        },
+        {
+          "file": "chunk-0001.bin",
+          "bytes": 50331648,
+          "sha256": "4c013a4c3bb4304c227129017e75ddabbb86adadcda4d51ff984525722cf7686"
+        },
+        {
+          "file": "chunk-0002.bin",
+          "bytes": 50331648,
+          "sha256": "52222be6329d8dad2da22b2c49bc5fa6ebe50b223412742af7e28edb4ee366a0"
+        },
+        {
+          "file": "chunk-0003.bin",
+          "bytes": 50331648,
+          "sha256": "4f3bd9b3c68c246cad8d185247d38d5d753819d4663890e50749ce1cb7dc10ad"
+        },
+        {
+          "file": "chunk-0004.bin",
+          "bytes": 50331648,
+          "sha256": "3562342868d8845bdd42bc2a25c3767d5c60b8a0895cfab9755a44f5bf833820"
+        },
+        {
+          "file": "chunk-0005.bin",
+          "bytes": 50331648,
+          "sha256": "d183bc2ffad8e69903737569847e4b779b2e2d969404c7dc3ad5f4ba5f7a5ee2"
+        },
+        {
+          "file": "chunk-0006.bin",
+          "bytes": 47316052,
+          "sha256": "99dd6708d82a52db740ebffabf18b20991b914201b11148f4fd4b489d80f09d5"
+        }
+      ]
+    },
+    "decoder": {
+      "file": "triposr_decoder.onnx",
+      "bytes": 180033,
+      "sha256": "2edb7f5df88b89d09e7a19b390a79d3b6e19c528fea869956f52880b6eb09f1c",
+      "chunks": [
+        {
+          "file": "chunk-0000.bin",
+          "bytes": 180033,
+          "sha256": "2edb7f5df88b89d09e7a19b390a79d3b6e19c528fea869956f52880b6eb09f1c"
+        }
+      ]
+    }
+  }
+}
