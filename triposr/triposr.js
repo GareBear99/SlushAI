@@ -64,7 +64,7 @@
   }
 
   function loadSessions(onProgress) {
-    ort.env.wasm.wasmPaths = './triposr/ort/';
+    ort.env.wasm.wasmPaths = '/SlushAI/triposr/ort/';
     ort.env.wasm.numThreads = Math.min(4, (navigator.hardwareConcurrency || 4));
     return fetch(MODEL_DIR + 'manifest.json').then(function (r) { return r.json(); })
       .then(function (manifest) {
